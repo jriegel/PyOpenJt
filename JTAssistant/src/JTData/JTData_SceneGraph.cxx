@@ -196,7 +196,7 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
     // handle late loaded properties
     auto metaData = HandleLateLoadsMeta(aLateLoaded);
     std::stringstream tempOut;
-    writeKeyValueStream(metaData, tempOut);
+    writeKeyValueStream(metaData, tempOut, 0);
     aResult->Properties = tempOut.str().c_str();
 
     // set the layer in part node

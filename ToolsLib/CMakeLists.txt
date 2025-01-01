@@ -28,6 +28,7 @@ set (ProjectSources
 	src/JtLayer.cpp 
 	src/JtUsdMesh.cpp 
 	src/JtGltfMesh.cpp
+	src/JtUtils.cpp
 )
 
 #file (GLOB_RECURSE ProjectHeaders src/*.h)
@@ -36,6 +37,7 @@ set (ProjectHeaders
 	src/JtLayer.h 
 	src/JtUsdMesh.h 
 	src/JtGltfMesh.h 
+	src/JtUtils.h
 )
 
 if(WIN32)

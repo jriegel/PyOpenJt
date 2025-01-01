@@ -1,4 +1,4 @@
-# This script configures project for JtTools.
+# This script configures project for JtDump.
 #
 
 

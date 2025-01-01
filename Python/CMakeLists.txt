@@ -1,10 +1,40 @@
+
+
+
+
+
+
+find_package(Python3 COMPONENTS Development REQUIRED)
+find_package(OpenCASCADE 	CONFIG 	REQUIRED)
+
 if(MSVC)
     #add_definitions(-D_3DLIFE_BUILD_)
 else(MSVC)
     add_definitions(-Wno-write-strings)
 endif(MSVC)
 
-find_package(Python3 COMPONENTS Development REQUIRED)
+
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+get_target_property (TKJT_INCLUDE_DIRS TKJT INTERFACE_INCLUDE_DIRECTORIES)
+get_target_property (ToolsLib_INCLUDE_DIRS ToolsLib INTERFACE_INCLUDE_DIRECTORIES)
+
+add_definitions (-DTKJT_CERRTRACING)
+
+if(WIN32)
+  add_definitions (-DWNT -DWINVER=0x0500)
+else()
+  add_definitions (-fexceptions -fPIC -DOCC_CONVERT_SIGNALS)
+endif()
+
+# Suppression of 3rdparty warnings in MSVC with #pragma warnings (disable)
+if(MSVC)
+  add_definitions (/wd4718)
+else()
+  add_definitions (-Wno-unknown-pragmas)
+endif()
+
 
    
 include_directories(
@@ -23,7 +53,17 @@ add_library(PyOpenJt SHARED
     JtFileObject.cpp
 )
 
-target_link_libraries(PyOpenJt PRIVATE Python3::Python TKJT ToolsLib)
+add_dependencies (PyOpenJt TKJT)
+add_dependencies (PyOpenJt ToolsLib)
+
+
+target_link_libraries(PyOpenJt PRIVATE 
+    Python3::Python 
+    TKJT 
+    ToolsLib
+    TKernel TKMath TKXSBase
+)
+target_include_directories (PyOpenJt PUBLIC ${OpenCASCADE_INCLUDE_DIR} )
 
 if(MSVC)
 	set_target_properties(PyOpenJt PROPERTIES SUFFIX ".pyd")

@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& os, const TCollection_ExtendedString& ext
 enum dumpConfig {
 	dump_TOC = 1,
 	dump_LOD0 = 2,
-
+	dump_Mesh = 4,
 	dump_all  = INT_MAX
 };
 
@@ -26,10 +26,10 @@ int writeModel(Handle(JtData_Model) model, std::ostream& out, int indent = 0, in
 
 //int writePart(Handle(JtNode_Partition) model, std::ostream& out, int indent = 0, int config = 0);
 
-int writeMetaData(Handle(JtNode_MetaData) model, std::ostream& out, int indent = 0, int config = 0);
+//int writeMetaData(Handle(JtNode_MetaData) model, std::ostream& out, int indent = 0, int config = 0);
 
 
-int writeKeyValueStream(const std::vector<char> &stream, std::ostream& out, int indent = 0, int config = 0);
+int writeKeyValueStream(const std::vector<char> &stream, std::ostream& out, int indent = 0);
 
 
 struct indentOp {
@@ -44,3 +44,13 @@ inline std::ostream& operator<<(std::ostream& stream, const indentOp& val) {
 		stream << '\t';
 	return stream;
 }
+
+void WriteMeshesWithoutLSG(dumpConfig config, std::ostream& outStream, Handle(JtData_Model) rootModel, const std::string& fileName);
+
+void RecurseDownTheTree(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix);
+
+void HandleAttributes(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord);
+
+void HandleAllChildren(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix);
+
+
