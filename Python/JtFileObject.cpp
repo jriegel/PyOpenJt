@@ -29,7 +29,7 @@ JtFile_getFileName(JtFileObject *self, void *)
 
 int JtFile_setFileName(JtFileObject* self, PyObject* value, void* closure)
 {
-    self->FileName = PyUnicode_AsUTF8(value);
+    self->FileName = PyUnicode_AsUTF8AndSize(value,0);
     if (PyErr_Occurred()) {
         PyErr_SetString(PyExc_ValueError, "Parameter have to be Unicode string!");
         return -1;

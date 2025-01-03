@@ -1,10 +1,15 @@
 
 
 
-
-
+# Try to find the stable ABI for linking
+#set (Python3_FIND_ABI "ANY" "ANY" "ANY" "ANY")
 
 find_package(Python3 COMPONENTS Development REQUIRED)
+
+ message(STATUS "******** PYTHON3_VERSION ${Python3_VERSION}")
+ message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+ message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
+
 find_package(OpenCASCADE 	CONFIG 	REQUIRED)
 
 if(MSVC)
@@ -35,7 +40,6 @@ else()
   add_definitions (-Wno-unknown-pragmas)
 endif()
 
-
    
 include_directories(
     ${CMAKE_SOURCE_DIR}/TKJT/src/
@@ -52,6 +56,8 @@ add_library(PyOpenJt SHARED
 	PyOpenJt.cpp
     JtFileObject.cpp
 )
+# use stable ABI of 3.7
+#target_compile_definitions(PyOpenJt PUBLIC -DPy_LIMITED_API=0x030A0000)
 
 add_dependencies (PyOpenJt TKJT)
 add_dependencies (PyOpenJt ToolsLib)
@@ -77,8 +83,8 @@ set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY         ${CMA
 set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release/lib)
 set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/lib)
 set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${CMAKE_BINARY_DIR}/Debug/lib)
-set_target_properties(PyOpenJt PROPERTIES OUTPUT_NAME bca)
-set_target_properties(PyOpenJt PROPERTIES DEBUG_OUTPUT_NAME bca_d)
+set_target_properties(PyOpenJt PROPERTIES OUTPUT_NAME PyOpenJt)
+set_target_properties(PyOpenJt PROPERTIES DEBUG_OUTPUT_NAME PyOpenJt_d)
 set_target_properties(PyOpenJt PROPERTIES PREFIX "")
 
 

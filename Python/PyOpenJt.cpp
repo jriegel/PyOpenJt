@@ -3,7 +3,7 @@
 #include <Python.h>
 #include <string>
 
-static PyObject *HashLife3DError;
+static PyObject *PyOpenJtError;
 
 
 // forwards of the addition of class handlers
@@ -48,7 +48,7 @@ static PyMethodDef PyOpenJt_Methods[] = {
 
 static struct PyModuleDef PyOpenJt_Module = {
     PyModuleDef_HEAD_INIT,
-    "bca",   /* name of module */
+    "PyOpenJt",   /* name of module */
     NULL , /* module documentation, may be NULL */
     -1,       /* size of per-interpreter state of the module,
               or -1 if the module keeps state in global variables. */
@@ -57,21 +57,21 @@ static struct PyModuleDef PyOpenJt_Module = {
 };
 
 PyMODINIT_FUNC
-PyInit_bca(void)
+PyInit_PyOpenJt(void)
 {
     PyObject *module;
 
     module = PyModule_Create(&PyOpenJt_Module);
     if (module == NULL)
         return NULL;
-    HashLife3DError = PyErr_NewException("3DLife.error", NULL, NULL);
-    Py_INCREF(HashLife3DError);
-    PyModule_AddObject(module, "error", HashLife3DError);
+    PyOpenJtError = PyErr_NewException("3DLife.error", NULL, NULL);
+    Py_INCREF(PyOpenJtError);
+    PyModule_AddObject(module, "error", PyOpenJtError);
 
     // add the JT file class
     addJtFileClass(module);
 
  
-    return module;
+    return module; 
 }
 
