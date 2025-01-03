@@ -130,7 +130,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
   }
 
   char guidBuf[100]; anLSGSegmentGUID.ToString(guidBuf);
-  cerr << "LSG Guid:" << guidBuf << '\n';
+  //cerr << "LSG Guid:" << guidBuf << '\n';
 
   // Read TOC
   if (!readTOC(aFile, aTOCOffset))
@@ -224,7 +224,7 @@ Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_I32 theO
 
     const Standard_Integer aType = (aAttrib >> 24) & 0xFF;
 
-    cerr << "TOC Entry: GUID:" << guidBuf << " Type:"<< aType << " LowerBits:" << lowerBits << " Offsett:" << aOffset << " Length : " << aLength << " Attribute : " << aAttrib << '\n';
+    //cerr << "TOC Entry: GUID:" << guidBuf << " Type:"<< aType << " LowerBits:" << lowerBits << " Offsett:" << aOffset << " Length : " << aLength << " Attribute : " << aAttrib << '\n';
 
     if (aTypeMap.IsBound(aType))
       aTypeMap.ChangeFind(aType)++;

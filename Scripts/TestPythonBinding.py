@@ -2,23 +2,10 @@ import sys, os
 print (os.getcwd())
 sys.path.append("~/lib")
 sys.path.append(os.getcwd() + "/../WinBuild/Debug")
-import bca
-bca.init()
-w = bca.World(0)
-w.count
+import PyOpenJt
 
-bca.getStatistic("NodeCount")
+f = PyOpenJt.JtFile(os.getcwd()+"/../Data/ExampleFiles/example_block_jt9.5.jt")
 
-w.getBit(0,0,0);nw = w.setBit(0,0,0);w.getBit(0,0,0);w.count
+f.FileName = os.getcwd()+"/../Data/ExampleFiles/example_block_jt9.5.jt"
+f.open()
 
-bca.getStatistic("WorldCount")
-def main():
-    bca.setValue("test","hallo")
-    print (bcapy.getValue("test"))
-    
-bca.runSelfTest()
-
-
-
-if __name__ == "__main__":
-    main()

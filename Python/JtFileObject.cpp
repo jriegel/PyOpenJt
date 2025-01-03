@@ -46,8 +46,21 @@ static PyGetSetDef JtFile_getseters[] = {
 
 
 
-static PyObject *
-JtFile_init(JtFileObject *self, PyObject *args, PyObject *)
+static int
+JtFile_init(JtFileObject* self, PyObject* args, PyObject*)
+{
+    char* value;
+    if (!PyArg_ParseTuple(args, "s", &value)) {
+        return -1;
+    }
+
+    self->FileName = value;
+
+    return 0;
+}
+
+static PyObject*
+JtFile_open(JtFileObject* self, PyObject* args, PyObject*)
 {
 
     Py_BEGIN_ALLOW_THREADS;
@@ -61,14 +74,17 @@ JtFile_init(JtFileObject *self, PyObject *args, PyObject *)
 
     Py_END_ALLOW_THREADS;
 
-    if (self->rootModel.IsNull() || self->PartitionNode.IsNull())
+    if (self->rootModel.IsNull() || self->PartitionNode.IsNull()) {
+        Py_INCREF(Py_False);
         return Py_False;
+    }
 
+    Py_INCREF(Py_True);
     return Py_True;
 }
 
 static PyMethodDef JtFile_methods[] = {
-    { "init", (PyCFunction)JtFile_init, METH_VARARGS | METH_KEYWORDS ,"Open the file and read the LSG" },
+    { "open", (PyCFunction)JtFile_open, METH_VARARGS | METH_KEYWORDS ,"Open the file and read the LSG" },
     { NULL }  /* Sentinel */
 };
 
@@ -137,7 +153,7 @@ void addJtFileClass(PyObject * module)
 	if (PyType_Ready(&JtFileClassType) < 0)
 		return;
 	Py_INCREF(&JtFileClassType);
-	PyModule_AddObject(module, "World", (PyObject *)&JtFileClassType);
+	PyModule_AddObject(module, "JtFile", (PyObject *)&JtFileClassType);
 }
 
 
