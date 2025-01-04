@@ -19,7 +19,7 @@ using namespace std;
 #include "tiny_gltf.h"
 
 
-void writeGltfMesh(Handle(JtElement_ShapeLOD_Vertex) vertexElement, std::string name)
+void writeTestGltfMesh( std::string name)
 {
     // Create a model with a single mesh and save it as a gltf file
     tinygltf::Model m;
@@ -117,5 +117,13 @@ void writeGltfMesh(Handle(JtElement_ShapeLOD_Vertex) vertexElement, std::string 
         true, // embedBuffers
         true, // pretty print
         false); // write binary
+
+}
+
+
+void RecurseDownTheTreeGlTf(const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix)
+{
+
+
 
 }

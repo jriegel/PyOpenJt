@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
             WriteMeshesWithoutLSG(dumpConfig::dump_all ,*outStream, rootModel, fileName);
         }
         else {
-            RecurseDownTheTree(dumpConfig::dump_all, indention, *outStream, PartitionNode, fileName);
+            RecurseDownTheTreeJson(dumpConfig::dump_all, indention, *outStream, PartitionNode, fileName);
         }
 
         indention--;

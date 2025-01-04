@@ -1,11 +1,16 @@
 
 #include <Python.h>
 #include <string>
+#include <sstream>      // std::stringstream
 
 #include <JtData_Model.hxx>
 #include <JtNode_Base.hxx>
 #include <JtNode_Partition.hxx>
 
+#include <JtData2Json.h>
+#include <JtGltfMesh.h>
+
+using namespace std;
 
 const char* JtFile_doc = "Object representing an open JT file";
 extern PyTypeObject JtFileClassType;
@@ -27,7 +32,7 @@ JtFile_getFileName(JtFileObject *self, void *)
     return  PyUnicode_FromString(self->FileName.c_str());
 }
 
-int JtFile_setFileName(JtFileObject* self, PyObject* value, void* closure)
+int JtFile_setFileName(JtFileObject* self, PyObject* value, void* )
 {
     self->FileName = PyUnicode_AsUTF8AndSize(value,0);
     if (PyErr_Occurred()) {
@@ -60,7 +65,7 @@ JtFile_init(JtFileObject* self, PyObject* args, PyObject*)
 }
 
 static PyObject*
-JtFile_open(JtFileObject* self, PyObject* args, PyObject*)
+JtFile_open(JtFileObject* self, PyObject* , PyObject*)
 {
 
     Py_BEGIN_ALLOW_THREADS;
@@ -83,8 +88,63 @@ JtFile_open(JtFileObject* self, PyObject* args, PyObject*)
     return Py_True;
 }
 
+static PyObject*
+JtFile_json(JtFileObject* self, PyObject* , PyObject*)
+{
+    if (self->rootModel.IsNull() || self->PartitionNode.IsNull())
+        return PyUnicode_FromStringAndSize("", 1);
+
+    std::stringstream outStream;
+    int indention = 0;
+    int outFilter = dumpConfig::dump_all;
+ 
+    Py_BEGIN_ALLOW_THREADS;
+
+    outStream << "{\n";
+    indention++;
+
+
+    writeModel(self->rootModel, outStream, indention, outFilter);
+
+    RecurseDownTheTreeJson(dumpConfig::dump_all, indention, outStream, self->PartitionNode, "");
+
+    indention--;
+    outStream << '}' << endl;
+
+    Py_END_ALLOW_THREADS;
+
+    return PyUnicode_FromStringAndSize(outStream.str().c_str(), outStream.str().size());
+}
+
+static PyObject*
+JtFile_writeGlTf(JtFileObject* self, PyObject* args , PyObject*)
+{
+    if (self->rootModel.IsNull() || self->PartitionNode.IsNull())
+        return PyUnicode_FromStringAndSize("", 1);
+
+    char* value;
+    if (!PyArg_ParseTuple(args, "s", &value)) {
+        Py_INCREF(Py_False);
+        return Py_False;
+    }
+   
+ 
+    Py_BEGIN_ALLOW_THREADS;
+
+
+    RecurseDownTheTreeGlTf( self->PartitionNode, "");
+
+    Py_END_ALLOW_THREADS;
+
+    Py_INCREF(Py_True);
+    return Py_True;
+}
+
+
 static PyMethodDef JtFile_methods[] = {
     { "open", (PyCFunction)JtFile_open, METH_VARARGS | METH_KEYWORDS ,"Open the file and read the LSG" },
+    { "json", (PyCFunction)JtFile_json, METH_VARARGS | METH_KEYWORDS ,"Get the content of the Jt-File as JSON" },
+    { "writeGlTf", (PyCFunction)JtFile_writeGlTf, METH_VARARGS | METH_KEYWORDS ,"Get the content of the Jt-File as JSON" },
     { NULL }  /* Sentinel */
 };
 

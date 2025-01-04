@@ -197,7 +197,7 @@ void WriteMeshesWithoutLSG(dumpConfig config, std::ostream& outStream, Handle(Jt
 
 }
 
-void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix)
+void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix)
 {
 
     // Handle all different types of LSG Nodes
@@ -211,8 +211,8 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
         outStream << indentOp(indention) << "\"jt_type\":\"Partition\",\n";
         outStream << indentOp(indention) << "\"name\":\"" << theNodeRecord->Name() << "\",\n";
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
-        HandleAllChildren(config, indention, outStream, aPartitionRecord, thePrefix);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
+        HandleAllChildrenJson(config, indention, outStream, aPartitionRecord, thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -248,8 +248,8 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
             outStream << "],\n";
         }
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
-        HandleAllChildren(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
+        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -295,8 +295,8 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
             outStream << indentOp(indention) << "\"active-layer-filter\":\"" << layerInfo.ActiveLayerFilter << "\",\n";
         }
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
-        HandleAllChildren(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
+        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -329,8 +329,8 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
         }
         outStream << "],\n";
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
-        HandleAllChildren(config, indention, outStream, aRangeLODRecord, thePrefix);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
+        HandleAllChildrenJson(config, indention, outStream, aRangeLODRecord, thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -343,8 +343,8 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
         outStream << indentOp(indention) << "\"jt_type\":\"LOD\",\n";
         outStream << indentOp(indention) << "\"name\":\"" << theNodeRecord->Name() << "\",\n";
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
-        HandleAllChildren(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
+        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -357,8 +357,8 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
         outStream << indentOp(indention) << "\"jt_type\":\"Group\",\n";
         outStream << indentOp(indention) << "\"name\":\"" << theNodeRecord->Name() << "\",\n";
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
-        HandleAllChildren(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
+        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -373,11 +373,11 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
         outStream << indentOp(indention) << "\"name\":\"" << theNodeRecord->Name() << "\",\n";
 
 
-        HandleAttributes(config, indention, outStream, theNodeRecord);
+        HandleAttributesJson(config, indention, outStream, theNodeRecord);
 
         Handle(JtNode_Base) aNode = Handle(JtNode_Base)::DownCast(anInstance->Object());
         outStream << indentOp(indention) << "\"InstancedObject\":\n";
-        RecurseDownTheTree(config, indention, outStream, aNode, thePrefix);
+        RecurseDownTheTreeJson(config, indention, outStream, aNode, thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
@@ -504,7 +504,7 @@ void RecurseDownTheTree(dumpConfig config, int & indention, std::ostream& outStr
 }
 
 
-void HandleAttributes(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord)
+void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord)
 {
     // Extract attributes
 
@@ -571,7 +571,7 @@ void HandleAttributes(dumpConfig config, int& indention, std::ostream& outStream
 
 }
 
-void HandleAllChildren(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix)
+void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix)
 {
     if (theGroupRecord->Children().IsEmpty())
         return;
@@ -597,7 +597,7 @@ void HandleAllChildren(dumpConfig config, int& indention, std::ostream& outStrea
             continue;
         }
 
-        RecurseDownTheTree(config, indention, outStream, aChildRecord, thePrefix);
+        RecurseDownTheTreeJson(config, indention, outStream, aChildRecord, thePrefix);
     }
 
     indention--;

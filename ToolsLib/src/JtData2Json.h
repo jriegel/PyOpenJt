@@ -47,10 +47,10 @@ inline std::ostream& operator<<(std::ostream& stream, const indentOp& val) {
 
 void WriteMeshesWithoutLSG(dumpConfig config, std::ostream& outStream, Handle(JtData_Model) rootModel, const std::string& fileName);
 
-void RecurseDownTheTree(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix);
+void RecurseDownTheTreeJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix);
 
-void HandleAttributes(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord);
+void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord);
 
-void HandleAllChildren(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix);
+void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix);
 
 
