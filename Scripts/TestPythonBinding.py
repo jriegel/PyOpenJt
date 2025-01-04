@@ -9,3 +9,5 @@ f = PyOpenJt.JtFile(os.getcwd()+"/../Data/ExampleFiles/example_block_jt9.5.jt")
 f.FileName = os.getcwd()+"/../Data/ExampleFiles/example_block_jt9.5.jt"
 f.open()
 
+j = f.json()
+print (j)
