@@ -14,8 +14,9 @@
 #include <string>
 
 
+
+
 void writeTestGltfMesh(std::string name);
+void writeGltfMesh(const Handle(JtNode_Base)& theNodeRecord, const std::string& name);
 
-
-void RecurseDownTheTreeGlTf(const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix);
 

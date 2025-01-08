@@ -131,8 +131,9 @@ JtFile_writeGlTf(JtFileObject* self, PyObject* args , PyObject*)
  
     Py_BEGIN_ALLOW_THREADS;
 
+    writeGltfMesh(self->PartitionNode, string(value));
 
-    RecurseDownTheTreeGlTf( self->PartitionNode, "");
+    //RecurseDownTheTreeGlTf( self->PartitionNode, "");
 
     Py_END_ALLOW_THREADS;
 
