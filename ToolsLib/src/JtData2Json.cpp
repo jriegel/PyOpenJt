@@ -60,6 +60,14 @@ const char* SegmentTypeString(int typeNum) {
 	}
 }
 
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+    size_t start_pos = 0;
+    while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+        str.replace(start_pos, from.length(), to);
+        start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+    }
+    return str;
+}
 
 std::ostream& operator<<(std::ostream& os, const TCollection_ExtendedString& extstr)
 {
@@ -67,7 +75,10 @@ std::ostream& operator<<(std::ostream& os, const TCollection_ExtendedString& ext
 	assert(extstr.LengthOfCString() < 2048);
 	Standard_PCharacter mchastr = str;
 	extstr.ToUTF8CString(mchastr);
-	return (os << str);
+    string temp = mchastr;
+    auto res = ReplaceAll(temp, "\\", "\\\\");
+
+	return (os << res);
 }
 
 std::ostream& operator<<(std::ostream& os, const Jt_GUID& extstr)
@@ -538,7 +549,7 @@ void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outSt
                     outStream << ',';
                 outStream << aTransform->GetTrsf()[i];
             }
-            outStream << "]\n";
+            outStream << "],\n";
 
         }
         else if (anAttrib->IsKind(TypeOf_JtAttribute_Material))
@@ -555,7 +566,7 @@ void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outSt
                     outStream << ',';
                 outStream << aMaterial->DiffuseColor()[i];
             }
-            outStream << "]\n";
+            outStream << "],\n";
 
             aMaterial->AmbientColor();
             aMaterial->SpecularColor();

@@ -40,6 +40,9 @@ set (ProjectHeaders
 	src/JtUtils.h
 )
 
+file (GLOB_RECURSE VmmLibSources src/vmmlib/*.hpp)
+
+
 if(WIN32)
   add_definitions (-DWNT -DWINVER=0x0500)
 else()
@@ -57,10 +60,15 @@ source_group ("Header Files" FILES
   ${ProjectHeaders}
 )
 
+source_group ("VmmLib Files" FILES
+  ${VmmLibSources}
+)
+
 
 add_library( ToolsLib  STATIC 
 	${ProjectSources}
 	${ProjectHeaders} 
+	${VmmLibSources}
 )
 
 add_dependencies (ToolsLib TKJT)
