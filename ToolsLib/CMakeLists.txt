@@ -80,6 +80,8 @@ target_include_directories (ToolsLib
 									${OpenCASCADE_INCLUDE_DIR} 
 									${ProjectHeaders}
 									${TINYGLTF_INCLUDE_DIRS}
+								PRIVATE_HEADER
+									${CMAKE_CURRENT_SOURCE_DIR}/src
 							)
 
 set_target_properties (ToolsLib PROPERTIES PUBLIC_HEADER "${ProjectHeaders}")

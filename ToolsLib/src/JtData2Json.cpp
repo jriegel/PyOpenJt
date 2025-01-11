@@ -410,6 +410,8 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
             aMeshRecord->Bounds();
             const JtData_Object::VectorOfLateLoads& aLateLoaded = aMeshRecord->LateLoads();
 
+            // get probably material
+            HandleAttributesJson(config, indention, outStream, theNodeRecord);
 
             for (int i = 0; i < aLateLoaded.Count(); i++) {
                 //cerr << "TriStripSet Late load SegType: " << aLateLoaded[i]->getSegmentType() << '\n';
@@ -568,9 +570,38 @@ void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outSt
             }
             outStream << "],\n";
 
-            aMaterial->AmbientColor();
-            aMaterial->SpecularColor();
-            aMaterial->EmissionColor();
+            outStream << indentOp(indention) << "\"Attribute_AmbientColor\": [";
+            first = true;
+            for (int i = 0; i < 4; i++) {
+                if (first)
+                    first = false;
+                else
+                    outStream << ',';
+                outStream << aMaterial->AmbientColor()[i];
+            }
+            outStream << "],\n";
+
+            outStream << indentOp(indention) << "\"Attribute_SpecularColor\": [";
+            first = true;
+            for (int i = 0; i < 4; i++) {
+                if (first)
+                    first = false;
+                else
+                    outStream << ',';
+                outStream << aMaterial->SpecularColor()[i];
+            }
+            outStream << "],\n";
+
+            outStream << indentOp(indention) << "\"Attribute_EmissionColor\": [";
+            first = true;
+            for (int i = 0; i < 4; i++) {
+                if (first)
+                    first = false;
+                else
+                    outStream << ',';
+                outStream << aMaterial->EmissionColor()[i];
+            }
+            outStream << "],\n";
 
         }
         else {

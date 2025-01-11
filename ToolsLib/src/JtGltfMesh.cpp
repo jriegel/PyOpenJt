@@ -24,7 +24,12 @@
 #include "JtUtils.h"
 #include "JtLayer.h"
 
+#include "vmmlib/matrix.hpp"
+#include "vmmlib/vector.hpp"
+
 #include <assert.h>
+#include <limits>
+
 
 
 using namespace std;
@@ -45,6 +50,8 @@ using namespace std;
 // #define TINYGLTF_NOEXCEPTION // optional. disable exception handling.
 #include "tiny_gltf.h"
 
+#pragma warning( push )
+#pragma warning( disable: 4267 4127)
 struct gltfConfig {
     bool useLayer = true;
     LayerInfo layerInfo;
@@ -53,7 +60,33 @@ struct gltfConfig {
     tinygltf::Mesh mesh;
     bool isInRangeLOD = false;
     uint32_t LOD = 0;
+    vmml::Matrix4d actTrsf;
+    bool TrsfSet = false;
+    float actDiffuseColor[4];
+    float actAmbientColor[4];
+    float actSpecularColor[4];
+    float actEmissionColor[4];
+    bool ColorSet = false;
 };
+#pragma warning( pop )
+
+void addFloatToBuffer(float f, std::vector<unsigned char> &data)
+{
+    unsigned char b[4] = { 0 };
+    memcpy(b, &f, 4);
+    data.push_back(b[0]);
+    data.push_back(b[1]);
+    data.push_back(b[2]);
+    data.push_back(b[3]);
+}
+
+void addUIntToBuffer(uint32_t value, std::vector<unsigned char>& data)
+{
+    data.push_back(value & 0xFF);
+    data.push_back((value >> 8) & 0xFF);
+    data.push_back((value >> 16) & 0xFF);
+    data.push_back((value >> 24) & 0xFF);
+}
 
 void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNodeRecord);
 void HandleAllChildrenGlTf(gltfConfig& config, const Handle(JtNode_Group)& theGroupRecord);
@@ -148,6 +181,8 @@ void writeTestGltfMesh( std::string name)
     // Create a simple material
     tinygltf::Material mat;
     mat.pbrMetallicRoughness.baseColorFactor = { 1.0f, 0.9f, 0.9f, 1.0f };
+    mat.pbrMetallicRoughness.metallicFactor = 0.2;
+    mat.pbrMetallicRoughness.roughnessFactor = 0.8;
     mat.doubleSided = true;
     m.materials.push_back(mat);
 
@@ -190,7 +225,9 @@ void writeGltfMesh(const Handle(JtNode_Base)& theNodeRecord, const std::string& 
 
     // Create a simple default material
     tinygltf::Material mat;
-    mat.pbrMetallicRoughness.baseColorFactor = { 1.0f, 0.9f, 0.9f, 1.0f };
+    mat.pbrMetallicRoughness.baseColorFactor = { 0.6f, 0.6f, 0.6f, 1.0f };
+    mat.pbrMetallicRoughness.metallicFactor = 0.2;
+    mat.pbrMetallicRoughness.roughnessFactor = 0.8;
     mat.doubleSided = true;
     config.model.materials.push_back(mat);
 
@@ -315,6 +352,9 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
         
         RecurseDownTheTreeGlTf(config, aNode);
 
+        // reset the transformation
+        config.TrsfSet = false;
+
     }
     else if (theNodeRecord->IsKind(TypeOf_JtNode_Shape_Vertex))
     {
@@ -333,6 +373,8 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
             auto boundBox = aMeshRecord->Bounds();
             const JtData_Object::VectorOfLateLoads& aLateLoaded = aMeshRecord->LateLoads();
 
+            // get probably material
+            HandleAttributesGlTf(config, theNodeRecord);
 
             for (int i = 0; i < aLateLoaded.Count(); i++) {
                 //cerr << "TriStripSet Late load SegType: " << aLateLoaded[i]->getSegmentType() << '\n';
@@ -349,40 +391,83 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
                     auto vertices = aProxyMetaDataElement->Vertices();
                     auto normals = aProxyMetaDataElement->Normals();
 
+                    uint32_t maxIdx = 0, minIdx = UINT32_MAX;
+
                     for (int l = 0; l < indices.Count(); l++) {
                         const uint32_t value = indices.Data()[l];
-                        //const uint16_t value = (uint16_t) indices.Data()[l];
-
                         
-                        config.buffer.data.push_back(  value & 0xFF );
-                        config.buffer.data.push_back( (value >> 8) & 0xFF );
-                        config.buffer.data.push_back( (value >> 16) & 0xFF );
-                        config.buffer.data.push_back( (value >> 24) & 0xFF);
+                        if (value > maxIdx) maxIdx = value;
+                        if (value < minIdx) minIdx = value;
+
+                        addUIntToBuffer(value, config.buffer.data);
                     }
                     auto startVertex = config.buffer.data.size();
                     
-                    for (int l = 0; l < vertices.Count() * 3; l++) {
+                    double minVrtxX = numeric_limits<float>::max(), maxVrtxX = -numeric_limits<float>::max();
+                    double minVrtxY = numeric_limits<float>::max(), maxVrtxY = -numeric_limits<float>::max();
+                    double minVrtxZ = numeric_limits<float>::max(), maxVrtxZ = -numeric_limits<float>::max();
+                    for (int l = 0; l < vertices.Count(); l++) {
                         
-                        float x = vertices.Data()[l];
-                        unsigned char b[4] = { 0 };
-                        memcpy(b, &x, 4);
-                        config.buffer.data.push_back(b[0]);
-                        config.buffer.data.push_back(b[1]);
-                        config.buffer.data.push_back(b[2]);
-                        config.buffer.data.push_back(b[3]);
+                        vmml::vec4d vrtx(
+                            vertices.Data()[l * 3 + 0],
+                            vertices.Data()[l * 3 + 1],
+                            vertices.Data()[l * 3 + 2],
+                            1.0
+                        );
 
+                        if (config.TrsfSet) {
+                            vrtx = config.actTrsf * vrtx;
+                        }
+
+                        // track the bounds for the gltf accessors
+                        if (vrtx.x() > maxVrtxX) maxVrtxX = vrtx.x();
+                        if (vrtx.x() < minVrtxX) minVrtxX = vrtx.x();
+                        if (vrtx.y() > maxVrtxY) maxVrtxY = vrtx.y();
+                        if (vrtx.y() < minVrtxY) minVrtxY = vrtx.y();
+                        if (vrtx.z() > maxVrtxZ) maxVrtxZ = vrtx.z();
+                        if (vrtx.z() < minVrtxZ) minVrtxZ = vrtx.z();
+
+                        
+                        addFloatToBuffer((float)vrtx.x(), config.buffer.data);
+                        addFloatToBuffer((float)vrtx.y(), config.buffer.data);
+                        addFloatToBuffer((float)vrtx.z(), config.buffer.data);
+                        
                     }
                     auto startNormals = config.buffer.data.size();
                     
-                    for (int l = 0; l < normals.Count() * 3; l++) {
-                        //const Jt_I32 value = (Jt_I32) normals.Data()[l];
-                        float x = normals.Data()[l];
-                        unsigned char b[4] = { 0 };
-                        memcpy(b, &x, 4);
-                        config.buffer.data.push_back(b[0]);
-                        config.buffer.data.push_back(b[1]);
-                        config.buffer.data.push_back(b[2]);
-                        config.buffer.data.push_back(b[3]);
+                    double minNrmX = numeric_limits<float>::max(), maxNrmX = -numeric_limits<float>::max();
+                    double minNrmY = numeric_limits<float>::max(), maxNrmY = -numeric_limits<float>::max();
+                    double minNrmZ = numeric_limits<float>::max(), maxNrmZ = -numeric_limits<float>::max();
+
+                    for (int l = 0; l < normals.Count(); l++) {
+
+                        vmml::vec4d normal(
+                            normals.Data()[l * 3 + 0],
+                            normals.Data()[l * 3 + 1],
+                            normals.Data()[l * 3 + 2],
+                            1.0
+                        );
+
+                        if (config.TrsfSet) {
+                            auto tmpTrsf = config.actTrsf;
+                            // only use the rotation
+                            tmpTrsf(0, 3) = 0.0;
+                            tmpTrsf(1, 3) = 0.0;
+                            tmpTrsf(2, 3) = 0.0;
+                            normal = tmpTrsf * normal;
+                        }
+
+                        // track the bounds for the gltf accessors
+                        if (normal.x() > maxNrmX) maxNrmX = normal.x();
+                        if (normal.x() < minNrmX) minNrmX = normal.x();
+                        if (normal.y() > maxNrmY) maxNrmY = normal.y();
+                        if (normal.y() < minNrmY) minNrmY = normal.y();
+                        if (normal.z() > maxNrmZ) maxNrmZ = normal.z();
+                        if (normal.z() < minNrmZ) minNrmZ = normal.z();
+
+                        addFloatToBuffer((float)normal.x(), config.buffer.data);
+                        addFloatToBuffer((float)normal.y(), config.buffer.data);
+                        addFloatToBuffer((float)normal.z(), config.buffer.data);
 
                     }
                     auto endNormals = config.buffer.data.size();
@@ -403,8 +488,8 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
                     accessorIdx.componentType = TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT;
                     accessorIdx.count = (startVertex - startIndex) / 4;
                     accessorIdx.type = TINYGLTF_TYPE_SCALAR;
-                    accessorIdx.maxValues.push_back(23);
-                    accessorIdx.minValues.push_back(0);
+                    accessorIdx.maxValues.push_back(maxIdx);
+                    accessorIdx.minValues.push_back(minIdx);
                     config.model.accessors.push_back(accessorIdx);
 
                     // The vertices 
@@ -420,8 +505,8 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
                     accessorVrtx.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
                     accessorVrtx.count = (startNormals - startVertex) / 12;
                     accessorVrtx.type = TINYGLTF_TYPE_VEC3;
-                    accessorVrtx.maxValues = { boundBox.MaxCorner.X, boundBox.MaxCorner.Y, boundBox.MaxCorner.Z };
-                    accessorVrtx.minValues = { boundBox.MinCorner.X, boundBox.MinCorner.Y, boundBox.MinCorner.Z };
+                    accessorVrtx.maxValues = { maxVrtxX, maxVrtxY, maxVrtxZ };
+                    accessorVrtx.minValues = { minVrtxX, minVrtxY, minVrtxZ };
                     config.model.accessors.push_back(accessorVrtx);
 
                     // The normals
@@ -437,23 +522,41 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
                     accessorNrm.componentType = TINYGLTF_COMPONENT_TYPE_FLOAT;
                     accessorNrm.count = (endNormals - startNormals) / 12;
                     accessorNrm.type = TINYGLTF_TYPE_VEC3;
-                    accessorNrm.maxValues = { 1.0, 1.0, 1.0 };
-                    accessorNrm.minValues = { -1.0, -1.0, -1.0 };
+                    accessorNrm.maxValues = { maxNrmX, maxNrmY, maxNrmZ };
+                    accessorNrm.minValues = { minNrmX, minNrmY, minNrmZ };
                     config.model.accessors.push_back(accessorNrm);
+
+                    int material = 0;
+                    if (config.ColorSet) {
+                        // Create a material
+                        tinygltf::Material mat;
+                        mat.pbrMetallicRoughness.baseColorFactor[0] = config.actDiffuseColor[0];
+                        mat.pbrMetallicRoughness.baseColorFactor[1] = config.actDiffuseColor[1];
+                        mat.pbrMetallicRoughness.baseColorFactor[2] = config.actDiffuseColor[2];
+                        mat.pbrMetallicRoughness.baseColorFactor[3] = config.actDiffuseColor[3];
+                        mat.pbrMetallicRoughness.metallicFactor = 0.2;
+                        mat.pbrMetallicRoughness.roughnessFactor = 0.8;
+                        mat.doubleSided = true;
+
+                        material = (int)config.model.materials.size();
+                        config.model.materials.push_back(mat);
+
+                    }
 
                     // Build the mesh primitive and add it to the mesh
                     tinygltf::Primitive primitive;
                     primitive.indices = (int) config.model.accessors.size() - 3;                 // The index of the accessor for the vertex indices
                     primitive.attributes["POSITION"] = (int) config.model.accessors.size() - 2;  // The index of the accessor for positions
                     primitive.attributes["NORMAL"] = (int) config.model.accessors.size() - 1;  // The index of the accessor for normals
-                    primitive.material = 0;
+                    primitive.material = material;
                     primitive.mode = TINYGLTF_MODE_TRIANGLES;
                     config.mesh.primitives.push_back(primitive);
                 }
 
             }
-
             
+            // reset the color
+            config.ColorSet = false;
         }
         else
             cerr << "!!! '" << theNodeRecord->Name() << "' " << "TypeOf_JtNode_Shape_Vertex->Unknown \n";
@@ -462,6 +565,8 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
     {
         cerr << "!!! '" << theNodeRecord->Name() << "' " << "Unknown node type \n";
     }
+
+    
 
 }
 
@@ -491,10 +596,24 @@ void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNode
             Handle(JtAttribute_GeometricTransform) aTransform =
                 Handle(JtAttribute_GeometricTransform)::DownCast(anAttrib);
 
-           
-            for (int i = 0; i < 16; i++) {
-                aTransform->GetTrsf()[i];
-            }
+            config.actTrsf(0, 0) = aTransform->GetTrsf()[0];
+            config.actTrsf(1, 0) = aTransform->GetTrsf()[1];
+            config.actTrsf(2, 0) = aTransform->GetTrsf()[2];
+            config.actTrsf(3, 0) = aTransform->GetTrsf()[3];
+            config.actTrsf(0, 1) = aTransform->GetTrsf()[4];
+            config.actTrsf(1, 1) = aTransform->GetTrsf()[5];
+            config.actTrsf(2, 1) = aTransform->GetTrsf()[6];
+            config.actTrsf(3, 1) = aTransform->GetTrsf()[7];
+            config.actTrsf(0, 2) = aTransform->GetTrsf()[8];
+            config.actTrsf(1, 2) = aTransform->GetTrsf()[9];
+            config.actTrsf(2, 2) = aTransform->GetTrsf()[10];
+            config.actTrsf(3, 2) = aTransform->GetTrsf()[11];
+            config.actTrsf(0, 3) = aTransform->GetTrsf()[12];
+            config.actTrsf(1, 3) = aTransform->GetTrsf()[13];
+            config.actTrsf(2, 3) = aTransform->GetTrsf()[14];
+            config.actTrsf(3, 3) = aTransform->GetTrsf()[15];
+
+            config.TrsfSet = true;
 
         }
         else if (anAttrib->IsKind(TypeOf_JtAttribute_Material))
@@ -502,11 +621,11 @@ void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNode
             Handle(JtAttribute_Material) aMaterial =
                 Handle(JtAttribute_Material)::DownCast(anAttrib);
             
-            aMaterial->DiffuseColor();
-            aMaterial->AmbientColor();
-            aMaterial->SpecularColor();
-            aMaterial->EmissionColor();
-
+            memcpy(config.actDiffuseColor, aMaterial->DiffuseColor(), 16);
+            memcpy(config.actAmbientColor, aMaterial->AmbientColor(), 16);
+            memcpy(config.actSpecularColor, aMaterial->SpecularColor(), 16);
+            memcpy(config.actEmissionColor, aMaterial->EmissionColor(), 16);
+            config.ColorSet = true;
         }
         else {
             cerr << "Unknown Attribute type \n";

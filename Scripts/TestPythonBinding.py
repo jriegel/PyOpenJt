@@ -4,11 +4,11 @@ sys.path.append("~/lib")
 sys.path.append(os.getcwd() + "/../WinBuild/Debug")
 import PyOpenJt
 
+#jtFile = "opening_protection_plate1_jt9.5.jt"
 jtFile = "fmsr_0b42017833aa11eb8d60005056bcb115----.jt"
 
 jtObj = PyOpenJt.JtFile(os.getcwd()+"/../Data/ExampleFiles/" + jtFile)
 
-#jtObj.FileName = os.getcwd()+"/../Data/ExampleFiles/" + jtFile
 jtObj.open()
 
 jsonFile = open("c:/temp/test2.json", "w")
