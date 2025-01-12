@@ -50,11 +50,13 @@ using namespace std;
 // #define TINYGLTF_NOEXCEPTION // optional. disable exception handling.
 #include "tiny_gltf.h"
 
+
+
 #pragma warning( push )
 #pragma warning( disable: 4267 4127)
 struct gltfConfig {
-    bool useLayer = true;
-    LayerInfo layerInfo;
+    bool useLayer = false;
+    std::vector<uint32_t> actFilter;
     tinygltf::Model model;
     tinygltf::Buffer buffer;
     tinygltf::Mesh mesh;
@@ -278,20 +280,31 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
         // cast to actuall type
         Handle(JtNode_Part) aPartRecord = Handle(JtNode_Part)::DownCast(theNodeRecord);
         const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
-
-
-        // handle late loaded properties
-        auto metaData = HandleLateLoadsMeta(aLateLoaded);
-        if (metaData.size() > 0) {
-
-            // handling layer in Part
-            std::vector<uint32_t> layer = ScanForLayer(metaData);
-            
+        auto name = theNodeRecord->Name();
+        bool useThisPart = true;
+        if (config.useLayer == true) {
+            // handle late loaded properties
+            auto metaData = HandleLateLoadsMeta(aLateLoaded);
+            if (metaData.size() > 0) {
+                useThisPart = false;
+                // handling layer in Part
+                std::vector<uint32_t> layer = ScanForLayer(metaData);
+                for (auto lp : layer) {
+                    for (auto l : config.actFilter) {
+                        if (lp == l) {
+                            useThisPart = true;
+                            goto end;
+                        }
+                    }
+                }
+            }
         }
+end:
 
-        HandleAttributesGlTf(config, theNodeRecord);
-        HandleAllChildrenGlTf(config, Handle(JtNode_Group)::DownCast(theNodeRecord));
-
+        if (useThisPart) {
+            HandleAttributesGlTf(config, theNodeRecord);
+            HandleAllChildrenGlTf(config, Handle(JtNode_Group)::DownCast(theNodeRecord));
+        }
     }
     else if (theNodeRecord->IsKind(TypeOf_JtNode_MetaData))
     {
@@ -304,7 +317,11 @@ void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNo
         if (metaData.size() > 0) {
             
             // handling layer in top meta data
-            LayerInfo layerInfo = ScanForLayerFilter(metaData);
+            auto layerInfo = ScanForLayerFilter(metaData);
+            if (layerInfo.ActiveLayerFilter.size() != 0) {
+                config.useLayer = true;
+                config.actFilter = layerInfo.LayerMap[layerInfo.ActiveLayerFilter];
+            }
         }
 
         HandleAttributesGlTf(config, theNodeRecord);

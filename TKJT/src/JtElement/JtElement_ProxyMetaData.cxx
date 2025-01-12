@@ -37,6 +37,19 @@ char strBuf[1024 * 64 + 2] ;
 //=======================================================================
 Standard_Boolean JtElement_ProxyMetaData::Read (JtData_Reader& theReader)
 {
+#if 0
+    bool ok = true;
+    uint8_t theValue;
+    std::cout << "\n Raw PMI dump:\n";
+    while (ok) {
+        ok = theReader.ReadPrimitiveValue(theValue);
+        std::cout << (char)theValue;
+    }
+    std::cout << "\n END Raw PMI dump\n";
+
+    return true;
+#endif
+
   std::wstring_convert<std::codecvt_utf8<wchar_t>> toUTF8;
   std::wstring Key, Value;
   Key.reserve(100);

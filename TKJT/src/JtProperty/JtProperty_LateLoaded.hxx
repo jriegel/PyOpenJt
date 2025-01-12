@@ -49,7 +49,10 @@ public:
   Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
 
   //! Load object from the referenced JT file segment.
-  void Load() { myDefferedObject = mySegModel->ReadSegment (mySegOffset); }
+  void Load() { myDefferedObject = mySegModel->ReadSegment(mySegOffset); }
+  
+  //! Load object from the referenced JT file segment.
+  void LoadDump() { myDefferedObject = mySegModel->ReadSegmentDump(mySegOffset); }
 
   Handle(JtData_Object) DefferedObject() { return myDefferedObject; }
 

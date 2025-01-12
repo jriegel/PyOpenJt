@@ -24,7 +24,7 @@
 #ifdef TKJT_CERRTRACING
     #define TRACE(msg)   /*std::cerr << "TRACE: " << msg << '\n'*/;
     #define INFO(msg)    /*std::cerr << "INFO: " << msg << '\n'*/;
-    #define WARNING(msg) /*std::cerr << "WARNING: " << msg << '\n'*/;
+    #define WARNING(msg) std::cerr << "WARNING: " << msg << '\n';
     #define ALARM(msg)   std::cerr << "ALARM: " << msg << '\n';
     #define FAIL(msg)    std::cerr << "FAIL: " << msg << '\n';
 

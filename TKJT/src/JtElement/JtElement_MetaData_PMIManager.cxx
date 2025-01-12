@@ -385,9 +385,9 @@ public:
         if (!Read (aDataLength) || !Read (aVersionNumber) || !Read (aCADTagCount))
           return Standard_False;
 
-        anEntitiesSortedByCADTagIndices.Allocate (aCADTagCount);
-        if (!theData.SortEntities (EntitiesSorter (aCADTagIndices, anEntitiesSortedByCADTagIndices)))
-          return Standard_False;
+        //anEntitiesSortedByCADTagIndices.Allocate (aCADTagCount);
+        //if (!theData.SortEntities (EntitiesSorter (aCADTagIndices, anEntitiesSortedByCADTagIndices)))
+        //  return Standard_False;
 
         // skip reading the remaining Compressed CAD Tag Data
         if (!Skip (aDataLength - (GetPosition() - aStartPos)))
@@ -410,6 +410,19 @@ Standard_Boolean JtElement_MetaData_PMIManager::Read (JtData_Reader& theReader)
 {
   return JtData_Object::Read (theReader)
     && PMIReader (theReader).Read (*this);
+
+#if 0
+    bool ok = true;
+    uint8_t theValue;
+    std::cout << "\n Raw PMI dump:\n";
+    while (ok) {
+        ok = theReader.ReadPrimitiveValue(theValue);
+        std::cout << (char)theValue;
+    }
+    std::cout << "\n END Raw PMI dump\n";
+
+    return true;
+#endif 
 }
 
 //=======================================================================

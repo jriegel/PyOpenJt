@@ -328,22 +328,124 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
   Standard_Size aReaderPos = aReader.GetPosition();
   if (aBytesSpec < aReaderPos)
   {
-#ifdef OCCT_DEBUG
     Standard_Size aBytesRest = aBytesSpec - aReaderPos;
-    ALARM("Error: " + (aBytesRest) + " extra bytes were read after end of the segment");
-#endif
+    ALARM("Error: " + std::to_string(aBytesRest) + " extra bytes were read after end of the segment");
     return Handle(JtData_Object)();
   }
   if (aBytesSpec > aReaderPos)
   {
-#ifdef OCCT_DEBUG
     Standard_Size aBytesRest = aBytesSpec - aReaderPos;
-    WARNING("Warning: " + aBytesRest + " segment bytes remained after reading, ignored");
-#endif
+    WARNING("Warning: " + std::to_string(aBytesRest) + " segment bytes remained after reading, ignored");
   }
 
   // Return the first object read from the segment
   return aFirstObject;
+}
+
+//=======================================================================
+//function : readSegment
+//purpose  : Read objects from a JT file segment
+//=======================================================================
+Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
+    const Jt_U64 theOffset,
+    const Standard_Boolean theIsLSG) const
+{
+    JtData_FileReader aReader(theFile, this, theOffset);
+
+    Standard_Size aSegStart = aReader.GetPosition();
+
+    // Read the segment header
+    Jt_GUID aGUID;
+    Jt_I32 aType;
+    Jt_I32 aSize;
+    if (!aReader.ReadGUID(aGUID) || !aReader.ReadI32(aType) || !aReader.ReadI32(aSize))
+    {
+        ALARM("Error: Failed to read header of segment with offset " + theOffset);
+        return Handle(JtData_Object)();
+    }
+
+    // Select appropriate reader for reading the segment data:
+    // - use the file reader if the segment is not compressed;
+    // - use JtData_Inflate is the segment is compressed.
+    JtData_Reader* aDataReaderPtr = &aReader;
+    switch (aType)
+    {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 17:
+    case 18:
+    case 20:
+    case 24:
+    {
+        // read Compression Flag, Data Length, Algorithm
+        Jt_I32 aFlag;
+        Jt_I32 aDataLength;
+        Jt_U8 aAlgorithm;
+        if (!aReader.ReadI32(aFlag) || !aReader.ReadI32(aDataLength) || !aReader.ReadU8(aAlgorithm))
+        {
+            ALARM("Error: Failed to read compression flags of segment with offset " + theOffset);
+            return Handle(JtData_Object)();
+        }
+
+        // if compressed, replace the reader by a JtData_Inflate instance
+        if (aFlag == 2 && aAlgorithm == 2)
+            aDataReaderPtr = new JtData_Inflate(aReader, aDataLength - sizeof(Jt_U8));
+        else if (aFlag == 3 && aAlgorithm == 3)
+            aDataReaderPtr = new JtData_InflateLzma(aReader, aDataLength - sizeof(Jt_U8));
+    }
+    }
+
+    //// Read the segment data
+    Handle(JtData_Object) aFirstObject;
+    //Standard_Boolean aResult;
+
+    //if (theIsLSG)
+    //    aResult = readLSGData(*aDataReaderPtr, aFirstObject);
+    //else
+    //    aResult = readElement(*aDataReaderPtr, aFirstObject);
+
+
+    //// Check the reading result
+    //if (!aResult)
+    //{
+    //    ALARM("Error: Segment data reading failed");
+    //    return Handle(JtData_Object)();
+    //}
+
+    uint8_t theValue;
+    std::cout << "\n Raw PMI dump:\n";
+    for (int i = 0; i < aSize; i++) {
+        aDataReaderPtr->ReadPrimitiveValue(theValue);
+        if(__isascii(theValue) != 0)
+            std::cout << '.';
+        else
+            std::cout << (char)theValue;
+    }
+    std::cout << "\n END Raw PMI dump\n";
+
+    // Free the JtData_Inflate reader if it was used
+    if (aDataReaderPtr != &aReader)
+        delete aDataReaderPtr;
+
+    // Check the loaded data length
+    Standard_Size aBytesSpec = aSegStart + aSize;
+    Standard_Size aReaderPos = aReader.GetPosition();
+    if (aBytesSpec < aReaderPos)
+    {
+        Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+        ALARM("Error: " + std::to_string(aBytesRest) + " extra bytes were read after end of the segment");
+        return Handle(JtData_Object)();
+    }
+    if (aBytesSpec > aReaderPos)
+    {
+        Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+        WARNING("Warning: " + std::to_string(aBytesRest) + " segment bytes remained after reading, ignored");
+    }
+
+    // Return the first object read from the segment
+    return aFirstObject;
 }
 
 //=======================================================================
@@ -619,14 +721,30 @@ Handle(JtData_Model) JtData_Model::FindSegment(const Jt_GUID &theGUID,
 //=======================================================================
 Handle(JtData_Object) JtData_Model::ReadSegment(const Jt_U64 theOffset) const
 {
-  ifstream aFile;
-  if (!open(aFile))
-  {
-    ALARM("Error: Failed to open Jt file of late-loaded segment");
-    return Handle(JtNode_Partition)();
-  }
+    ifstream aFile;
+    if (!open(aFile))
+    {
+        ALARM("Error: Failed to open Jt file of late-loaded segment");
+        return Handle(JtNode_Partition)();
+    }
 
-  return readSegment(aFile, theOffset, Standard_False);
+    return readSegment(aFile, theOffset, Standard_False);
+}
+
+//=======================================================================
+//function : ReadSegment
+//purpose  : Read object from a late loaded segment
+//=======================================================================
+Handle(JtData_Object) JtData_Model::ReadSegmentDump(const Jt_U64 theOffset) const
+{
+    ifstream aFile;
+    if (!open(aFile))
+    {
+        ALARM("Error: Failed to open Jt file of late-loaded segment");
+        return Handle(JtNode_Partition)();
+    }
+
+    return readSegmentDump(aFile, theOffset, Standard_False);
 }
 
 //=======================================================================

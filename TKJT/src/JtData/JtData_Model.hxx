@@ -55,7 +55,9 @@ public:
                                                           Jt_U64&  theOffset) const;
 
   //! Read object from a late loaded segment.
-  Standard_EXPORT Handle(JtData_Object) ReadSegment (const Jt_U64 theOffset) const;
+  Standard_EXPORT Handle(JtData_Object) ReadSegment(const Jt_U64 theOffset) const;
+  //! Read object from a late loaded segment.
+  Standard_EXPORT Handle(JtData_Object) ReadSegmentDump(const Jt_U64 theOffset) const;
 
   //! Dump this entity.
   Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const;
@@ -93,9 +95,13 @@ protected:
   Standard_Boolean readTOC (std::ifstream& theFile, const Jt_I32 theOffset);
 
   //! Read object(s) from a JT file segment.
-  Handle(JtData_Object) readSegment (std::ifstream&           theFile,
-                                     const Jt_U64             theOffset,
-                                     const Standard_Boolean   theIsLSG) const;
+  Handle(JtData_Object) readSegment(std::ifstream& theFile,
+      const Jt_U64             theOffset,
+      const Standard_Boolean   theIsLSG) const;
+  //! Read object(s) from a JT file segment.
+  Handle(JtData_Object) readSegmentDump(std::ifstream& theFile,
+      const Jt_U64             theOffset,
+      const Standard_Boolean   theIsLSG) const;
   //! Read LSG segment data.
   Standard_Boolean readLSGData  (JtData_Reader&               theReader,
                                  Handle(JtData_Object)&       theFirstObject) const;

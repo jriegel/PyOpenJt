@@ -12,4 +12,4 @@
 
 #include <JtData_Object.hxx>
 
-const std::vector<char>& HandleLateLoadsMeta(const JtData_Object::VectorOfLateLoads& aLateLoaded);
+const std::vector<char> HandleLateLoadsMeta(const JtData_Object::VectorOfLateLoads& aLateLoaded);

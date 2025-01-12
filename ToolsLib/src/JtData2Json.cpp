@@ -180,7 +180,7 @@ static Handle(Standard_Type) TypeOf_JtAttribute_GeometricTransform = STANDARD_TY
 static Handle(Standard_Type) TypeOf_JtElement_ProxyMetaData = STANDARD_TYPE(JtElement_ProxyMetaData);
 static Handle(Standard_Type) TypeOf_JtElement_ShapeLOD_Vertex = STANDARD_TYPE(JtElement_ShapeLOD_Vertex);
 
-void WriteMeshesWithoutLSG(dumpConfig config, std::ostream& outStream, Handle(JtData_Model) rootModel, const std::string& fileName)
+void WriteMeshesWithoutLSG(dumpConfig , std::ostream& outStream, Handle(JtData_Model) rootModel, const std::string& )
 {
     auto toc = rootModel->getTOC();
 
@@ -517,7 +517,7 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
 }
 
 
-void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord)
+void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord)
 {
     // Extract attributes
 
