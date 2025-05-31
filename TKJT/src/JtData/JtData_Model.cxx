@@ -39,7 +39,7 @@ const Standard_Boolean JtData_Model::IsLittleEndianHost =
 
 static const Jt_GUID EOEMarkerGUID("ffffffff-ffff-ffff-ff-ff-ff-ff-ff-ff-ff-ff");
 
-IMPLEMENT_STANDARD_RTTIEXT(JtData_Model, MMgt_TShared)
+IMPLEMENT_STANDARD_RTTIEXT(JtData_Model, Standard_Transient)
 
 //=======================================================================
 //function : JtData_Model
