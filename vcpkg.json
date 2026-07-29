@@ -1,0 +1,16 @@
+{
+  "name": "pyopenjt",
+  "version-string": "0.0.0",
+  "dependencies": [
+    "qt5-base",
+    "qt5-tools",
+    "eigen3",
+    "opencascade",
+    "tbb",
+    "cli11",
+    "tinygltf",
+    "liblzma",
+    "zlib",
+    "draco"
+  ]
+}

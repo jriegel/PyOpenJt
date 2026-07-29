@@ -27,20 +27,7 @@ IF %ERRORLEVEL% NEQ 0 (
     exit 1
 )
 
-echo  [94mInstall dependencies:[0m
-
-call %VCPKG_DIR%vcpkg.exe install ^
-   qt5-base:x64-windows ^
-   qt5-tools:x64-windows ^
-   eigen3:x64-windows^
-   opencascade:x64-windows ^
-   tbb:x64-windows ^
-   cli11:x64-windows ^
-   tinygltf:x64-windows ^
-   liblzma:x64-windows ^
-   zlib:x64-windows ^
-   tinygltf ^
-   draco
+echo  [94mUsing vcpkg manifest dependencies from vcpkg.json.[0m
    
 
   

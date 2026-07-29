@@ -92,7 +92,7 @@ protected:
   Standard_Boolean open (std::ifstream& aFile) const;
 
   //! Read TOC from the JT file.
-  Standard_Boolean readTOC (std::ifstream& theFile, const Jt_I32 theOffset);
+  Standard_Boolean readTOC (std::ifstream& theFile, const Jt_U64 theOffset);
 
   //! Read object(s) from a JT file segment.
   Handle(JtData_Object) readSegment(std::ifstream& theFile,

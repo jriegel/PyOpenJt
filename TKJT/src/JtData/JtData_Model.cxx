@@ -179,7 +179,7 @@ Standard_Boolean JtData_Model::open(ifstream &aFile) const
 //function : readTOC
 //purpose  : Read TOC from the JT file
 //=======================================================================
-Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_I32 theOffset)
+Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
 {
   JtData_FileReader aReader(theFile, this, theOffset);
 
@@ -220,10 +220,10 @@ Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_I32 theO
 
     char guidBuf[100]; aGUID.ToString(guidBuf);
 
-    int lowerBits = aAttrib & 0xFF; 
 
     const Standard_Integer aType = (aAttrib >> 24) & 0xFF;
 
+    //int lowerBits = aAttrib & 0xFF; 
     //cerr << "TOC Entry: GUID:" << guidBuf << " Type:"<< aType << " LowerBits:" << lowerBits << " Offsett:" << aOffset << " Length : " << aLength << " Attribute : " << aAttrib << '\n';
 
     if (aTypeMap.IsBound(aType))
@@ -286,10 +286,10 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
       case 24:
       {
         // read Compression Flag, Data Length, Algorithm
-        Jt_I32 aFlag;
+        Jt_U32 aFlag;
         Jt_I32 aDataLength;
         Jt_U8 aAlgorithm;
-        if (!aReader.ReadI32(aFlag) || !aReader.ReadI32(aDataLength) || !aReader.ReadU8(aAlgorithm))
+        if (!aReader.ReadU32(aFlag) || !aReader.ReadI32(aDataLength) || !aReader.ReadU8(aAlgorithm))
         {
           ALARM("Error: Failed to read compression flags of segment with offset " + theOffset);
           return Handle(JtData_Object)();
@@ -348,7 +348,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
 //=======================================================================
 Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
     const Jt_U64 theOffset,
-    const Standard_Boolean theIsLSG) const
+    const Standard_Boolean ) const
 {
     JtData_FileReader aReader(theFile, this, theOffset);
 
@@ -603,7 +603,7 @@ Standard_Boolean JtData_Model::readElement(JtData_Reader &theReader,
                                            Jt_I32 *theObjectIDPtr) const
 {
   // Read Element Length
-  Standard_Integer anElemLength;
+    Jt_I32 anElemLength;
   if (!theReader.ReadI32(anElemLength))
   {
     ALARM("Error: Failed to read element length");
@@ -652,7 +652,7 @@ Standard_Boolean JtData_Model::readElement(JtData_Reader &theReader,
   }
 
   // Read the object data
-  Standard_Integer anObjectBaseType;
+  Jt_U8 anObjectBaseType;
   if (!theReader.ReadU8(anObjectBaseType))
     return Standard_False;
 
