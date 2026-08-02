@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug JtDump",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/WinBuild/Debug/JtDump.exe",
+      "args": [
+        "${workspaceFolder}/Data/ExampleFiles/example_block_jt9.5.jt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "externalConsole": false,
+      "stopAtEntry": false,
+      "preLaunchTask": "build JtDump"
+    }
+  ]
+}

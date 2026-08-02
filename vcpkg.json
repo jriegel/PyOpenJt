@@ -7,7 +7,6 @@
     "eigen3",
     "opencascade",
     "tbb",
-    "cli11",
     "tinygltf",
     "liblzma",
     "zlib",

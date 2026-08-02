@@ -6,8 +6,6 @@
  * \details This file holds the executable definition to dump Jt information as JSON
  */
 
-#include <CLI/CLI.hpp>
-
 #include <JtData_Model.hxx>
 #include <JtNode_Base.hxx>
 #include <JtNode_Partition.hxx>
@@ -37,7 +35,10 @@
 #include <iostream>
 #include <iomanip>
 #include <assert.h>
+#include <fstream>
 #include <regex>
+#include <string>
+#include <vector>
 
 using namespace std;
 
@@ -48,24 +49,55 @@ int outFilter = dumpConfig::dump_all;
 
 int main(int argc, char* argv[])
 {
-	CLI::App app("JtDump - dumps information of a Jt file as JSON");
-
-	// add version output
-	app.set_version_flag("--version", std::string("0.8"));
-
-	std::vector<std::string> files;
-	app.add_option("jt-files", files, "Jt file(s) to dump")->check(CLI::ExistingFile);
+    const std::string version = "0.8";
+    std::vector<std::string> files;
     std::string outFileName;
-    app.add_option("-o", outFileName, "Out File Name");
-    //app.add_option("-m", meshData, "Mesh Data mode (0=none)");
+    bool showVersion = false;
+    bool showHelp = false;
 
-	CLI11_PARSE(app, argc, argv);
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
 
-	if (files.size() == 0) {
+        if (arg == "--version") {
+            showVersion = true;
+        }
+        else if (arg == "-h" || arg == "--help") {
+            showHelp = true;
+        }
+        else if (arg == "-o") {
+            if (i + 1 >= argc) {
+                std::cerr << "Missing value for -o" << std::endl;
+                return 1;
+            }
+            outFileName = argv[++i];
+        }
+        else if (arg.rfind('-', 0) == 0) {
+            std::cerr << "Unknown option: " << arg << std::endl;
+            return 1;
+        }
+        else {
+            files.push_back(arg);
+        }
+    }
 
-		cerr << "No input Jt files given!" << endl;
-		return 1;
-	}
+    if (showVersion) {
+        std::cout << version << std::endl;
+        return 0;
+    }
+
+    if (showHelp) {
+        std::cout << "Usage: JtDump [options] <jt-file> [<jt-file> ...]" << std::endl;
+        std::cout << "Options:" << std::endl;
+        std::cout << "  -o <file>   Write JSON output to the specified file" << std::endl;
+        std::cout << "  -h, --help  Show this help message" << std::endl;
+        std::cout << "  --version   Show the program version" << std::endl;
+        return 0;
+    }
+
+    if (files.empty()) {
+        std::cerr << "No input Jt files given!" << std::endl;
+        return 1;
+    }
 
     std::ofstream outFile(outFileName.c_str());
     if (outFile.is_open()) {
@@ -73,16 +105,15 @@ int main(int argc, char* argv[])
     }
 
     if (files.size() > 1) {
-        *outStream << '[' << endl;
+        *outStream << '[' << std::endl;
         indention++;
     }
 
     bool first = true;
 
-	// go through Jt files
-	for (const auto& aarg : files) {
-
-        string fileName = regex_replace(aarg, std::regex("\\\\"), "/"); // replace 'def' -> 'klm'
+    // go through Jt files
+    for (const auto& aarg : files) {
+        std::string fileName = std::regex_replace(aarg, std::regex("\\\\"), "/");
 
         if (files.size() > 1) {
             if (first)
@@ -91,44 +122,39 @@ int main(int argc, char* argv[])
                 *outStream << ',';
         }
 
-        *outStream << '{' << endl;
+        *outStream << '{' << std::endl;
         indention++;
 
+        TCollection_ExtendedString aFileName(fileName.c_str());
 
-		TCollection_ExtendedString aFileName(fileName.c_str(), Standard_True);
+        Handle(JtData_Model) rootModel = new JtData_Model(aFileName);
 
+        if (rootModel.IsNull())
+            return 2;
 
-		Handle(JtData_Model) rootModel =   new JtData_Model(aFileName);
+        Handle(JtNode_Partition) PartitionNode = rootModel->Init();
 
-
-		if (rootModel.IsNull())
-			return 2;
-
-		Handle(JtNode_Partition) PartitionNode = rootModel->Init();
-
-    
         writeModel(rootModel, *outStream, indention, outFilter);
 
         if (PartitionNode.IsNull()) {
-            WriteMeshesWithoutLSG(dumpConfig::dump_all ,*outStream, rootModel, fileName);
+            WriteMeshesWithoutLSG(dumpConfig::dump_all, *outStream, rootModel, fileName);
         }
         else {
             RecurseDownTheTreeJson(dumpConfig::dump_all, indention, *outStream, PartitionNode, fileName);
         }
 
         indention--;
-        *outStream << '}' << endl;
-		
-	}
+        *outStream << '}' << std::endl;
+    }
 
     if (files.size() > 1) {
         indention--;
-        *outStream << ']' << endl;
+        *outStream << ']' << std::endl;
     }
 
     assert(indention == 0);
 
-	return 0;
+    return 0;
 }
 
 
