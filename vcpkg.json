@@ -10,6 +10,7 @@
     "tinygltf",
     "liblzma",
     "zlib",
-    "draco"
+    "draco",
+    "cli11"
   ]
 }
