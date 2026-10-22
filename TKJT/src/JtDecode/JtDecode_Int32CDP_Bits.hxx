@@ -40,7 +40,7 @@ public:
 
   //! Set out-of-band data.
   void SetOOBData (JtDecode_Int32CDP theOOBData)
-    { myOOBData = theOOBData; }
+    { myOOBData = std::move (theOOBData); }
 
   //! Get expected count of output values.
   TKJT_EXPORT int32_t GetOutValCount() const override;

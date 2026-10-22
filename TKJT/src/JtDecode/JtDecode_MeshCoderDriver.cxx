@@ -19,7 +19,7 @@
 #include <JtData_VectorRef.hxx>
 
 #include <Standard_Assert.hxx>
-#include <NCollection_Handle.hxx>
+#include <memory>
 
 #include <vector>
 #include <bitset>
@@ -663,8 +663,8 @@ protected:
 
   JtDecode_MeshCoderDriver *_pTMC; // TopoDualMeshCoder this codec is attached to
 
-  NCollection_Handle<JtDecode_DualVFMesh> _pSrcVFM; // Input VFMesh
-  NCollection_Handle<JtDecode_DualVFMesh> _pDstVFM; // Output VFMesh
+  std::unique_ptr<JtDecode_DualVFMesh> _pSrcVFM; // Input VFMesh
+  std::unique_ptr<JtDecode_DualVFMesh> _pDstVFM; // Output VFMesh
 
   std::vector<int32_t> _viActiveFaces;   // Stack of incomplete "active faces"
   JtDecode_BitVec _vbRemovedActiveFaces; // Helper bitvec parallel to above
@@ -684,7 +684,7 @@ void JtDecode_MeshCodec::run()
 {
   // Assert state is consistent and ready to co/dec
   if (!_pDstVFM)
-    _pDstVFM = new JtDecode_DualVFMesh();
+    _pDstVFM = std::make_unique<JtDecode_DualVFMesh>();
 
   //Standard_ASSERT_RETURN (_pDstVFM != NULL, "Error", );
   _pDstVFM->clear();
@@ -1193,21 +1193,21 @@ JtDecode_MeshCoderDriver::~JtDecode_MeshCoderDriver()
   delete _pMeshDecoder;
 }
 
-JtDecode_MeshCoderDriver::InputData::Handle
+JtDecode_MeshCoderDriver::InputData::Ptr
 JtDecode_MeshCoderDriver::LoadInputData (JtData_Reader& theReader)
 {
-  InputData::Handle aData (new InputData);
+  InputData::Ptr aData (new InputData);
 
   JtData_VectorRef<JtDecode_Int32CDP> aVectorRef (*aData);
   for (size_t i = 0; i < aVectorRef.Count(); i++)
   {
     if (!aVectorRef[i].Load2 (theReader))
-      return (InputData::Handle)0;
+      return nullptr;
   }
 
   uint32_t aHash;
   if (!theReader.ReadU32 (aHash))
-    return (InputData::Handle)0;
+    return nullptr;
 
   return aData;
 }

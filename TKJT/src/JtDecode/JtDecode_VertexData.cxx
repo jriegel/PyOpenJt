@@ -20,80 +20,80 @@
 #include <JtDecode_VertexData_ExpMant.hxx>
 #include <JtDecode_VertexData_Deering.hxx>
 
-JtDecode_VertexData::Handle JtDecode_VertexData::LoadQuantizedCoords (JtData_Reader& theReader)
+JtDecode_VertexData::Ptr JtDecode_VertexData::LoadQuantizedCoords (JtData_Reader& theReader)
 {
   // Read parameters
   JtDecode_VertexData_Quantized::PointQuantizerData aQuantizerData;
   Jt_I32 aVertexCount;
   if (!aQuantizerData.Read (theReader)
    || !theReader.ReadI32 (aVertexCount))
-    return (Handle)0;
+    return nullptr;
 
   // Create decoder object
-  Handle aData (new JtDecode_VertexData_Quantized (aQuantizerData, 3, JtDecode_Unpack_Lag1));
+  Ptr aData (new JtDecode_VertexData_Quantized (aQuantizerData, 3, JtDecode_Unpack_Lag1));
 
   // Load encoded data
   if (!aData->load (theReader, &JtDecode_Int32CDP::Load1, aVertexCount))
-    return (Handle)0;
+    return nullptr;
 
   // Success
   return aData;
 }
 
-JtDecode_VertexData::Handle JtDecode_VertexData::LoadCompressedCoords (JtData_Reader& theReader)
+JtDecode_VertexData::Ptr JtDecode_VertexData::LoadCompressedCoords (JtData_Reader& theReader)
 {
   // Read parameters
   Jt_I32 aVertexCount;
   Jt_U8 aNbComponents;
   if (!theReader.ReadI32 (aVertexCount)
    || !theReader.ReadU8 (aNbComponents))
-    return (Handle)0;
+    return nullptr;
 
   JtDecode_VertexData_Quantized::PointQuantizerData aQuantizerData;
   if (!aQuantizerData.Read (theReader))
-    return (Handle)0;
+    return nullptr;
 
   // Create decoder object
-  Handle aData;
+  Ptr aData;
   if (aQuantizerData.X.bits)
-    aData = new JtDecode_VertexData_Quantized (aQuantizerData, aNbComponents, JtDecode_Unpack_Lag1);
+    aData = std::make_unique<JtDecode_VertexData_Quantized>(aQuantizerData, aNbComponents, JtDecode_Unpack_Lag1);
   else
-    aData = new JtDecode_VertexData_ExpMant (aNbComponents, JtDecode_Unpack_Lag1);
+    aData = std::make_unique<JtDecode_VertexData_ExpMant>(aNbComponents, JtDecode_Unpack_Lag1);
 
   // Load encoded data
   if (!aData->load (theReader, &JtDecode_Int32CDP::Load2, aVertexCount))
-    return (Handle)0;
+    return nullptr;
 
   // Read hash value
   Jt_I32 aHash;
   if (!theReader.ReadI32 (aHash))
-    return (Handle)0;
+    return nullptr;
 
   // Success
   return aData;
 }
 
-JtDecode_VertexData::Handle JtDecode_VertexData::LoadQuantizedNormals (JtData_Reader& theReader)
+JtDecode_VertexData::Ptr JtDecode_VertexData::LoadQuantizedNormals (JtData_Reader& theReader)
 {
   // Read parameters
   Jt_U8  aNbBits;
   Jt_I32 aNormalsCount;
   if (!theReader.ReadU8  (aNbBits)
    || !theReader.ReadI32 (aNormalsCount))
-    return (Handle)0;
+    return nullptr;
 
   // Create decoder object
-  Handle aData (new JtDecode_VertexData_Deering (aNbBits, JtDecode_Unpack_Lag1));
+  Ptr aData (new JtDecode_VertexData_Deering (aNbBits, JtDecode_Unpack_Lag1));
 
   // Load encoded data
   if (!aData->load (theReader, &JtDecode_Int32CDP::Load1, aNormalsCount))
-    return (Handle)0;
+    return nullptr;
 
   // Success
   return aData;
 }
 
-JtDecode_VertexData::Handle JtDecode_VertexData::LoadCompressedNormals (JtData_Reader& theReader)
+JtDecode_VertexData::Ptr JtDecode_VertexData::LoadCompressedNormals (JtData_Reader& theReader)
 {
   // Read parameters
   Jt_I32 aNormalsCount;
@@ -102,23 +102,23 @@ JtDecode_VertexData::Handle JtDecode_VertexData::LoadCompressedNormals (JtData_R
   if (!theReader.ReadI32 (aNormalsCount)
    || !theReader.ReadU8  (aNbComponents)
    || !theReader.ReadU8  (aNbBits))
-    return (Handle)0;
+    return nullptr;
 
   // Create decoder object
-  Handle aData;
+  Ptr aData;
   if (aNbBits)
-    aData = new JtDecode_VertexData_Deering (aNbBits);
+    aData = std::make_unique<JtDecode_VertexData_Deering>(aNbBits);
   else
-    aData = new JtDecode_VertexData_ExpMant (aNbComponents);
+    aData = std::make_unique<JtDecode_VertexData_ExpMant>(aNbComponents);
 
   // Load encoded data
   if (!aData->load (theReader, &JtDecode_Int32CDP::Load2, aNormalsCount))
-    return (Handle)0;
+    return nullptr;
 
   // Read hash value
   Jt_I32 aHash;
   if (!theReader.ReadI32 (aHash))
-    return (Handle)0;
+    return nullptr;
 
   // Success
   return aData;

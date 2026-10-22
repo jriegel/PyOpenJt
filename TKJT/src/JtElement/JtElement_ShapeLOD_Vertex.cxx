@@ -16,7 +16,7 @@
 
 #include <JtElement_ShapeLOD_Vertex.hxx>
 
-#include <NCollection_Handle.hxx>
+#include <memory>
 
 #include <JtData_Reader.hxx>
 #include <JtData_Inflate.hxx>
@@ -39,28 +39,28 @@ class JtElement_ShapeLOD_Vertex::VertexDataDecodeTask
 {
 public:
 
-  VertexDataDecodeTask (JtData_SingleHandle<JtDecode_VertexData> theData, VertexData& theResult)
-    : myData (theData) , myResultPtr (&theResult) {}
+  VertexDataDecodeTask (std::unique_ptr<JtDecode_VertexData> theData, VertexData& theResult)
+    : myData (std::move (theData)) , myResultPtr (&theResult) {}
 
   void operator ()() const { *myResultPtr = const_cast <JtDecode_VertexData&> (*myData).Decode(); }
 
 private:
 
-  NCollection_Handle<JtDecode_VertexData> myData;
+  std::shared_ptr<JtDecode_VertexData> myData;
   VertexData* myResultPtr;
 };
 
 class JtElement_ShapeLOD_Vertex::MeshDecodeTask
 {
-  NCollection_Handle<JtDecode_MeshCoderDriver::InputData> myData;
+  std::shared_ptr<JtDecode_MeshCoderDriver::InputData> myData;
   IndicesVec* myVertexIndicesPtr;
   IndicesVec* myNormalIndicesPtr;
 
 public:
-  MeshDecodeTask (JtData_SingleHandle<JtDecode_MeshCoderDriver::InputData> theData,
+  MeshDecodeTask (std::unique_ptr<JtDecode_MeshCoderDriver::InputData> theData,
                   IndicesVec& theVertexIndices,
                   IndicesVec& theNormalIndices)
-    : myData             (theData)
+    : myData             (std::move (theData))
     , myVertexIndicesPtr (&theVertexIndices)
     , myNormalIndicesPtr (&theNormalIndices) {}
 
@@ -401,25 +401,25 @@ bool JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepData (JtData_Re
 
     // read unique vertex coords data and start decoding it
     {
-      JtDecode_VertexData::Handle anEncodedVertices =
+      JtDecode_VertexData::Ptr anEncodedVertices =
         JtDecode_VertexData::LoadQuantizedCoords (theReader);
 
       if (!anEncodedVertices)
         return false;
 
-      aDecodeTasks.Run (VertexDataDecodeTask (anEncodedVertices, myVertices));
+      aDecodeTasks.Run (VertexDataDecodeTask (std::move(anEncodedVertices), myVertices));
     }
 
     // read unique vertex normals data if present and start decoding it
     if (aNormalBinding != VertexBinding1::None)
     {
-      JtDecode_VertexData::Handle anEncodedNormals =
+      JtDecode_VertexData::Ptr anEncodedNormals =
         JtDecode_VertexData::LoadQuantizedNormals (theReader);
 
       if (!anEncodedNormals)
         return false;
 
-      aDecodeTasks.Run (VertexDataDecodeTask (anEncodedNormals, myNormals));
+      aDecodeTasks.Run (VertexDataDecodeTask (std::move(anEncodedNormals), myNormals));
     }
 
     /*
@@ -471,14 +471,14 @@ bool JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtData_Reader& 
   JtData_Parallel::TaskGroup aDecodeTasks;
 
   // Read mesh data and start decoding it
-  JtDecode_MeshCoderDriver::InputData::Handle aMeshData =
+  JtDecode_MeshCoderDriver::InputData::Ptr aMeshData =
     JtDecode_MeshCoderDriver::LoadInputData (theReader);
 
   if (!aMeshData)
     return false;
 
   IndicesVec aVertexIndices, aNormalIndices;
-  aDecodeTasks.Run (MeshDecodeTask (aMeshData, aVertexIndices, aNormalIndices));
+  aDecodeTasks.Run (MeshDecodeTask (std::move(aMeshData), aVertexIndices, aNormalIndices));
 
   ///////////////////////////////////////////////////////////////////
   // Topologically Compressed Vertex Records data collection
@@ -510,27 +510,27 @@ bool JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtData_Reader& 
   VertexData aUniqueVertices;
   if (aCoordsPresent)
   {
-    JtDecode_VertexData::Handle anEncodedVertices =
+    JtDecode_VertexData::Ptr anEncodedVertices =
       JtDecode_VertexData::LoadCompressedCoords (theReader);
 
     if (!anEncodedVertices)
       return false;
 
     aUniqueVerticesCount = anEncodedVertices->GetOutVertexCount();
-    aDecodeTasks.Run (VertexDataDecodeTask (anEncodedVertices, aUniqueVertices));
+    aDecodeTasks.Run (VertexDataDecodeTask (std::move(anEncodedVertices), aUniqueVertices));
   }
 
   // Read vertex normals data and start decoding it
   VertexData aUniqueNormals;
   if (aNormalsPresent)
   {
-    JtDecode_VertexData::Handle anEncodedNormals =
+    JtDecode_VertexData::Ptr anEncodedNormals =
       JtDecode_VertexData::LoadCompressedNormals (theReader);
 
     if (!anEncodedNormals)
       return false;
 
-    aDecodeTasks.Run (VertexDataDecodeTask (anEncodedNormals, aUniqueNormals));
+    aDecodeTasks.Run (VertexDataDecodeTask (std::move(anEncodedNormals), aUniqueNormals));
   }
 
   // Create a temporary vector of maps used to map combination of coord index and normal index

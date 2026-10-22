@@ -17,7 +17,7 @@
 #ifndef _JtDecode_VertexData_HeaderFile
 #define _JtDecode_VertexData_HeaderFile
 
-#include <JtData_SingleHandle.hxx>
+#include <memory>
 #include <JtData_Vector.hxx>
 #include <JtData_CompVector.hxx>
 #include <JtData_Reader.hxx>
@@ -28,21 +28,21 @@ class JtDecode_VertexData
 {
 public:
 
-  typedef JtData_SingleHandle<JtDecode_VertexData> Handle;
+  typedef std::unique_ptr<JtDecode_VertexData> Ptr;
 
   typedef JtData_CompVector<float, int32_t> Decoded;
 
   //! Load lossy quantized vertex coords data.
-  TKJT_EXPORT static Handle LoadQuantizedCoords   (JtData_Reader& theReader);
+  TKJT_EXPORT static Ptr LoadQuantizedCoords   (JtData_Reader& theReader);
 
   //! Load lossless compressed vertex coords data.
-  TKJT_EXPORT static Handle LoadCompressedCoords  (JtData_Reader& theReader);
+  TKJT_EXPORT static Ptr LoadCompressedCoords  (JtData_Reader& theReader);
 
   //! Load lossy quantized vertex normals data.
-  TKJT_EXPORT static Handle LoadQuantizedNormals  (JtData_Reader& theReader);
+  TKJT_EXPORT static Ptr LoadQuantizedNormals  (JtData_Reader& theReader);
 
   //! Load lossless compressed vertex normals data.
-  TKJT_EXPORT static Handle LoadCompressedNormals (JtData_Reader& theReader);
+  TKJT_EXPORT static Ptr LoadCompressedNormals (JtData_Reader& theReader);
 
   //! Get expected count of output vertices.
   int32_t GetOutVertexCount() { return myPackages.IsEmpty() ? 0 : myPackages[0].GetOutValCount(); }

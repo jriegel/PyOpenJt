@@ -27,8 +27,8 @@ public:
   JtDecode_Int32CDP_Chopper (JtDecode_Int32CDP theMSBData,
                              JtDecode_Int32CDP theLSBData,
                              Jt_U8 theChop, Jt_U8 theSpan, Jt_I32 theBias)
-    : myMSBData (theMSBData)
-    , myLSBData (theLSBData)
+    : myMSBData (std::move (theMSBData))
+    , myLSBData (std::move (theLSBData))
     , myShift   (theSpan - theChop)
     , myBias    (theBias) {}
 

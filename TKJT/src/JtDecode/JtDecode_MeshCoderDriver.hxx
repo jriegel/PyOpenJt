@@ -19,7 +19,7 @@
 
 #include <Standard.hxx>
 #include <JtData_Types.hxx>
-#include <JtData_SingleHandle.hxx>
+#include <memory>
 #include <JtDecode_Int32CDP.hxx>
 
 class JtDecode_MeshDecoder;
@@ -32,7 +32,7 @@ class JtDecode_MeshCoderDriver
 public:
   struct InputData
   {
-    typedef JtData_SingleHandle<InputData> Handle;
+    typedef std::unique_ptr<InputData> Ptr;
 
     JtDecode_Int32CDP _viOutDegSyms[8];
     JtDecode_Int32CDP _vviOutValSyms;
@@ -49,7 +49,7 @@ public:
   typedef JtData_Vector<int32_t, int32_t> IndicesVec;
 
   //! Read encoded data from the stream.
-  TKJT_EXPORT static InputData::Handle LoadInputData (JtData_Reader& theReader);
+  TKJT_EXPORT static InputData::Ptr LoadInputData (JtData_Reader& theReader);
 
   //! Constructor.
   TKJT_EXPORT JtDecode_MeshCoderDriver() : _pMeshDecoder (NULL) {}

@@ -28,39 +28,39 @@
 
 #include <JtData_Message.hxx>
 
-JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader& theReader)
+JtDecode_Int32CDP::EncodedDataPtr JtDecode_Int32CDP::loadCDP1 (JtData_Reader& theReader)
 {
   // Read codec type
   int aCodec;
   if (!theReader.ReadU8 (aCodec))
-    return EncodedDataHandle();
+    return EncodedDataPtr();
 
   // Null codec, just read uncoded values
   if (aCodec == 0)
   {
     Jt_VecU32 aCodeText;
     if (!theReader.ReadVec (aCodeText))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
-    return EncodedDataHandle (new JtDecode_Int32CDP_Null (aCodeText.Move()));
+    return EncodedDataPtr (new JtDecode_Int32CDP_Null (aCodeText.Move()));
   }
 
   // Bits based codec
-  JtData_SingleHandle<JtDecode_Int32CDP_Bits> aData;
+  std::unique_ptr<JtDecode_Int32CDP_Bits> aData;
   switch (aCodec)
   {
   case 1:
-    aData = new JtDecode_Int32CDP_Bitlength  (theReader);
+    aData = std::make_unique<JtDecode_Int32CDP_Bitlength>(theReader);
     break;
   case 2:
-    aData = new JtDecode_Int32CDP_Huffman    (theReader);
+    aData = std::make_unique<JtDecode_Int32CDP_Huffman>(theReader);
     break;
   case 3:
-    aData = new JtDecode_Int32CDP_Arithmetic (theReader);
+    aData = std::make_unique<JtDecode_Int32CDP_Arithmetic>(theReader);
     break;
   default:
     TRACE (std::string("Unknown Codec (") + std::to_string(aCodec) + ")!");
-    return EncodedDataHandle();
+    return EncodedDataPtr();
   }
 
   // Huffman or arithmetic codec: read probability contexts and load OOB data
@@ -69,18 +69,18 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader&
   {
     // read probability contexts
     if (!theReader.ReadU8 (aProbContextTableCount))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
     JtData_Vector<JtDecode_ProbContextI32> aProbContexts (aProbContextTableCount);
     {
       JtDecode_BitReader::Raw aContextReader (theReader);
 
       if (!aProbContexts[0].ReadFirst (aContextReader))
-        return EncodedDataHandle();
+        return EncodedDataPtr();
 
       for (int i = 1; i < aProbContextTableCount; i++)
         if (!aProbContexts[i].ReadNext (aContextReader, aProbContexts[0]))
-          return EncodedDataHandle();
+          return EncodedDataPtr();
     }
     aData->SetProbContexts (aProbContexts.Move());
 
@@ -91,8 +91,8 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader&
     {
       JtDecode_Int32CDP anOOBData;
       if (!anOOBData.Load1 (theReader))
-        return EncodedDataHandle();
-      aData->SetOOBData (anOOBData);
+        return EncodedDataPtr();
+      aData->SetOOBData (std::move (anOOBData));
     }
   }
 
@@ -102,7 +102,7 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader&
   if (!theReader.ReadI32 (aCodeTextLength)
    || !theReader.ReadI32 (aValueCount))
   {
-    return EncodedDataHandle();
+    return EncodedDataPtr();
   }
   aData->SetOutValCount (aValueCount);
 
@@ -111,37 +111,37 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader&
   {
     Jt_I32 aSymbolCount;
     if (!theReader.ReadI32 (aSymbolCount))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
   }
 
   // Read CodeText data
   if (!aData->LoadVec())
-    return EncodedDataHandle();
+    return EncodedDataPtr();
 
-  return EncodedDataHandle (aData);
+  return aData;
 }
 
-JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP2 (JtData_Reader& theReader)
+JtDecode_Int32CDP::EncodedDataPtr JtDecode_Int32CDP::loadCDP2 (JtData_Reader& theReader)
 {
   // Read number of output values
   Jt_I32 aValueCount;
   if (!theReader.ReadI32 (aValueCount))
-    return EncodedDataHandle();
+    return EncodedDataPtr();
 
   if (aValueCount == 0)
-    return EncodedDataHandle (new JtDecode_Int32CDP_Null (Jt_VecU32().Move()));
+    return EncodedDataPtr (new JtDecode_Int32CDP_Null (Jt_VecU32().Move()));
 
   // Read codec type
   int aCodec;
   if (!theReader.ReadU8 (aCodec))
-    return EncodedDataHandle();
+    return EncodedDataPtr();
 
   // Chopper pseudo-codec
   if (aCodec == 4)
   {
     Jt_U8 aChop;
     if (!theReader.ReadU8 (aChop))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
     if (aChop == 0)
       return loadCDP2 (theReader);
@@ -150,56 +150,56 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP2 (JtData_Reader&
     Jt_U8  aSpan;
     if (!theReader.ReadI32 (aBias)
      || !theReader.ReadU8  (aSpan))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
     // load chopped MSB and LSB data
     JtDecode_Int32CDP aMSBData;
     JtDecode_Int32CDP aLSBData;
     if (!aMSBData.Load2 (theReader)
      || !aLSBData.Load2 (theReader))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
     if (aMSBData.GetOutValCount() != aValueCount
      || aLSBData.GetOutValCount() != aValueCount)
     {
       ALARM ("Error: Chopped data size mismatch");
-      return EncodedDataHandle();
+      return EncodedDataPtr();
     }
 
-    return EncodedDataHandle (
-      new JtDecode_Int32CDP_Chopper (aMSBData, aLSBData, aChop, aSpan, aBias));
+    return EncodedDataPtr (
+      new JtDecode_Int32CDP_Chopper (std::move (aMSBData), std::move (aLSBData), aChop, aSpan, aBias));
   }
 
   // Null, bitlength or arithmetic codec: read CodeText length
   Jt_I32 aCodeTextLength;
   if (!theReader.ReadI32 (aCodeTextLength) || aCodeTextLength <= 0)
-    return EncodedDataHandle();
+    return EncodedDataPtr();
 
   // Null codec
   if (aCodec == 0)
   {
     Jt_VecU32 aCodeText;
     if (!theReader.ReadVec (aCodeText, (aCodeTextLength + 31) / 32))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
-    return EncodedDataHandle (new JtDecode_Int32CDP_Null (aCodeText.Move()));
+    return EncodedDataPtr (new JtDecode_Int32CDP_Null (aCodeText.Move()));
   }
 
   // Bits based codec
-  JtData_SingleHandle<JtDecode_Int32CDP_Bits> aData;
+  std::unique_ptr<JtDecode_Int32CDP_Bits> aData;
   switch (aCodec)
   {
   case 1: // Bitlength codec
-    aData = new JtDecode_Int32CDP_Bitlength2 (theReader);
+    aData = std::make_unique<JtDecode_Int32CDP_Bitlength2>(theReader);
     break;
 
   case 3: // Arithmetic codec
-    aData = new JtDecode_Int32CDP_Arithmetic (theReader);
+    aData = std::make_unique<JtDecode_Int32CDP_Arithmetic>(theReader);
     break;
 
   default: // Unknown codec
     TRACE (std::string("Unknown Codec (") + std::to_string(aCodec) + ")!");
-    return EncodedDataHandle();
+    return EncodedDataPtr();
   }
 
   // Bitlength or arithmetic codec: set expected output values count
@@ -207,7 +207,7 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP2 (JtData_Reader&
 
   // Bitlength or arithmetic codec: read CodeText data
   if (!aData->Load ((aCodeTextLength + 31) / 32))
-    return EncodedDataHandle();
+    return EncodedDataPtr();
 
   // Arithmetic codec: read probability context and load OOB data
   if (aCodec == 3)
@@ -217,17 +217,17 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP2 (JtData_Reader&
     {
       JtDecode_BitReader::Raw aContextReader (theReader);
       if (!aProbContexts[0].ReadMk2 (aContextReader))
-        return EncodedDataHandle();
+        return EncodedDataPtr();
     }
     aData->SetProbContexts (aProbContexts.Move());
 
     // load out-of-band data
     JtDecode_Int32CDP anOOBData;
     if (!anOOBData.Load2 (theReader))
-      return EncodedDataHandle();
+      return EncodedDataPtr();
 
-    aData->SetOOBData (anOOBData);
+    aData->SetOOBData (std::move (anOOBData));
   }
 
-  return EncodedDataHandle (aData);
+  return aData;
 }

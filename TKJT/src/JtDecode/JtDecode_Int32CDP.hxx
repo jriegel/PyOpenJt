@@ -18,7 +18,7 @@
 #define _JtDecode_Int32CDP_HeaderFile
 
 #include <JtData_Types.hxx>
-#include <JtData_SingleHandle.hxx>
+#include <memory>
 #include <JtData_Reader.hxx>
 #include <JtDecode_Unpack.hxx>
 
@@ -123,11 +123,11 @@ public:
   }
 
 protected:
-  typedef JtData_SingleHandle<EncodedData> EncodedDataHandle;
+  typedef std::unique_ptr<EncodedData> EncodedDataPtr;
 
 protected:
-  TKJT_EXPORT static EncodedDataHandle loadCDP1 (JtData_Reader& theReader);
-  TKJT_EXPORT static EncodedDataHandle loadCDP2 (JtData_Reader& theReader);
+  TKJT_EXPORT static EncodedDataPtr loadCDP1 (JtData_Reader& theReader);
+  TKJT_EXPORT static EncodedDataPtr loadCDP2 (JtData_Reader& theReader);
 
 
   DecodedData::Mover decode (JtDecode_Unpack& theUnpacker = JtDecode_Unpack_Null)
@@ -136,14 +136,14 @@ protected:
       return DecodedData().Move();
 
     DecodedData aDecodedData (myEncodedData->Decode());
-    myEncodedData = 0;
+    myEncodedData.reset();
     theUnpacker (aDecodedData);
 
     return aDecodedData.Move();
   }
 
 protected:
-  EncodedDataHandle myEncodedData;
+  EncodedDataPtr myEncodedData;
 };
 
 #endif
