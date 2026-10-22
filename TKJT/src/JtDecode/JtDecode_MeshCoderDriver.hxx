@@ -17,7 +17,6 @@
 #ifndef _JtDecode_MeshCoderDriver_HeaderFile
 #define _JtDecode_MeshCoderDriver_HeaderFile
 
-#include <Standard.hxx>
 #include <JtData_Types.hxx>
 #include <memory>
 #include <JtDecode_Int32CDP.hxx>

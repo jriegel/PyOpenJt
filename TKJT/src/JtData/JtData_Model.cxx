@@ -25,7 +25,6 @@
 #include <JtProperty_LateLoaded.hxx>
 #include <JtProperty_String.hxx>
 
-#include <NCollection_DataMap.hxx>
 #include <string>
 #include <sstream>
 #include <charconv>

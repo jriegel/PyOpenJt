@@ -88,7 +88,6 @@ struct Jt_XYZ
   operator JtData_VectorRef<const Type, Jt_I32>() const
     { return JtData_VectorRef<const Type, Jt_I32> (*this); }
 
-  DEFINE_STANDARD_ALLOC
 };
 
 typedef Jt_XYZ<Jt_F32> Jt_CoordF32;
@@ -105,7 +104,6 @@ struct Jt_BBoxF32
   operator JtData_VectorRef<const Jt_F32, Jt_I32>() const
     { return JtData_VectorRef<const Jt_F32, Jt_I32> (*this); }
 
-  DEFINE_STANDARD_ALLOC
 };
 
 class Jt_GUID
@@ -179,7 +177,6 @@ protected:
   Jt_U64 U64 (int theIdx) const { return data.U64[theIdx]; }
 
 public:
-  DEFINE_STANDARD_ALLOC
 };
 
 #endif

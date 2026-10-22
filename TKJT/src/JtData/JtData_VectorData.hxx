@@ -17,7 +17,6 @@
 #ifndef _JtData_VectorData_HeaderFile
 #define _JtData_VectorData_HeaderFile
 
-#include <Standard.hxx>
 
 #include <cstring>
 
@@ -29,7 +28,6 @@ private:
   struct ValHolder
   {
     ValT Value;
-    DEFINE_STANDARD_ALLOC
   };
 
 protected:
@@ -146,7 +144,6 @@ public:
     SizeT myCount;
 
   public:
-    DEFINE_STANDARD_ALLOC
   };
 };
 

@@ -20,8 +20,7 @@
 #include <JtData_Types.hxx>
 
 #include <memory>
-#include <Standard.hxx>
-#include <NCollection_Map.hxx>
+#include <NCollection_DataMap.hxx>
 
 template <class RootClass>
 class JtData_ClassInfo
