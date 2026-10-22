@@ -16,7 +16,7 @@
 
 #include <JtData_Reader.hxx>
 #include <string>
-
+#include <cstdlib>
 //=======================================================================
 //function : JtData_Reader
 //purpose  : Constructor
@@ -40,13 +40,13 @@ JtData_Reader::~JtData_Reader() {}
 
 const void* JtData_Reader::LoadBytes (const size_t theLength)
 {
-  void* aBuffer = Standard::Allocate (theLength);
+  void* aBuffer = std::malloc (theLength);
   if (!aBuffer)
     return 0L;
 
   if (!Read (aBuffer, theLength))
   {
-    Standard::Free (aBuffer);
+    std::free (aBuffer);
     return 0L;
   }
 
@@ -61,7 +61,7 @@ const void* JtData_Reader::LoadBytes (const size_t theLength)
 void JtData_Reader::UnloadBytes (const void* theAddress)
 {
   if (theAddress)
-    Standard::Free (const_cast <void*&> (theAddress));
+    std::free (const_cast <void*> (theAddress));
 }
 
 //=======================================================================

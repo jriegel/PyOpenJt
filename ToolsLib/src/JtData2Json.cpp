@@ -28,6 +28,9 @@
 #include <codecvt>
 #include <locale>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 
@@ -316,7 +319,7 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         outStream << indentOp(indention) << "\"limits\":[";
         bool first = true;
 
-        for (Standard_Integer anIdx = 1; anIdx <= aRangeLODRecord->RangeLimits().Count(); ++anIdx) {
+        for (int anIdx = 1; anIdx <= aRangeLODRecord->RangeLimits().Count(); ++anIdx) {
             if (first)
                 first = false;
             else
@@ -509,7 +512,7 @@ void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, 
     if (theNodeRecord->Attributes().IsEmpty())
         return;
 
-    for (Standard_Integer anIdx = 0; anIdx < (Standard_Integer)theNodeRecord->Attributes().Count(); ++anIdx)
+    for (int anIdx = 0; anIdx < (int)theNodeRecord->Attributes().Count(); ++anIdx)
     {
         const std::shared_ptr<JtData_Object>& anObject = theNodeRecord->Attributes()[anIdx];
 
@@ -609,7 +612,7 @@ void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outS
 
     bool first = true;
 
-    for (Standard_Integer aChildIdx = 0; aChildIdx < (Standard_Integer)theGroupRecord->Children().Count(); ++aChildIdx)
+    for (int aChildIdx = 0; aChildIdx < (int)theGroupRecord->Children().Count(); ++aChildIdx)
     {
         if (first)
             first = false;

@@ -18,7 +18,8 @@
 #define _JtData_Object_HeaderFile
 
 #include <memory>
-#include <NCollection_List.hxx>
+#include <unordered_map>
+#include <vector>
 #include <string>
 
 #include <JtData_Vector.hxx>
@@ -40,9 +41,9 @@ public:
   //! @param theGUID - Jt object's type GUID.
   static const ClassInfo* FindClass (const Jt_GUID& theGUID) { return ClassInfo::Find (theGUID); }
 
-  typedef NCollection_DataMap <int, std::shared_ptr<JtData_Object>> MapOfObjects;
+  typedef std::unordered_map <int, std::shared_ptr<JtData_Object>>               MapOfObjects;
   typedef JtData_Vector       <std::shared_ptr<JtData_Object>>                   VectorOfObjects;
-  typedef NCollection_List    <std::shared_ptr<JtProperty_LateLoaded>>           ListOfLateLoads;
+  typedef std::vector         <std::shared_ptr<JtProperty_LateLoaded>>           ListOfLateLoads;
   typedef JtData_Vector       <std::shared_ptr<JtProperty_LateLoaded>>           VectorOfLateLoads;
 
 public:

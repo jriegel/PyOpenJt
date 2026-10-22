@@ -3,6 +3,7 @@
 #include <assert.h>
 #include  <cctype>
 
+#include <iostream>
 using namespace std;
 
 LayerInfo ScanForLayerFilter(const vector<char>& stream)

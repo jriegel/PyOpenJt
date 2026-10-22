@@ -43,7 +43,9 @@ void JtData_DeferredObject::Resolve (std::shared_ptr<JtData_Object>& theObject,
   std::shared_ptr<JtData_DeferredObject> aDeferred = std::dynamic_pointer_cast<JtData_DeferredObject>(theObject);
   if (aDeferred)
   {
-    theObjectsMap.Find (aDeferred->myObjectID, theObject);
+    auto anIter = theObjectsMap.find (aDeferred->myObjectID);
+    if (anIter != theObjectsMap.end())
+      theObject = anIter->second;
   }
 }
 

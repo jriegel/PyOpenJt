@@ -23,7 +23,7 @@
 #include <string>
 
 #include <ostream>
-#include <NCollection_DataMap.hxx>
+#include <unordered_map>
 
 #include <fstream>
 #include <vector>
@@ -125,9 +125,9 @@ protected:
   int           myMajorVersion;
   int           myMinorVersion;
 
-  NCollection_DataMap <Jt_GUID, Jt_U64, Jt_GUID> myTOC;
+  std::unordered_map<Jt_GUID, Jt_U64> myTOC;
 
-  // adding addition toc table since OCC container are uterly stupid, can't interate over keys and values!
+  // adding addition toc table for ordered iteration over the entries
   std::vector < JtData_Model::TocEntry> stdToc;
 };
 

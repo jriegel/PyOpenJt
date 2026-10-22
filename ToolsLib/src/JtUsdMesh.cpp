@@ -3,6 +3,9 @@
 #include <assert.h>
 #include  <cctype>
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
 using namespace std;
 
 void writeUsdMesh(std::shared_ptr<JtElement_ShapeLOD_Vertex> vertexElement, std::string name)

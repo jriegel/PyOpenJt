@@ -17,7 +17,6 @@
 #include <JtElement_XTBRep.hxx>
 #include <JtData_Reader.hxx>
 
-#include <TColStd_HArray1OfCharacter.hxx>
 
 
 IMPLEMENT_OBJECT_CLASS(JtElement_XTBRep, "XT B-Rep Object",

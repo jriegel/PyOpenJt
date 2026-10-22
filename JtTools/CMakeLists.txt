@@ -6,7 +6,6 @@
 # Look for required dependencies
 # =============================================================================
 
-find_package(OpenCASCADE 	CONFIG 	REQUIRED)
 find_package(CLI11			CONFIG	REQUIRED)
 find_package(Eigen3 				REQUIRED)
 
@@ -27,7 +26,7 @@ add_definitions (-DTKJT_CERRTRACING)
 if(WIN32)
   add_definitions (-DWNT -DWINVER=0x0500)
 else()
-  add_definitions (-fexceptions -fPIC -DOCC_CONVERT_SIGNALS)
+  add_definitions (-fexceptions -fPIC)
 endif()
 
 # Suppression of 3rdparty warnings in MSVC with #pragma warnings (disable)
@@ -55,10 +54,8 @@ target_link_libraries (JtDump PRIVATE
 								TKJT 
 								ToolsLib 
 								CLI11::CLI11
-								TKernel TKMath TKXSBase
 								Eigen3::Eigen
 						)
-target_include_directories (JtDump PUBLIC ${OpenCASCADE_INCLUDE_DIR} )
 
 set_target_properties(JtDump PROPERTIES RUNTIME_OUTPUT_DIRECTORY         ${CMAKE_BINARY_DIR})
 set_target_properties(JtDump PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)

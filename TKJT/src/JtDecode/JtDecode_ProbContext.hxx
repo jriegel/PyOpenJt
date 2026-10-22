@@ -21,7 +21,6 @@
 #include <JtData_Vector.hxx>
 #include <JtDecode_BitReader.hxx>
 
-#include <NCollection_DataMap.hxx>
 
 
 //! Class representing the probability context for codecs.

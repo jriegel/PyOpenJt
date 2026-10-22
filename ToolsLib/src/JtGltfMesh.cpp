@@ -31,17 +31,14 @@
 #include <assert.h>
 #include <limits>
 
-
-
-using namespace std;
-
-
-
 #ifdef WIN32
+#define NOMINMAX
 #include <Windows.h>
 #include <stringapiset.h>
 #define CP_UTF8 65001
 #endif 
+
+using namespace std;
 
 // Define these only in *one* .cc file.
 #define TINYGLTF_IMPLEMENTATION
@@ -583,7 +580,7 @@ void HandleAttributesGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Base>
     if (theNodeRecord->Attributes().IsEmpty())
         return;
 
-    for (Standard_Integer anIdx = 0; anIdx < (Standard_Integer)theNodeRecord->Attributes().Count(); ++anIdx)
+    for (int anIdx = 0; anIdx < (int)theNodeRecord->Attributes().Count(); ++anIdx)
     {
         const std::shared_ptr<JtData_Object>& anObject = theNodeRecord->Attributes()[anIdx];
 
@@ -646,7 +643,7 @@ void HandleAllChildrenGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Grou
     if (theGroupRecord->Children().IsEmpty())
         return;
 
-    for (Standard_Integer aChildIdx = 0; aChildIdx < (Standard_Integer)theGroupRecord->Children().Count(); ++aChildIdx)
+    for (int aChildIdx = 0; aChildIdx < (int)theGroupRecord->Children().Count(); ++aChildIdx)
     {
 
         std::shared_ptr<JtNode_Base> aChildRecord = std::dynamic_pointer_cast<JtNode_Base>(theGroupRecord->Children()[aChildIdx]);

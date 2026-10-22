@@ -18,7 +18,6 @@
 
 #include <JtData_VectorRef.hxx>
 
-#include <Standard_Assert.hxx>
 #include <memory>
 
 #include <vector>
@@ -29,7 +28,7 @@
 #include <JtDecode_Int32CDPScheduler.hxx>
 
 #ifdef _MSC_VER
-  #pragma warning (disable : 4127) // to prevent compilation warnings on Standard_ASSERT
+  #pragma warning (disable : 4127) // to prevent warnings on constant conditions
 #endif
 
 // Vector that operates on individual bits in an unsigned integer vector,
@@ -333,7 +332,7 @@ bool JtDecode_DualVFMesh::isValidVtx (int32_t iVtx) const
 bool JtDecode_DualVFMesh::newVtx (int32_t iVtx, int32_t iValence, uint16_t uFlags)
 {
   // for debug
-  Standard_ASSERT (iVtx == (int32_t)_vVtxEnts.size(), "Error", return false);
+  if (!(iVtx == (int32_t)_vVtxEnts.size())) { return false; }
 
   _vVtxEnts.push_back (VtxEnt());
   VtxEnt& rFE = _vVtxEnts.back();
@@ -404,7 +403,7 @@ bool JtDecode_DualVFMesh::newFace (int32_t  iFace,
                                    uint16_t uFlags)
 {
   // for debug
-  Standard_ASSERT ((int32_t)_vFaceEnts.size() == iFace, "Error", return false);
+  if (!((int32_t)_vFaceEnts.size() == iFace)) { return false; }
 
   _vFaceEnts.push_back (FaceEnt());
   FaceEnt& rVE = _vFaceEnts.back();
@@ -440,7 +439,7 @@ bool JtDecode_DualVFMesh::newFace (int32_t iFace,
                                    const JtDecode_BitVec* pvbFaceAttrMask,
                                    uint16_t uFlags)
 {
-  Standard_ASSERT ((int32_t)_vFaceEnts.size() == iFace, "Error", return false);
+  if (!((int32_t)_vFaceEnts.size() == iFace)) { return false; }
 
   _vFaceEnts.push_back (FaceEnt());
   FaceEnt& rVE = _vFaceEnts.back();
@@ -686,7 +685,6 @@ void JtDecode_MeshCodec::run()
   if (!_pDstVFM)
     _pDstVFM = std::make_unique<JtDecode_DualVFMesh>();
 
-  //Standard_ASSERT_RETURN (_pDstVFM != NULL, "Error", );
   _pDstVFM->clear();
   clear();
 
@@ -761,8 +759,7 @@ void JtDecode_MeshCodec::completeV (int32_t iFace)
     int32_t iVtx = activateV (iFace, jVtxSlot);
 
     // Assert FV consistency
-    Standard_ASSERT_RETURN (
-      _pDstVFM->vtx (iFace, jVtxSlot) == iVtx && _pDstVFM->face (iVtx, iVSlot) == iFace, "Error", );
+    if (!(_pDstVFM->vtx (iFace, jVtxSlot) == iVtx && _pDstVFM->face (iVtx, iVSlot) == iFace)) return;
 
     // Process the faces of iVtx starting from face slot
     // jVtxSlot where iVtx is incident on iFace
@@ -854,7 +851,7 @@ void JtDecode_MeshCodec::completeF (int32_t iVtx, int32_t iVSlot)
       break;
 
     jn = pDstVFM->findVtxSlot (vn, iVtx2);
-    Standard_ASSERT_RETURN (jn > -1, "Error", );
+    if (!(jn > -1)) return;
     DecModN (jn, pDstVFM->degree (vn));
     addVtxToFace (iVtx, i, vn, jn);
     vp = vn;
@@ -882,7 +879,7 @@ void JtDecode_MeshCodec::completeF (int32_t iVtx, int32_t iVSlot)
       break;
 
     jn = pDstVFM->findVtxSlot (vn, iVtx2);
-    Standard_ASSERT_RETURN (jn > -1, "Error", );
+    if (!(jn > -1)) return;
 
     IncModN (jn, pDstVFM->degree (vn));
     addVtxToFace (iVtx, i, vn, jn);
@@ -899,7 +896,7 @@ void JtDecode_MeshCodec::completeF (int32_t iVtx, int32_t iVSlot)
   for (; ilast <= i ; ilast++)
   {
     int32_t iFace = activateF (iVtx, ilast);
-    Standard_ASSERT_RETURN (iFace >= -1, "Error", );
+    if (!(iFace >= -1)) return;
   }
 }
 
@@ -979,7 +976,7 @@ int32_t JtDecode_MeshCodec::nextActiveFace()
 
   JtDecode_DualVFMesh *pDstVFM = const_cast<JtDecode_DualVFMesh*> (_pDstVFM.operator->());
   for (i = static_cast<int32_t>(_viActiveFaces.size()) - 1;
-       i >= Max (0, static_cast<int32_t>(_viActiveFaces.size()) - cWidth); --i)
+       i >= std::max (0, static_cast<int32_t>(_viActiveFaces.size()) - cWidth); --i)
   {
     int32_t iFace0 = _viActiveFaces[i];
     if (_vbRemovedActiveFaces.Test (iFace0))
@@ -1107,7 +1104,7 @@ int32_t JtDecode_MeshDecoder::ioFace (int32_t iVtx, int32_t /*jFSlot*/)
 
     if (cDeg <= JtDecode_DualVFMesh::cMBits)
     {
-      uint64_t uAttrMask = _pTMC->_nextAttrMaskSymbol (/*iCntxt*/Min (7, Max (0, cDeg - 2)));
+      uint64_t uAttrMask = _pTMC->_nextAttrMaskSymbol (/*iCntxt*/std::min (7, std::max (0, cDeg - 2)));
 
       for (uint64_t uMask = uAttrMask; uMask; nFaceAttrs += (uMask & 1), uMask >>= 1);
 
@@ -1130,7 +1127,7 @@ int32_t JtDecode_MeshDecoder::ioFace (int32_t iVtx, int32_t /*jFSlot*/)
     // Error check for a corrupt degree or attrmask
     if (nFaceAttrs > cDeg)
     {
-      Standard_ASSERT_RETURN (nFaceAttrs <= cDeg, "Error", -1);
+      if (!(nFaceAttrs <= cDeg)) return -1;
       return -2;
     }
 
@@ -1151,7 +1148,7 @@ int32_t JtDecode_MeshDecoder::ioSplitFace (int32_t /*iVtx*/, int32_t /*jFSlot*/)
 {
   // Obtain a SPLITFACE symbol
   int32_t eSym = _pTMC->_nextSplitFaceSymbol();
-  Standard_ASSERT_RETURN (eSym >= -1, "Error", -1);
+  if (!(eSym >= -1)) return -1;
 
   int32_t iFace = -1;
   if (eSym > -1)
@@ -1161,7 +1158,7 @@ int32_t JtDecode_MeshDecoder::ioSplitFace (int32_t /*iVtx*/, int32_t /*jFSlot*/)
     int32_t iOffset = eSym;
     size_t cLen = _viActiveFaces.size();
 
-    Standard_ASSERT_RETURN (iOffset > 0 && iOffset <= static_cast<int32_t>(cLen), "Error", -1);
+    if (!(iOffset > 0 && iOffset <= static_cast<int32_t>(cLen))) return -1;
     iFace = _viActiveFaces[cLen - iOffset];
   }
 
@@ -1175,7 +1172,7 @@ int32_t JtDecode_MeshDecoder::ioSplitPos (int32_t /*iVtx*/, int32_t /*jFSlot*/)
 {
   // Obtain a SPLITVTX symbol
   int32_t eSym = _pTMC->_nextSplitPosSymbol();
-  Standard_ASSERT_RETURN (eSym >= -1, "Error", -1);
+  if (!(eSym >= -1)) return -1;
 
   int32_t iVSlot = -1;
 
@@ -1318,7 +1315,7 @@ void JtDecode_MeshCoderDriver::Decode (IndicesVec* theVertexIndices, IndicesVec*
     if (_iDegReadPos[i]      != _viOutDegSyms[i].Count() ||
         _iAttrMaskReadPos[i] != _vvuOutAttrMasks[i].Count())
     {
-      Standard_ASSERT (false, "ERROR: Not all symbols have been consumed!", return);
+      return;
     }
   }
 
@@ -1329,7 +1326,7 @@ void JtDecode_MeshCoderDriver::Decode (IndicesVec* theVertexIndices, IndicesVec*
       _iSplitFaceReadPos   != _viOutSplitVtxSyms.Count() ||
       _iSplitPosReadPos    != _viOutSplitPosSyms.Count())
   {
-    Standard_ASSERT (false, "ERROR: Not all symbols have been consumed!", return);
+    return;
   }
 
   // Decode output VFMesh

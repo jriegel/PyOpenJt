@@ -56,12 +56,12 @@ public:
   template <class Collection>
   static Mover FromCollection (const Collection& theCollection)
   {
-    JtData_Vector aVector (theCollection.Size());
+    JtData_Vector aVector (static_cast<SizeT> (theCollection.size()));
     if (!aVector.IsEmpty())
     {
       ValT* apElem = &aVector.First();
-      for (typename Collection::Iterator it (theCollection); it.More(); it.Next())
-        *apElem++ = it.Value();
+      for (const auto& anItem : theCollection)
+        *apElem++ = anItem;
     }
     return aVector.Move();
   }

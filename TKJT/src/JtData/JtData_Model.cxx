@@ -149,16 +149,14 @@ std::shared_ptr<JtNode_Partition> JtData_Model::Init()
   }
 
   // Find and read LSG segment
-  Jt_U64 anLSGSegmentOffset;
-  if (!myTOC.Find(anLSGSegmentGUID, anLSGSegmentOffset))
+  auto aTocIter = myTOC.find(anLSGSegmentGUID);
+  if (aTocIter == myTOC.end())
   {
     cerr << "No LSG segment, TODO: Read only Meshes plain...\n";
     return std::shared_ptr<JtNode_Partition>();
   }
-  else
-  {
-    TRACE("Info: LSG segment is found at offset " + anLSGSegmentOffset);
-  }
+  const Jt_U64 anLSGSegmentOffset = aTocIter->second;
+  TRACE("Info: LSG segment is found at offset " + anLSGSegmentOffset);
 
   std::shared_ptr<JtData_Object> aRootNode = readSegment(aFile, anLSGSegmentOffset, true);
 
@@ -193,8 +191,7 @@ bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
   TRACE("Info: TOC entries count = " + aCount);
 
   // Read TOC entries
-  typedef NCollection_DataMap<int, int> TypeMap;
-  TypeMap aTypeMap;
+  std::unordered_map<int, int> aTypeMap;
   
   while (aCount--)
   {
@@ -229,12 +226,9 @@ bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
     //int lowerBits = aAttrib & 0xFF; 
     //cerr << "TOC Entry: GUID:" << guidBuf << " Type:"<< aType << " LowerBits:" << lowerBits << " Offsett:" << aOffset << " Length : " << aLength << " Attribute : " << aAttrib << '\n';
 
-    if (aTypeMap.IsBound(aType))
-      aTypeMap.ChangeFind(aType)++;
-    else
-      aTypeMap.Bind(aType, 1);
+    ++aTypeMap[aType];
 
-    myTOC.Bind(aGUID, aOffset);
+    myTOC[aGUID] = aOffset;
     //stdToc.insert({ aGUID, aOffset });
     //TocEntry tocItem(aGUID, int(aOffset), int(aLength), int(aType));
 
@@ -243,9 +237,9 @@ bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
   }
 
   TRACE("Info: Type statistics");
-  for (TypeMap::Iterator aMapIter(aTypeMap); aMapIter.More(); aMapIter.Next())
+  for (const auto& aTypeCount : aTypeMap)
   {
-    //cerr << (std::string("Type ") + std::to_string(aMapIter.Key()) + " count " + std::to_string(aMapIter.Value())) << '\n';
+    //cerr << (std::string("Type ") + std::to_string(aTypeCount.first) + " count " + std::to_string(aTypeCount.second)) << '\n';
   }
 
   return true;
@@ -469,8 +463,8 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
   }
 
   // Bind the objects together
-  for (JtData_Object::MapOfObjects::Iterator it(aMapObjects); it.More(); it.Next())
-    it.ChangeValue()->BindObjects(aMapObjects);
+  for (auto& anEntry : aMapObjects)
+    anEntry.second->BindObjects(aMapObjects);
 
   // Read property atom elements
   JtData_Object::MapOfObjects aMapProperties;
@@ -500,7 +494,8 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
     }
 
     std::shared_ptr<JtData_Object> anObject;
-    aMapObjects.Find(anObjectId, anObject);
+    if (auto anObjIter = aMapObjects.find(anObjectId); anObjIter != aMapObjects.end())
+      anObject = anObjIter->second;
 
     // read (key,value) pairs
     JtData_Object::ListOfLateLoads aLateLoads;
@@ -526,13 +521,14 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
 
       // analyse the value
       std::shared_ptr<JtData_Object> aProperty;
-      if (aMapProperties.Find(aValue, aProperty))
+      if (auto aPropIter = aMapProperties.find(aValue); aPropIter != aMapProperties.end())
       {
+        aProperty = aPropIter->second;
         // if this is late loaded property, add it to a list
         std::shared_ptr<JtProperty_LateLoaded> aLateProp =
             std::dynamic_pointer_cast<JtProperty_LateLoaded>(aProperty);
         if (aLateProp)
-          aLateLoads.Append(aLateProp);
+          aLateLoads.push_back(aLateProp);
         // if this is a string property with key = "JT_PROP_NAME", bind it to the object
         else
         {
@@ -541,8 +537,9 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
           if (aStringProp)
           {
             std::shared_ptr<JtData_Object> aKeyProperty;
-            if (aMapProperties.Find(aKey, aKeyProperty))
+            if (auto aKeyIter = aMapProperties.find(aKey); aKeyIter != aMapProperties.end())
             {
+              aKeyProperty = aKeyIter->second;
               std::shared_ptr<JtProperty_String> aKeyStringProp =
                   std::dynamic_pointer_cast<JtProperty_String>(aKeyProperty);
               if (aKeyStringProp && aKeyStringProp->Value() == anObjectNameKey)
@@ -559,7 +556,7 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
     }
 
     // bind the late loaded properties to the object
-    if (anObject && !aLateLoads.IsEmpty())
+    if (anObject && !aLateLoads.empty())
       anObject->BindLateLoads(aLateLoads);
   }
 
@@ -587,7 +584,7 @@ bool JtData_Model::readElements(JtData_Reader &theReader,
     // if an object of a known type is read, store it
     if (typeid(*anObject) != typeid(JtData_Object))
     {
-      theMap.Bind(anObjectID, anObject);
+      theMap[anObjectID] = anObject;
       if (!theFirstObject)
         theFirstObject = anObject;
     }
@@ -705,8 +702,11 @@ bool JtData_Model::readElement(JtData_Reader &theReader,
 std::shared_ptr<JtData_Model> JtData_Model::FindSegment(const Jt_GUID &theGUID,
                                                Jt_U64 &theOffset) const
 {
-  if (myTOC.Find(theGUID, theOffset))
+  if (auto aTocIter = myTOC.find(theGUID); aTocIter != myTOC.end())
+  {
+    theOffset = aTocIter->second;
     return self();
+  }
   else if (myParent)
     return myParent->FindSegment(theGUID, theOffset);
   else

@@ -19,6 +19,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <functional>
 #include <ostream>
 #include <istream>
 #include <JtData_Export.hxx>
@@ -154,29 +155,21 @@ public:
   bool operator != (const Jt_GUID& theOther) const
     { return !operator == (theOther); }
 
-  Jt_I32 Hash (const Jt_I32 theUpper) const
-    { return ((&data.codes.U32)[0] ^ (&data.codes.U32)[1] ^ (&data.codes.U32)[2] ^ (&data.codes.U32)[3]) % theUpper; }
-
-  size_t operator()(const Jt_GUID& theKey) const 
-  {
-      return theKey.Hash(INT_MAX);
-  }
-
-  size_t operator()(const Jt_GUID& theKey1, const Jt_GUID& theKey2) const
-  {
-      return theKey1 == theKey2;
-  }
-
-  static int HashCode (const Jt_GUID& theKey, const int theUpper)
-    { return theKey.Hash (theUpper); }
-
-  static bool IsEqual (const Jt_GUID& theKey1, const Jt_GUID& theKey2)
-    { return theKey1 == theKey2; }
-
 protected:
   Jt_U64 U64 (int theIdx) const { return data.U64[theIdx]; }
 
 public:
+};
+
+template <>
+struct std::hash<Jt_GUID>
+{
+  size_t operator() (const Jt_GUID& theKey) const noexcept
+  {
+    const size_t h0 = std::hash<Jt_U64>{} (theKey.data.U64[0]);
+    const size_t h1 = std::hash<Jt_U64>{} (theKey.data.U64[1]);
+    return h0 ^ (h1 + 0x9e3779b97f4a7c15ULL + (h0 << 6) + (h0 >> 2));
+  }
 };
 
 #endif

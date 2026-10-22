@@ -20,7 +20,7 @@
 #include <JtData_Types.hxx>
 
 #include <memory>
-#include <NCollection_DataMap.hxx>
+#include <unordered_map>
 
 template <class RootClass>
 class JtData_ClassInfo
@@ -28,11 +28,11 @@ class JtData_ClassInfo
 public:
   static const JtData_ClassInfo* Find (const Jt_GUID& theGUID)
   {
-    const JtData_ClassInfo* aValue;
-    if (JtData_ClassInfo<RootClass>::DerivedClasses().Find (theGUID, aValue))
-      return aValue;
+    auto anIter = JtData_ClassInfo<RootClass>::DerivedClasses().find (theGUID);
+    if (anIter != JtData_ClassInfo<RootClass>::DerivedClasses().end())
+      return anIter->second;
     else
-      return NULL;
+      return nullptr;
   }
 
   virtual std::shared_ptr<RootClass> Create() const = 0;
@@ -42,7 +42,7 @@ public:
   virtual ~JtData_ClassInfo() {};
 
 protected:
-  typedef NCollection_DataMap<Jt_GUID, const JtData_ClassInfo*, Jt_GUID> MapOfClasses;
+  typedef std::unordered_map<Jt_GUID, const JtData_ClassInfo*> MapOfClasses;
   static MapOfClasses& DerivedClasses()
   {
     static MapOfClasses aMap;
@@ -61,7 +61,7 @@ public:
   : myName (theName)
   {
     if (theRegister)
-      this->DerivedClasses().Bind (theGUID, this);
+      this->DerivedClasses()[theGUID] = this;
   }
 
   virtual std::shared_ptr<RootClass> Create() const { return std::make_shared<Class>(); }

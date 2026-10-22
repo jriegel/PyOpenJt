@@ -6,7 +6,6 @@
 # Look for required dependencies
 # =============================================================================
 
-find_package(OpenCASCADE 	CONFIG 	REQUIRED)
 find_path(TINYGLTF_INCLUDE_DIRS "tiny_gltf.h")
 
 find_package(draco CONFIG REQUIRED)
@@ -46,7 +45,7 @@ file (GLOB_RECURSE VmmLibSources src/vmmlib/*.hpp)
 if(WIN32)
   add_definitions (-DWNT -DWINVER=0x0500)
 else()
-  add_definitions (-fexceptions -fPIC -DOCC_CONVERT_SIGNALS)
+  add_definitions (-fexceptions -fPIC)
 endif()
 
 # Suppression of 3rdparty warnings in MSVC with #pragma warnings (disable)
@@ -77,7 +76,6 @@ target_link_libraries (ToolsLib PRIVATE TKJT  draco::draco)
 
 target_include_directories (ToolsLib 
 								PUBLIC 
-									${OpenCASCADE_INCLUDE_DIR} 
 									${ProjectHeaders}
 									${TINYGLTF_INCLUDE_DIRS}
 								PRIVATE_HEADER

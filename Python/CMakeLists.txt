@@ -10,7 +10,6 @@ find_package(Python3 COMPONENTS Development REQUIRED)
  message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
  message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
 
-find_package(OpenCASCADE 	CONFIG 	REQUIRED)
 
 if(MSVC)
     #add_definitions(-D_3DLIFE_BUILD_)
@@ -30,7 +29,7 @@ add_definitions (-DTKJT_CERRTRACING)
 if(WIN32)
   add_definitions (-DWNT -DWINVER=0x0500)
 else()
-  add_definitions (-fexceptions -fPIC -DOCC_CONVERT_SIGNALS)
+  add_definitions (-fexceptions -fPIC)
 endif()
 
 # Suppression of 3rdparty warnings in MSVC with #pragma warnings (disable)
@@ -67,9 +66,7 @@ target_link_libraries(PyOpenJt PRIVATE
     Python3::Python 
     TKJT 
     ToolsLib
-    TKernel TKMath TKXSBase
 )
-target_include_directories (PyOpenJt PUBLIC ${OpenCASCADE_INCLUDE_DIR} )
 
 if(MSVC)
 	set_target_properties(PyOpenJt PROPERTIES SUFFIX ".pyd")

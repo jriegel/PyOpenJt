@@ -15,6 +15,7 @@
 // on <http://www.gnu.org/licenses/>.
 
 #include <JtDecode_ProbContext.hxx>
+#include <unordered_map>
 
 bool JtDecode_ProbContextI32::ReadFirst (JtDecode_BitReader::Raw& theReader)
 {
@@ -27,12 +28,16 @@ bool JtDecode_ProbContextI32::ReadNext (JtDecode_BitReader::Raw& theReader,
   if (!read (theReader, 32, 6, 6, 0, 6, 0))
     return false;
 
-  NCollection_DataMap<int, int32_t> aValuesMap;
+  std::unordered_map<int, int> aValuesMap;
   size_t i;
   for (i = 0; i < theFirstContext.Size(); i++)
-    aValuesMap.Bind (theFirstContext[i].symbol, theFirstContext[i].associatedValue);
+    aValuesMap[theFirstContext[i].symbol] = theFirstContext[i].associatedValue;
   for (i = 0; i < Size(); i++)
-    aValuesMap.Find (myEntries[i].symbol, myEntries[i].associatedValue);
+  {
+    auto anIter = aValuesMap.find (myEntries[i].symbol);
+    if (anIter != aValuesMap.end())
+      myEntries[i].associatedValue = anIter->second;
+  }
 
   return true;
 }
