@@ -534,8 +534,8 @@ void JTGui_MainWindow::loadFile (const QString& theFileName)
 
 void JTGui_MainWindow::onCurrentLayerFilterChanged(int index)
 {
-    auto itemData = ui->comboBox_LayerFilter->itemData(index);
-    std::vector<int> *layerVector = (std::vector<int> *)(itemData.toULongLong());
+    //auto itemData = ui->comboBox_LayerFilter->itemData(index);
+    //std::vector<int> *layerVector = (std::vector<int> *)(itemData.toULongLong());
 
 }
 

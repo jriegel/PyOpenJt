@@ -237,10 +237,10 @@ bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
   }
 
   TRACE("Info: Type statistics");
-  for (const auto& aTypeCount : aTypeMap)
-  {
+  //for (const auto& aTypeCount : aTypeMap)
+  //{
     //cerr << (std::string("Type ") + std::to_string(aTypeCount.first) + " count " + std::to_string(aTypeCount.second)) << '\n';
-  }
+  //}
 
   return true;
 }
