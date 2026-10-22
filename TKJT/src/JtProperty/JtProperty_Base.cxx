@@ -34,14 +34,14 @@ JtProperty_Base::JtProperty_Base()
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtProperty_Base::Read (JtData_Reader& theReader)
+bool JtProperty_Base::Read (JtData_Reader& theReader)
 {
   if (!JtData_Object::Read (theReader))
-    return Standard_False;
+    return false;
 
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (myVersion))
-    return Standard_False;
+    return false;
 
   return theReader.ReadU32 (myStateFlags);
 }
@@ -50,7 +50,7 @@ Standard_Boolean JtProperty_Base::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtProperty_Base::Dump (Standard_OStream& theStream) const
+int JtProperty_Base::Dump (std::ostream& theStream) const
 {
   return JtData_Object::Dump (theStream);
 }

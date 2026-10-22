@@ -23,16 +23,16 @@ IMPLEMENT_STANDARD_RTTIEXT(JtData_Object, Standard_Transient)
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtData_Object::Read (JtData_Reader&)
+bool JtData_Object::Read (JtData_Reader&)
 {
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtData_Object::Dump (Standard_OStream& /*theStream*/) const
+int JtData_Object::Dump (std::ostream& /*theStream*/) const
 {
   return 0;
 }

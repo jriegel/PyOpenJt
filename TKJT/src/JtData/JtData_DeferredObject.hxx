@@ -23,7 +23,7 @@ class JtData_DeferredObject : public JtData_Object
 {
 public:
   //! Read a deferred object from a JT file.
-  static Standard_Boolean Read (JtData_Reader&         theReader,
+  static bool Read (JtData_Reader&         theReader,
                                 Handle(JtData_Object)& theResult);
 
   //! Replace the deferred object by the corresponding object from the given map.
@@ -31,7 +31,7 @@ public:
                        const MapOfObjects&    theObjectsMap);
 
   //! Read an array of deferred objects from a JT file.
-  static Standard_Boolean ReadVec (JtData_Reader&   theReader,
+  static bool ReadVec (JtData_Reader&   theReader,
                                    VectorOfObjects& theResult);
 
   //! Replace the deferred objects by the corresponding objects from the given map.

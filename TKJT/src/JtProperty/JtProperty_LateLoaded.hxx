@@ -43,10 +43,10 @@ class JtProperty_LateLoaded : public JtProperty_Base
 {
 public:
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   //! Load object from the referenced JT file segment.
   void Load() { myDefferedObject = mySegModel->ReadSegment(mySegOffset); }

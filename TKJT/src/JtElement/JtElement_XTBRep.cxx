@@ -28,20 +28,20 @@ IMPLEMENT_OBJECT_CLASS(JtElement_XTBRep, "XT B-Rep Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtElement_XTBRep::Read (JtData_Reader& theReader)
+bool JtElement_XTBRep::Read (JtData_Reader& theReader)
 {
   if (!JtData_Object::Read (theReader)
    || !theReader.ReadI32 (myVersion)
    || !theReader.ReadI32 (myPKMajorVersion)
    || !theReader.ReadI32 (myPKMinorVersion))
   {
-    return Standard_False;
+    return false;
   }
 
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI32 (myPKBuild))
   {
-    return Standard_False;
+    return false;
   }
 
   return theReader.ReadVec (myData);
@@ -51,7 +51,7 @@ Standard_Boolean JtElement_XTBRep::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtElement_XTBRep::Dump (Standard_OStream& theStream) const
+int JtElement_XTBRep::Dump (std::ostream& theStream) const
 {
   theStream << "JtElement_XTBRep { " << myPKMajorVersion << "." << myPKMinorVersion << "." << myPKBuild << " } ";
   return JtData_Object::Dump (theStream);

@@ -28,10 +28,10 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Shape_Vertex, "Vertex Shape Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Shape_Vertex::Read (JtData_Reader &theReader)
+bool JtNode_Shape_Vertex::Read (JtData_Reader &theReader)
 {
   if (!JtNode_Shape_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion = 1;
 
@@ -43,35 +43,35 @@ Standard_Boolean JtNode_Shape_Vertex::Read (JtData_Reader &theReader)
     if (!theReader.ReadI32 (aNormalBinding)
      || !theReader.ReadI32 (aTextCoordBinding)
      || !theReader.ReadI32 (aColorBinding))
-      return Standard_False;
+      return false;
   }
   else
   {
     JtElement_ShapeLOD_Vertex::VertexBinding2 aVertexBinding;
     if (!theReader.ReadI16 (aVersion)
      || !aVertexBinding.Read (theReader))
-      return Standard_False;
+      return false;
   }
 
   JtElement_ShapeLOD_Vertex::QuantizationParams aQuantizationParams;
   if (!aQuantizationParams.Read (theReader))
-    return Standard_False;
+    return false;
 
   if (aVersion != 1)
   {
     JtElement_ShapeLOD_Vertex::VertexBinding2 aVertexBinding;
     if (!aVertexBinding.Read (theReader))
-      return Standard_False;
+      return false;
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  : 
 //=======================================================================
-Standard_Integer JtNode_Shape_Vertex::Dump (Standard_OStream &theStream) const
+int JtNode_Shape_Vertex::Dump (std::ostream &theStream) const
 {
   theStream << "JtNode_Shape_Vertex ";
   return JtNode_Shape_Base::Dump (theStream);

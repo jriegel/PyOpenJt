@@ -28,10 +28,10 @@ class JtElement_ProxyMetaData : public JtData_Object
 {
 public:
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   const std::vector<char>& getKeyValueStream() { return keyValueStream; }
 

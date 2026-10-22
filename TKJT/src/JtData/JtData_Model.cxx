@@ -34,8 +34,8 @@
 
 using namespace std;
 
-const Standard_Boolean JtData_Model::IsLittleEndianHost =
-    Image_PixMap::IsBigEndianHost() ? Standard_False : Standard_True;
+const bool JtData_Model::IsLittleEndianHost =
+    Image_PixMap::IsBigEndianHost() ? false : true;
 
 static const Jt_GUID EOEMarkerGUID("ffffffff-ffff-ffff-ff-ff-ff-ff-ff-ff-ff-ff");
 
@@ -47,7 +47,7 @@ IMPLEMENT_STANDARD_RTTIEXT(JtData_Model, Standard_Transient)
 //=======================================================================
 JtData_Model::JtData_Model(const TCollection_ExtendedString &theFileName,
                            const Handle(JtData_Model) & theParent)
-    : myParent(theParent), myFileName(theFileName), myIsFileLE(Standard_False), myMajorVersion(0), myMinorVersion(0) {}
+    : myParent(theParent), myFileName(theFileName), myIsFileLE(false), myMajorVersion(0), myMinorVersion(0) {}
 
 //=======================================================================
 //function : Init
@@ -70,7 +70,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
   aFile.read(vstr, 80);
 
   TCollection_AsciiString aMajorVersionStr(vstr);
-  Standard_Integer aPos = aMajorVersionStr.Search("Version");
+  int aPos = aMajorVersionStr.Search("Version");
   if (aPos < 1)
   {
     ALARM("Error: Failed to read Jt file version");
@@ -151,7 +151,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
     TRACE("Info: LSG segment is found at offset " + anLSGSegmentOffset);
   }
 
-  Handle(JtData_Object) aRootNode = readSegment(aFile, anLSGSegmentOffset, Standard_True);
+  Handle(JtData_Object) aRootNode = readSegment(aFile, anLSGSegmentOffset, true);
 
   aFile.close();
 
@@ -162,7 +162,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
 //function : open
 //purpose  : Open the file
 //=======================================================================
-Standard_Boolean JtData_Model::open(ifstream &aFile) const
+bool JtData_Model::open(ifstream &aFile) const
 {
 #ifdef WNT
   aFile.open(reinterpret_cast<const wchar_t *>(myFileName.ToExtString()),
@@ -179,18 +179,18 @@ Standard_Boolean JtData_Model::open(ifstream &aFile) const
 //function : readTOC
 //purpose  : Read TOC from the JT file
 //=======================================================================
-Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
+bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
 {
   JtData_FileReader aReader(theFile, this, theOffset);
 
   // Read entry count
   Jt_I32 aCount;
   if (!aReader.ReadI32(aCount) || aCount < 1)
-    return Standard_False;
+    return false;
   TRACE("Info: TOC entries count = " + aCount);
 
   // Read TOC entries
-  typedef NCollection_DataMap<Standard_Integer, Standard_Integer> TypeMap;
+  typedef NCollection_DataMap<int, int> TypeMap;
   TypeMap aTypeMap;
   
   while (aCount--)
@@ -205,14 +205,14 @@ Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theO
 
         if (!aReader.ReadGUID(aGUID) || !aReader.ReadU64(aOffset) || !aReader.ReadU32(aLength) || !aReader.ReadU32(aAttrib))
         {
-            return Standard_False;
+            return false;
         }
     }
     else {
         Jt_I32 oldOffset, oldLength;
         if (!aReader.ReadGUID(aGUID) || !aReader.ReadI32(oldOffset) || !aReader.ReadI32(oldLength) || !aReader.ReadU32(aAttrib))
         {
-            return Standard_False;
+            return false;
         }
         aOffset = oldOffset;
         aLength = oldLength;
@@ -221,7 +221,7 @@ Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theO
     char guidBuf[100]; aGUID.ToString(guidBuf);
 
 
-    const Standard_Integer aType = (aAttrib >> 24) & 0xFF;
+    const int aType = (aAttrib >> 24) & 0xFF;
 
     //int lowerBits = aAttrib & 0xFF; 
     //cerr << "TOC Entry: GUID:" << guidBuf << " Type:"<< aType << " LowerBits:" << lowerBits << " Offsett:" << aOffset << " Length : " << aLength << " Attribute : " << aAttrib << '\n';
@@ -245,7 +245,7 @@ Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theO
     //cerr << (std::string("Type ") + std::to_string(aMapIter.Key()) + " count " + std::to_string(aMapIter.Value())) << '\n';
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -254,11 +254,11 @@ Standard_Boolean JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theO
 //=======================================================================
 Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
                                                 const Jt_U64 theOffset,
-                                                const Standard_Boolean theIsLSG) const
+                                                const bool theIsLSG) const
 {
   JtData_FileReader aReader(theFile, this, theOffset);
 
-  Standard_Size aSegStart = aReader.GetPosition();
+  size_t aSegStart = aReader.GetPosition();
 
   // Read the segment header
   Jt_GUID aGUID;
@@ -305,7 +305,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
 
   // Read the segment data
   Handle(JtData_Object) aFirstObject;
-  Standard_Boolean aResult;
+  bool aResult;
 
   if (theIsLSG)
     aResult = readLSGData(*aDataReaderPtr, aFirstObject);
@@ -324,17 +324,17 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
   }
 
   // Check the loaded data length
-  Standard_Size aBytesSpec = aSegStart + aSize;
-  Standard_Size aReaderPos = aReader.GetPosition();
+  size_t aBytesSpec = aSegStart + aSize;
+  size_t aReaderPos = aReader.GetPosition();
   if (aBytesSpec < aReaderPos)
   {
-    Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+    size_t aBytesRest = aBytesSpec - aReaderPos;
     ALARM("Error: " + std::to_string(aBytesRest) + " extra bytes were read after end of the segment");
     return Handle(JtData_Object)();
   }
   if (aBytesSpec > aReaderPos)
   {
-    Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+    size_t aBytesRest = aBytesSpec - aReaderPos;
     WARNING("Warning: " + std::to_string(aBytesRest) + " segment bytes remained after reading, ignored");
   }
 
@@ -348,11 +348,11 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
 //=======================================================================
 Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
     const Jt_U64 theOffset,
-    const Standard_Boolean ) const
+    const bool ) const
 {
     JtData_FileReader aReader(theFile, this, theOffset);
 
-    Standard_Size aSegStart = aReader.GetPosition();
+    size_t aSegStart = aReader.GetPosition();
 
     // Read the segment header
     Jt_GUID aGUID;
@@ -399,7 +399,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
 
     //// Read the segment data
     Handle(JtData_Object) aFirstObject;
-    //Standard_Boolean aResult;
+    //bool aResult;
 
     //if (theIsLSG)
     //    aResult = readLSGData(*aDataReaderPtr, aFirstObject);
@@ -430,17 +430,17 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
         delete aDataReaderPtr;
 
     // Check the loaded data length
-    Standard_Size aBytesSpec = aSegStart + aSize;
-    Standard_Size aReaderPos = aReader.GetPosition();
+    size_t aBytesSpec = aSegStart + aSize;
+    size_t aReaderPos = aReader.GetPosition();
     if (aBytesSpec < aReaderPos)
     {
-        Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+        size_t aBytesRest = aBytesSpec - aReaderPos;
         ALARM("Error: " + std::to_string(aBytesRest) + " extra bytes were read after end of the segment");
         return Handle(JtData_Object)();
     }
     if (aBytesSpec > aReaderPos)
     {
-        Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+        size_t aBytesRest = aBytesSpec - aReaderPos;
         WARNING("Warning: " + std::to_string(aBytesRest) + " segment bytes remained after reading, ignored");
     }
 
@@ -452,7 +452,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
 //function : readLSGData
 //purpose  : Read LSG segment data
 //=======================================================================
-Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
+bool JtData_Model::readLSGData(JtData_Reader &theReader,
                                            Handle(JtData_Object) & theFirstObject) const
 {
   const TCollection_ExtendedString anObjectNameKey = "JT_PROP_NAME";
@@ -462,7 +462,7 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
   if (!readElements(theReader, aMapObjects, theFirstObject))
   {
     ALARM("Error: Failed to read LSG elements");
-    return Standard_False;
+    return false;
   }
 
   // Bind the objects together
@@ -474,7 +474,7 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
   if (!readElements(theReader, aMapProperties, theFirstObject))
   {
     ALARM("Error: Failed to read property atom elements");
-    return Standard_False;
+    return false;
   }
 
   // Read Property Table
@@ -483,7 +483,7 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
   if (!theReader.ReadI16(aTableVersion) || !theReader.ReadI32(aTableLength))
   {
     ALARM("Error: Failed to read property table");
-    return Standard_False;
+    return false;
   }
 
   while (aTableLength-- > 0)
@@ -493,7 +493,7 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
     if (!theReader.ReadI32(anObjectId))
     {
       ALARM("Error: Failed to read LSG object ID");
-      return Standard_False;
+      return false;
     }
 
     Handle(JtData_Object) anObject;
@@ -508,7 +508,7 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
       if (!theReader.ReadI32(aKey))
       {
         ALARM("Error: Failed to read property key");
-        return Standard_False;
+        return false;
       }
 
       if (aKey == 0)
@@ -518,7 +518,7 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
       if (!theReader.ReadI32(aValue))
       {
         ALARM("Error: Failed to read property value");
-        return Standard_False;
+        return false;
       }
 
       // analyse the value
@@ -560,14 +560,14 @@ Standard_Boolean JtData_Model::readLSGData(JtData_Reader &theReader,
       anObject->BindLateLoads(aLateLoads);
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : readElements
 //purpose  : Read a sequence of elements from a JT file segment
 //=======================================================================
-Standard_Boolean JtData_Model::readElements(JtData_Reader &theReader,
+bool JtData_Model::readElements(JtData_Reader &theReader,
                                             JtData_Object::MapOfObjects &theMap,
                                             Handle(JtData_Object) & theFirstObject) const
 {
@@ -579,7 +579,7 @@ Standard_Boolean JtData_Model::readElements(JtData_Reader &theReader,
   {
     // if End-Of-Elements marker is reached, finish the reading
     if (anObject.IsNull())
-      return Standard_True;
+      return true;
 
     // if an object of a known type is read, store it
     if (!anObject->IsInstance(STANDARD_TYPE(JtData_Object)))
@@ -591,14 +591,14 @@ Standard_Boolean JtData_Model::readElements(JtData_Reader &theReader,
   }
 
   // Fail if the reading was failed
-  return Standard_False;
+  return false;
 }
 
 //=======================================================================
 //function : readElement
 //purpose  : Read an element from a JT file segment
 //=======================================================================
-Standard_Boolean JtData_Model::readElement(JtData_Reader &theReader,
+bool JtData_Model::readElement(JtData_Reader &theReader,
                                            Handle(JtData_Object) & theObject,
                                            Jt_I32 *theObjectIDPtr) const
 {
@@ -607,22 +607,22 @@ Standard_Boolean JtData_Model::readElement(JtData_Reader &theReader,
   if (!theReader.ReadI32(anElemLength))
   {
     ALARM("Error: Failed to read element length");
-    return Standard_False;
+    return false;
   }
 
   // Start reading the element data
-  Standard_Size anElemStart = theReader.GetPosition();
+  size_t anElemStart = theReader.GetPosition();
 
   // Read Object Type ID
   Jt_GUID anObjectTypeID;
   if (!theReader.ReadGUID(anObjectTypeID))
   {
     ALARM("Error: Failed to read element GUID");
-    return Standard_False;
+    return false;
   }
   else
   {
-    Standard_Character aGuidString[128];
+    char aGuidString[128];
     anObjectTypeID.ToString(aGuidString);
     TRACE(std::string("Info: Reading element with GUID ") + aGuidString);
   }
@@ -639,12 +639,12 @@ Standard_Boolean JtData_Model::readElement(JtData_Reader &theReader,
   {
     // End-Of-Elements marker
     theObject = Handle(JtData_Object)();
-    return Standard_True;
+    return true;
   }
   else
   {
     // unknown object
-    Standard_Character aGuidString[128];
+    char aGuidString[128];
     anObjectTypeID.ToString(aGuidString);
     //cerr << std::string("Unknown Element with GUID ") + aGuidString << '\n';
     theObject = new JtData_Object();
@@ -654,45 +654,45 @@ Standard_Boolean JtData_Model::readElement(JtData_Reader &theReader,
   // Read the object data
   Jt_U8 anObjectBaseType;
   if (!theReader.ReadU8(anObjectBaseType))
-    return Standard_False;
+    return false;
 
   if (theObjectIDPtr)
   {
     // for LSG segment, always read Object ID for elements
     if (!theReader.ReadI32(*theObjectIDPtr))
-      return Standard_False;
+      return false;
   }
   else if (MajorVersion() > 8)
   {
     // for other segments, read Object ID only if JT version is 9.x or higher
     Jt_I32 anObjectID;
     if (!theReader.ReadI32(anObjectID))
-      return Standard_False;
+      return false;
   }
 
   if (!theObject->Read(theReader))
-    return Standard_False;
+    return false;
 
   // Check the loaded data length
-  Standard_Size aBytesSpec = anElemStart + anElemLength;
-  Standard_Size aReaderPos = theReader.GetPosition();
+  size_t aBytesSpec = anElemStart + anElemLength;
+  size_t aReaderPos = theReader.GetPosition();
   if (aBytesSpec < aReaderPos)
   {
 #ifdef _DEBUG
-    Standard_Size aBytesRest = aReaderPos - aBytesSpec;
+    size_t aBytesRest = aReaderPos - aBytesSpec;
     cerr << "Error: " << (aBytesRest) << " extra bytes were read after end of the element";
 #endif
-    return Standard_False;
+    return false;
   }
   if (aBytesSpec > aReaderPos)
   {
-    Standard_Size aBytesRest = aBytesSpec - aReaderPos;
+    size_t aBytesRest = aBytesSpec - aReaderPos;
     WARNING(std::string("Warning: ") + std::to_string(aBytesRest) + " element bytes remained after reading, corrected");
     if (!theReader.Skip(aBytesRest))
-      return Standard_False;
+      return false;
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -708,7 +708,7 @@ Handle(JtData_Model) JtData_Model::FindSegment(const Jt_GUID &theGUID,
     return myParent->FindSegment(theGUID, theOffset);
   else
   {
-    Standard_Character aGuidString[128];
+    char aGuidString[128];
     theGUID.ToString(aGuidString);
     ALARM(std::string("Error: Failed to find segment with GUID: ") + aGuidString);
     return Handle(JtData_Model)();
@@ -728,7 +728,7 @@ Handle(JtData_Object) JtData_Model::ReadSegment(const Jt_U64 theOffset) const
         return Handle(JtNode_Partition)();
     }
 
-    return readSegment(aFile, theOffset, Standard_False);
+    return readSegment(aFile, theOffset, false);
 }
 
 //=======================================================================
@@ -744,14 +744,14 @@ Handle(JtData_Object) JtData_Model::ReadSegmentDump(const Jt_U64 theOffset) cons
         return Handle(JtNode_Partition)();
     }
 
-    return readSegmentDump(aFile, theOffset, Standard_False);
+    return readSegmentDump(aFile, theOffset, false);
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtData_Model::Dump(Standard_OStream & /*theStream*/) const
+int JtData_Model::Dump(std::ostream & /*theStream*/) const
 {
   return 0;
 }

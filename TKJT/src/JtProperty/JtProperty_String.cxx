@@ -26,15 +26,15 @@ IMPLEMENT_OBJECT_CLASS(JtProperty_String, "String Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtProperty_String::Read (JtData_Reader& theReader)
+bool JtProperty_String::Read (JtData_Reader& theReader)
 {
   if (!JtProperty_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   return theReader.ReadMbString (myValue);
 }
@@ -43,7 +43,7 @@ Standard_Boolean JtProperty_String::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtProperty_String::Dump (Standard_OStream& theStream) const
+int JtProperty_String::Dump (std::ostream& theStream) const
 {
 //  theStream << "JtProperty_String { " << myValue << " } ";
   return JtProperty_Base::Dump (theStream);

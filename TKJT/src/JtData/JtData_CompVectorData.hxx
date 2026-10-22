@@ -28,8 +28,8 @@ protected:
   struct Size : JtData_VectorData<ValT, SizeT>::Size
   {
     Size (SizeT theCount, CompCountT theCompCount)
-      : JtData_VectorData<ValT, SizeT>::Size (theCount, static_cast <Standard_Size> (theCount)
-                                              * static_cast <Standard_Size> (theCompCount)) {}
+      : JtData_VectorData<ValT, SizeT>::Size (theCount, static_cast <size_t> (theCount)
+                                              * static_cast <size_t> (theCompCount)) {}
   };
 
 public:
@@ -62,13 +62,13 @@ public:
     Base (ValT* theData, SizeT theCount, CompCountT theCompCount)
       : simpleData (theData, theCount), myCompCount (theCompCount) {}
 
-    Standard_Boolean allocate (const SizeT theCount, const CompCountT theCompCount)
+    bool allocate (const SizeT theCount, const CompCountT theCompCount)
     {
       myCompCount = theCompCount;
       return simpleData::allocate (Size (theCount, theCompCount));
     }
 
-    Standard_Boolean reallocate (const SizeT theCount, const CompCountT theCompCount = 0)
+    bool reallocate (const SizeT theCount, const CompCountT theCompCount = 0)
     {
       if (theCompCount)  myCompCount = theCompCount;
       return simpleData::reallocate (Size (theCount, myCompCount));

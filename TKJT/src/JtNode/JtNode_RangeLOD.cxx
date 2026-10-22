@@ -26,15 +26,15 @@ IMPLEMENT_OBJECT_CLASS(JtNode_RangeLOD, "RangeLOD Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_RangeLOD::Read (JtData_Reader& theReader)
+bool JtNode_RangeLOD::Read (JtData_Reader& theReader)
 {
   if (!JtNode_LOD::Read (theReader))
-    return Standard_False;
+    return false;
 
   myVersion = 0;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (myVersion))
-    return Standard_False;
+    return false;
 
   return theReader.ReadVec          <Jt_F32> (myVecR)
       && theReader.ReadUniformStruct<Jt_F32> (myCenter);
@@ -44,7 +44,7 @@ Standard_Boolean JtNode_RangeLOD::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_RangeLOD::Dump (Standard_OStream& theStream) const
+int JtNode_RangeLOD::Dump (std::ostream& theStream) const
 {
   /*
 	theStream << "JtNode_LOD { ";

@@ -62,7 +62,7 @@ Jt_GUID::Jt_GUID (const char* theString)
 // function : ToString
 // purpose  :
 // =======================================================================
-Standard_Boolean Jt_GUID::ToString (char* theString) const
+bool Jt_GUID::ToString (char* theString) const
 {
   return GUIDStringLength ==
     sprintf (theString, "%08x-%04x-%04x-%02x-%02x-%02x-%02x-%02x-%02x-%02x-%02x",

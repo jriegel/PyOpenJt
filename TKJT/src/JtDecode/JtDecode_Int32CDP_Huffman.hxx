@@ -31,9 +31,9 @@ public:
 protected:
 
   //! Decode the data.
-  Standard_EXPORT void decode (int32_t* theResultPtr,
+  TKJT_EXPORT void decode (int32_t* theResultPtr,
                                int32_t* theResultEnd,
-                               const int32_t* theOOBDataPtr) Standard_OVERRIDE;
+                               const int32_t* theOOBDataPtr) override;
 };
 
 #endif

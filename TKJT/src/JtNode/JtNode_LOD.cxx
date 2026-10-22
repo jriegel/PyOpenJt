@@ -26,15 +26,15 @@ IMPLEMENT_OBJECT_CLASS(JtNode_LOD, "LOD Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_LOD::Read (JtData_Reader& theReader)
+bool JtNode_LOD::Read (JtData_Reader& theReader)
 {
   if (!JtNode_Group::Read (theReader))
-    return Standard_False;
+    return false;
 
   myVersion = 0;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (myVersion))
-    return Standard_False;
+    return false;
 
   Jt_VecF32 aReservedVec;
   Jt_F32    aReservedVal;
@@ -46,7 +46,7 @@ Standard_Boolean JtNode_LOD::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_LOD::Dump (Standard_OStream& theStream) const
+int JtNode_LOD::Dump (std::ostream& theStream) const
 {
   /*
 	theStream << "JtNode_LOD { ";

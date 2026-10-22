@@ -36,7 +36,7 @@ public:
   }
 
   virtual RootClass*       Create() const = 0;
-  virtual Standard_CString Name()   const = 0;
+  virtual const char* Name()   const = 0;
 
   // D-tor to prevent gcc warnings
   virtual ~JtData_ClassInfo() {};
@@ -53,11 +53,11 @@ protected:
 template <class Class, class RootClass>
 class JtData_ClassInfoT : public JtData_ClassInfo<RootClass>
 {
-  Standard_CString myName;
+  const char* myName;
 
 public:
-  JtData_ClassInfoT (const Jt_GUID& theGUID, Standard_CString theName,
-                     Standard_Boolean theRegister = Standard_False)
+  JtData_ClassInfoT (const Jt_GUID& theGUID, const char* theName,
+                     bool theRegister = false)
   : myName (theName)
   {
     if (theRegister)
@@ -65,13 +65,13 @@ public:
   }
 
   virtual RootClass*       Create() const { return new Class(); }
-  virtual Standard_CString Name()   const { return myName; }
+  virtual const char* Name()   const { return myName; }
 };
 
 #define DEFINE_CLASS_INFO(theClass, theRootClass) \
   static JtData_ClassInfoT<theClass, theRootClass> ClassInfo;
 
 #define IMPLEMENT_CLASS_INFO(theClass, theRootClass, theName, theGUID) \
-  JtData_ClassInfoT<theClass, theRootClass> theClass::ClassInfo (theGUID, theName, Standard_True);
+  JtData_ClassInfoT<theClass, theRootClass> theClass::ClassInfo (theGUID, theName, true);
 
 #endif // _JtData_ClassInfo_HeaderFile

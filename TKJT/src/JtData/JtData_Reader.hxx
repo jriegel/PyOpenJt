@@ -43,97 +43,97 @@ public:
 
 public:
   //! Constructor.
-  Standard_EXPORT JtData_Reader (const Handle(JtData_Model)& theModel);
+  TKJT_EXPORT JtData_Reader (const Handle(JtData_Model)& theModel);
 
   //! Destructor.
-  Standard_EXPORT virtual ~JtData_Reader();
+  TKJT_EXPORT virtual ~JtData_Reader();
 
   //! Read raw bytes from the stream.
-  Standard_EXPORT virtual Standard_Boolean ReadBytes (void* theBuffer, Standard_Size theLength) = 0;
+  TKJT_EXPORT virtual bool ReadBytes (void* theBuffer, size_t theLength) = 0;
 
   //! Skip some bytes.
-  Standard_EXPORT virtual Standard_Boolean SkipBytes (Standard_Size theLength) = 0;
+  TKJT_EXPORT virtual bool SkipBytes (size_t theLength) = 0;
 
   //! Get absolute reading position.
-  Standard_EXPORT virtual Standard_Size GetPosition() const = 0;
+  TKJT_EXPORT virtual size_t GetPosition() const = 0;
 
   //! Get the associated model.
   const Handle(JtData_Model)& Model() const { return myModel; }
 
   //! Read a primitive value from the stream.
   template <class Type>
-  Standard_Boolean ReadPrimitiveValue (Type& theValue)
+  bool ReadPrimitiveValue (Type& theValue)
   {
     if (!ReadBytes (&theValue, sizeof (Type)))
-      return Standard_False;
+      return false;
 
     if (myNeedSwap)
       ByteSwap (theValue);
 
-    return Standard_True;
+    return true;
   }
 
   //! Specialization for signed byte.
-  Standard_Boolean ReadPrimitiveValue (int8_t& theValue)
+  bool ReadPrimitiveValue (int8_t& theValue)
     { return ReadBytes (&theValue, sizeof (int8_t)); }
 
   //! Specialization for unsigned byte.
-  Standard_Boolean ReadPrimitiveValue (uint8_t& theValue)
+  bool ReadPrimitiveValue (uint8_t& theValue)
     { return ReadBytes (&theValue, sizeof (uint8_t)); }
 
   //! Read given number of primitive values all having the same type.
   template <class Type, class SizeT>
-  Standard_Boolean ReadPrimitiveArray (Type* theArray, const SizeT theLength)
+  bool ReadPrimitiveArray (Type* theArray, const SizeT theLength)
   {
     if (!ReadBytes (theArray, theLength * sizeof (Type)))
-      return Standard_False;
+      return false;
 
     if (myNeedSwap)
       for (SizeT i = 0; i < theLength; i++)
         ByteSwap (theArray[i]);
 
-    return Standard_True;
+    return true;
   }
 
   //! Specialization for array of signed bytes.
   template <class SizeT>
-  Standard_Boolean ReadPrimitiveArray (int8_t* theArray, const SizeT theLength)
+  bool ReadPrimitiveArray (int8_t* theArray, const SizeT theLength)
     { return ReadBytes (theArray, theLength); }
 
   //! Specialization for array of unsigned bytes.
   template <class SizeT>
-  Standard_Boolean ReadPrimitiveArray (uint8_t* theArray, const SizeT theLength)
+  bool ReadPrimitiveArray (uint8_t* theArray, const SizeT theLength)
     { return ReadBytes (theArray, theLength); }
 
   //! Load/map raw bytes from the stream to memory
   //! and return a pointer to access the data.
-  const void* LoadBytes (const Standard_Size theLength);
+  const void* LoadBytes (const size_t theLength);
 
   //! Free/unmap memory allocated/mapped by the Load method.
   void UnloadBytes (const void* theAddress);
 
   //! Read a 1-byte character string.
-  Standard_Boolean ReadSbString (TCollection_AsciiString& theString);
+  bool ReadSbString (TCollection_AsciiString& theString);
 
   //! Read a 2-byte character string.
-  Standard_Boolean ReadMbString (TCollection_ExtendedString& theString);
+  bool ReadMbString (TCollection_ExtendedString& theString);
 
   //! Read a 2-byte character string into a std::wstring
-  Standard_Boolean ReadMbString(std::wstring& theString);
+  bool ReadMbString(std::wstring& theString);
 
-  Standard_Boolean ReadObject(char16_t &theObject)
+  bool ReadObject(char16_t &theObject)
   {
     Jt_I16 theValue;
     if (ReadI16(theValue)) {
       theObject = theValue;
-      return Standard_True;
+      return true;
     }
-    return Standard_False;
+    return false;
   }
 
 protected:
   Handle(JtData_Model) myModel;
-  Standard_Boolean     myNeedSwap;
+  bool     myNeedSwap;
 };
 
 #endif // _JtData_Reader_HeaderFile

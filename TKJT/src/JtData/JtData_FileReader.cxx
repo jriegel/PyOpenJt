@@ -36,7 +36,7 @@ JtData_FileReader::JtData_FileReader (std::ifstream&                theFile,
 //purpose  : Read raw bytes from the stream
 //=======================================================================
 
-Standard_Boolean JtData_FileReader::ReadBytes (void* theBuffer, Standard_Size theLength)
+bool JtData_FileReader::ReadBytes (void* theBuffer, size_t theLength)
 {
   myFile->read (reinterpret_cast<char*> (theBuffer), theLength);
   return !myFile->eof();
@@ -47,7 +47,7 @@ Standard_Boolean JtData_FileReader::ReadBytes (void* theBuffer, Standard_Size th
 //purpose  : Skip some bytes
 //=======================================================================
 
-Standard_Boolean JtData_FileReader::SkipBytes (Standard_Size theLength)
+bool JtData_FileReader::SkipBytes (size_t theLength)
 {
   myFile->seekg (theLength, std::ios_base::cur);
   return !myFile->eof();
@@ -58,7 +58,7 @@ Standard_Boolean JtData_FileReader::SkipBytes (Standard_Size theLength)
 //purpose  : Get absolute reading position
 //=======================================================================
 
-Standard_Size JtData_FileReader::GetPosition() const
+size_t JtData_FileReader::GetPosition() const
 {
-  return static_cast <Standard_Size> (myFile->tellg());
+  return static_cast <size_t> (myFile->tellg());
 }

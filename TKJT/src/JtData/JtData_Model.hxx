@@ -23,7 +23,7 @@
 #include <TCollection_ExtendedString.hxx>
 
 #include <Standard_DefineHandle.hxx>
-#include <Standard_OStream.hxx>
+#include <ostream>
 #include <NCollection_DataMap.hxx>
 
 #include <fstream>
@@ -38,41 +38,41 @@ DEFINE_STANDARD_HANDLE(JtData_Model, Standard_Transient)
 class JtData_Model : public Standard_Transient
 {
 public:
-  static const Standard_Boolean IsLittleEndianHost;
+  static const bool IsLittleEndianHost;
 
 public:
   //! Constructor initializing model by specified file
   //! @param theFileName - name of Jt file
   //! @param theParent - the parent model in case of non monolythic assembly.
-  Standard_EXPORT JtData_Model (const TCollection_ExtendedString& theFileName,
+  TKJT_EXPORT JtData_Model (const TCollection_ExtendedString& theFileName,
                                 const Handle(JtData_Model)& theParent = Handle(JtData_Model)());
 
   //! Read JT file header, TOC and LSG and return a handle to the root LSG node.
-  Standard_EXPORT Handle(JtNode_Partition) Init();
+  TKJT_EXPORT Handle(JtNode_Partition) Init();
 
   //! Lookup offset of a segment in TOCs of this model and its ancestor models.
-  Standard_EXPORT Handle(JtData_Model) FindSegment (const Jt_GUID& theGUID,
+  TKJT_EXPORT Handle(JtData_Model) FindSegment (const Jt_GUID& theGUID,
                                                           Jt_U64&  theOffset) const;
 
   //! Read object from a late loaded segment.
-  Standard_EXPORT Handle(JtData_Object) ReadSegment(const Jt_U64 theOffset) const;
+  TKJT_EXPORT Handle(JtData_Object) ReadSegment(const Jt_U64 theOffset) const;
   //! Read object from a late loaded segment.
-  Standard_EXPORT Handle(JtData_Object) ReadSegmentDump(const Jt_U64 theOffset) const;
+  TKJT_EXPORT Handle(JtData_Object) ReadSegmentDump(const Jt_U64 theOffset) const;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const;
 
   //! Return file name.
   const TCollection_ExtendedString& FileName()     const { return myFileName; }
 
   //! Return Little Endian state.
-  Standard_Boolean                  IsFileLE()     const { return myIsFileLE; }
+  bool                  IsFileLE()     const { return myIsFileLE; }
 
   //! Return major version of Jt file.
-  Standard_Integer                  MajorVersion() const { return myMajorVersion; }
+  int                  MajorVersion() const { return myMajorVersion; }
 
   //! Return minor version of Jt file.
-  Standard_Integer                  MinorVersion() const { return myMinorVersion; }
+  int                  MinorVersion() const { return myMinorVersion; }
 
   struct TocEntry {
       TocEntry(const Jt_GUID& _GUID, uint64_t _Offset, uint32_t _Length, int _Type) :GUID(_GUID), Offset(_Offset), Length(_Length), Type(_Type) {}
@@ -89,30 +89,30 @@ public:
 
 protected:
   //! Open the file.
-  Standard_Boolean open (std::ifstream& aFile) const;
+  bool open (std::ifstream& aFile) const;
 
   //! Read TOC from the JT file.
-  Standard_Boolean readTOC (std::ifstream& theFile, const Jt_U64 theOffset);
+  bool readTOC (std::ifstream& theFile, const Jt_U64 theOffset);
 
   //! Read object(s) from a JT file segment.
   Handle(JtData_Object) readSegment(std::ifstream& theFile,
       const Jt_U64             theOffset,
-      const Standard_Boolean   theIsLSG) const;
+      const bool   theIsLSG) const;
   //! Read object(s) from a JT file segment.
   Handle(JtData_Object) readSegmentDump(std::ifstream& theFile,
       const Jt_U64             theOffset,
-      const Standard_Boolean   theIsLSG) const;
+      const bool   theIsLSG) const;
   //! Read LSG segment data.
-  Standard_Boolean readLSGData  (JtData_Reader&               theReader,
+  bool readLSGData  (JtData_Reader&               theReader,
                                  Handle(JtData_Object)&       theFirstObject) const;
 
   //! Read a sequence of elements from a JT file segment.
-  Standard_Boolean readElements (JtData_Reader&               theReader,
+  bool readElements (JtData_Reader&               theReader,
                                  JtData_Object::MapOfObjects& theMap,
                                  Handle(JtData_Object)&       theFirstObject) const;
 
   //! Read an element from a JT file segment.
-  Standard_Boolean readElement  (JtData_Reader&               theReader,
+  bool readElement  (JtData_Reader&               theReader,
                                  Handle(JtData_Object)&       theObject,
                                  Jt_I32*                      theObjectIDPtr = 0L) const;
 
@@ -120,10 +120,10 @@ protected:
   Handle(JtData_Model)       myParent;
 
   TCollection_ExtendedString myFileName;
-  Standard_Boolean           myIsFileLE;
+  bool           myIsFileLE;
 
-  Standard_Integer           myMajorVersion;
-  Standard_Integer           myMinorVersion;
+  int           myMajorVersion;
+  int           myMinorVersion;
 
   NCollection_DataMap <Jt_GUID, Jt_U64, Jt_GUID> myTOC;
 

@@ -31,7 +31,7 @@
 JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader& theReader)
 {
   // Read codec type
-  Standard_Integer aCodec;
+  int aCodec;
   if (!theReader.ReadU8 (aCodec))
     return EncodedDataHandle();
 
@@ -64,7 +64,7 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader&
   }
 
   // Huffman or arithmetic codec: read probability contexts and load OOB data
-  Standard_Integer aProbContextTableCount = 0;
+  int aProbContextTableCount = 0;
   if (aCodec >= 2)
   {
     // read probability contexts
@@ -78,7 +78,7 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP1 (JtData_Reader&
       if (!aProbContexts[0].ReadFirst (aContextReader))
         return EncodedDataHandle();
 
-      for (Standard_Integer i = 1; i < aProbContextTableCount; i++)
+      for (int i = 1; i < aProbContextTableCount; i++)
         if (!aProbContexts[i].ReadNext (aContextReader, aProbContexts[0]))
           return EncodedDataHandle();
     }
@@ -132,7 +132,7 @@ JtDecode_Int32CDP::EncodedDataHandle JtDecode_Int32CDP::loadCDP2 (JtData_Reader&
     return EncodedDataHandle (new JtDecode_Int32CDP_Null (Jt_VecU32().Move()));
 
   // Read codec type
-  Standard_Integer aCodec;
+  int aCodec;
   if (!theReader.ReadU8 (aCodec))
     return EncodedDataHandle();
 

@@ -26,7 +26,7 @@ IMPLEMENT_OBJECT_CLASS(JtNode_MetaData, "MetaData Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_MetaData::Read (JtData_Reader& theReader)
+bool JtNode_MetaData::Read (JtData_Reader& theReader)
 {
   Jt_I16 aVersion;
   return JtNode_Group::Read (theReader)
@@ -37,7 +37,7 @@ Standard_Boolean JtNode_MetaData::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_MetaData::Dump (Standard_OStream& theStream) const
+int JtNode_MetaData::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_MetaData ";
   return JtNode_Group::Dump (theStream);

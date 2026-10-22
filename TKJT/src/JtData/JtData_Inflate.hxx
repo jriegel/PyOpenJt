@@ -26,35 +26,35 @@ class JtData_Inflate : public JtData_Reader
 {
 public:
   //! Constructor.
-  Standard_EXPORT JtData_Inflate (JtData_Reader& theReader, const Standard_Size theLength);
+  TKJT_EXPORT JtData_Inflate (JtData_Reader& theReader, const size_t theLength);
 
   //! Destructor.
-  Standard_EXPORT virtual ~JtData_Inflate();
+  TKJT_EXPORT virtual ~JtData_Inflate();
 
   //! Buffered inflate raw bytes.
-  Standard_EXPORT Standard_Boolean ReadBytes (void* theBuffer, Standard_Size theLength) Standard_OVERRIDE;
+  TKJT_EXPORT bool ReadBytes (void* theBuffer, size_t theLength) override;
 
   //! Skip some bytes.
-  Standard_EXPORT Standard_Boolean SkipBytes (Standard_Size theLength) Standard_OVERRIDE;
+  TKJT_EXPORT bool SkipBytes (size_t theLength) override;
 
   //! Get absolute reading position in the inflated data.
-  Standard_EXPORT Standard_Size GetPosition() const Standard_OVERRIDE;
+  TKJT_EXPORT size_t GetPosition() const override;
 
 protected:
-  Standard_Size read (Bytef* theBuffer, Standard_Size theLength);
+  size_t read (Bytef* theBuffer, size_t theLength);
 
 protected:
-  static const Standard_Size CHUNK = 32768;
+  static const size_t CHUNK = 32768;
 
   JtData_Reader* myReader;
   z_stream       myZStream;
 
   const Bytef*   myInBuffer;
-  Standard_Size  myInputRest;
+  size_t  myInputRest;
 
   Bytef          myOutBuffer[CHUNK];
   const Bytef*   myOutBufPos;
-  Standard_Size  myOutBufRest;
+  size_t  myOutBufRest;
 };
 
 #endif // _JtData_Inflate_HeaderFile

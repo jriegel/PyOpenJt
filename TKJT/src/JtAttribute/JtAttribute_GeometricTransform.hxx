@@ -26,22 +26,22 @@ class JtAttribute_GeometricTransform : public JtAttribute_Base
 {
 public:
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   //! Return transformation.
-  Standard_EXPORT void GetTrsf (gp_Trsf& theTrsf) const;
+  TKJT_EXPORT void GetTrsf (gp_Trsf& theTrsf) const;
 
   //! Return transformationy.
-  const Standard_Real* GetTrsf() const { return myTransform; }
+  const double* GetTrsf() const { return myTransform; }
 
   DEFINE_STANDARD_RTTIEXT(JtAttribute_GeometricTransform,JtAttribute_Base)
   DEFINE_OBJECT_CLASS (JtAttribute_GeometricTransform)
 
 protected:
-  Standard_Real myTransform[16];
+  double myTransform[16];
 };
 
 DEFINE_STANDARD_HANDLE(JtAttribute_GeometricTransform, JtAttribute_Base)

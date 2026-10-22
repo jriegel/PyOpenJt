@@ -26,7 +26,7 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Partition, "Partition Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Partition::Read (JtData_Reader& theReader)
+bool JtNode_Partition::Read (JtData_Reader& theReader)
 {
   myModel = theReader.Model();
 
@@ -35,14 +35,14 @@ Standard_Boolean JtNode_Partition::Read (JtData_Reader& theReader)
    || !theReader.ReadI32      (aFlags)
    || !theReader.ReadMbString (myFileName))
   {
-    return Standard_False;
+    return false;
   }
 
-  const Standard_Boolean hasUntransformedBndBox = ((aFlags & 1) != 0);
+  const bool hasUntransformedBndBox = ((aFlags & 1) != 0);
 
   Jt_BBoxF32 aBBox;
   if (!theReader.ReadUniformStruct<Jt_F32> (aBBox))
-    return Standard_False;
+    return false;
 
   Jt_F32 anArea;
   Jt_I32 aVrtxRange[2];
@@ -53,23 +53,23 @@ Standard_Boolean JtNode_Partition::Read (JtData_Reader& theReader)
    || !theReader.ReadArray (aNodeRange)
    || !theReader.ReadArray (aPolyRange))
   {
-    return Standard_False;
+    return false;
   }
 
   if (hasUntransformedBndBox
    && !theReader.ReadUniformStruct<Jt_F32> (aBBox))
   {
-    return Standard_False;
+    return false;
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Partition::Dump (Standard_OStream& theStream) const
+int JtNode_Partition::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_Partition ";
   return JtNode_Group::Dump (theStream);
@@ -79,16 +79,16 @@ Standard_Integer JtNode_Partition::Dump (Standard_OStream& theStream) const
 //function : Load
 //purpose  : Load the referenced JT file and bind its LSG to this node
 //=======================================================================
-Standard_Boolean JtNode_Partition::Load()
+bool JtNode_Partition::Load()
 {
   Handle(JtData_Model)     aModel    = new JtData_Model (myFileName, myModel);
   Handle(JtNode_Partition) aRootNode = aModel->Init();
   if (aRootNode.IsNull())
-    return Standard_False;
+    return false;
 
   myChildren = aRootNode->Children();
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================

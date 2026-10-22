@@ -33,22 +33,22 @@ public:
     : myIdxIdx (0), myIndices (theIndices), myEntities (theEntities) {}
 
   template <class Entity, class SizeT>
-  Standard_Boolean operator() (const JtData_Vector<Entity, SizeT>& theEntities)
+  bool operator() (const JtData_Vector<Entity, SizeT>& theEntities)
   {
     for (SizeT i = 0; i < theEntities.Count(); i++)
     {
       if (myIdxIdx > myIndices.Count())
-        return Standard_False;
+        return false;
 
       Jt_I32 anIdx = myIndices[myIdxIdx];
       if (anIdx > myEntities.Count())
-        return Standard_False;
+        return false;
 
       myEntities[anIdx] = &theEntities[i];
       myIdxIdx++;
     }
 
-    return Standard_True;
+    return true;
   }
 };
 
@@ -57,60 +57,60 @@ class JtElement_MetaData_PMIManager::PMIReader : public JtData_Reader::Wrapper<P
 public:
   PMIReader (JtData_Reader& theReader) : JtData_Reader::Wrapper<PMIReader> (theReader) {}
 
-  Standard_Boolean ReadObject (TextPolylineData&)
+  bool ReadObject (TextPolylineData&)
   {
     PolylineData aData;
     if (!Read (aData.SegmentIndices))
-      return Standard_False;
+      return false;
 
     return aData.SegmentIndices.IsEmpty() || Read (aData.VertexCoords);
   }
 
-  Standard_Boolean ReadObject (NonTextPolylineData&)
+  bool ReadObject (NonTextPolylineData&)
   {
     PolylineData aData;
     if (!Read (aData.SegmentIndices))
-      return Standard_False;
+      return false;
 
     if (myVersion > 4)
     {
       JtData_Vector<Jt_I16, Jt_I32> aTypes;
       if (!Read (aTypes))
-        return Standard_False;
+        return false;
     }
 
     return Read (aData.VertexCoords);
   }
 
-  Standard_Boolean ReadObject (PMIBaseData& theData)
+  bool ReadObject (PMIBaseData& theData)
   {
     Jt_U8 a2DFrameFlag;
     if (!Read (theData.UserLabel)
      || !Read (a2DFrameFlag))
-      return Standard_False;
+      return false;
 
     if (a2DFrameFlag)
     {
       RefFrame2D a2DRefFrame;
       if (!ReadUniformStruct<Jt_F32> (a2DRefFrame))
-        return Standard_False;
+        return false;
     }
 
     if (!Read (theData.TextHeight))
-      return Standard_False;
+      return false;
 
     if (myVersion > 4)
     {
       if (!Read (theData.ValidFlag))
-        return Standard_False;
+        return false;
     }
     else
       theData.ValidFlag = 1;
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (TextData2D& theData)
+  bool ReadObject (TextData2D& theData)
   {
     Jt_I32 aReservedI32;
     Jt_F32 aReservedF32;
@@ -122,14 +122,14 @@ public:
         && Read (theData.PolylineData);
   }
 
-  Standard_Boolean ReadObject (PMI2DData& theData)
+  bool ReadObject (PMI2DData& theData)
   {
     return Read (static_cast <PMIBaseData&> (theData))
         && Read (theData.TextEntities)
         && Read (theData.PolylineData);
   }
 
-  Standard_Boolean ReadObject (PMI3DData& theData)
+  bool ReadObject (PMI3DData& theData)
   {
     Jt_I16 aPolylineDimensionality;
     PolylineData aPolylineData;
@@ -140,25 +140,25 @@ public:
         && Read (aPolylineData.VertexCoords);
   }
 
-  Standard_Boolean ReadObject (Note& theData)
+  bool ReadObject (Note& theData)
   {
     if (!Read (static_cast <PMI2DData&> (theData)))
-      return Standard_False;
+      return false;
 
     if (myVersion > 5)
     {
       Jt_U32 anURLFlag;
       if (!Read (anURLFlag))
-        return Standard_False;
+        return false;
     }
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (SpotWeld& theData)
+  bool ReadObject (SpotWeld& theData)
   {
     if (!Read (static_cast <PMI3DData&> (theData)))
-      return Standard_False;
+      return false;
 
     if (myVersion >= 4)
     {
@@ -168,16 +168,16 @@ public:
        || !Read (anApproachDirection)
        || !Read (aClampingDirection)
        || !Read (aNormalDirection))
-        return Standard_False;
+        return false;
     }
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (MeasurePoint& theData)
+  bool ReadObject (MeasurePoint& theData)
   {
     if (!Read (static_cast <PMI3DData&> (theData)))
-      return Standard_False;
+      return false;
 
     if (myVersion >= 4)
     {
@@ -187,18 +187,18 @@ public:
        || !Read (aMeasurementDirection)
        || !Read (aCoordinateDirection)
        || !Read (aNormalDirection))
-        return Standard_False;
+        return false;
     }
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (DesignGroupAttribute& theData)
+  bool ReadObject (DesignGroupAttribute& theData)
   {
     if (!Read (theData.Type))
-      return Standard_False;
+      return false;
 
-    Standard_Boolean aResult = Standard_False;
+    bool aResult = false;
     switch (theData.Type)
     {
     case 1: aResult = Read (theData.Int);      break;
@@ -210,22 +210,22 @@ public:
                    && Read (theData.DescrStringID);
   }
 
-  Standard_Boolean ReadObject (DesignGroup& theData)
+  bool ReadObject (DesignGroup& theData)
   {
     if (!Read (theData.NameStringID))
-      return Standard_False;
+      return false;
 
     if (myVersion >= 3)
     {
       JtData_Vector <DesignGroupAttribute, Jt_I32> anAttributes;
       if (!Read (anAttributes))
-        return Standard_False;
+        return false;
     }
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (CoordSystem& theData)
+  bool ReadObject (CoordSystem& theData)
   {
     Jt_CoordF32 anOrigin, anXAxisPoint, anYAxisPoint;
     return Read (theData.NameStringID)
@@ -234,7 +234,7 @@ public:
         && Read (anYAxisPoint);
   }
 
-  Standard_Boolean ReadObject (PMIEntities& theData)
+  bool ReadObject (PMIEntities& theData)
   {
     return Read (theData.DimensionEntities)
         && Read (theData.NoteEntities)
@@ -251,17 +251,17 @@ public:
         && Read (theData.CoordSystemEntities);
   }
 
-  Standard_Boolean ReadObject (Association& theData)
+  bool ReadObject (Association& theData)
   {
     return ReadUniformStruct<Jt_I32> (theData);
   }
 
-  Standard_Boolean ReadObject (UserAttribute& theData)
+  bool ReadObject (UserAttribute& theData)
   {
     return Read (theData.KeyStringID) && Read (theData.ValueStringID);
   }
 
-  Standard_Boolean ReadObject (ModelView& theData)
+  bool ReadObject (ModelView& theData)
   {
     Jt_DirF32   anEyeDirection;
     Jt_F32      anAngle;
@@ -287,56 +287,56 @@ public:
         && Read (theData.NameStringID);
   }
 
-  Standard_Boolean ReadObject (PropertyAtom& theData)
+  bool ReadObject (PropertyAtom& theData)
   {
     if (!Read (static_cast <TCollection_ExtendedString&> (theData)))
-      return Standard_False;
+      return false;
 
     if (myVersion > 6)
     {
       Jt_U32 aHiddenFlag;
       if (!Read (aHiddenFlag))
-        return Standard_False;
+        return false;
     }
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (Property& theData)
+  bool ReadObject (Property& theData)
   {
     return Read (theData.Key) && Read (theData.Value);
   }
 
-  Standard_Boolean ReadObject (GenericEntity& theData)
+  bool ReadObject (GenericEntity& theData)
   {
     if (!Read (static_cast <PMI2DData&> (theData)))
-      return Standard_False;
+      return false;
 
     if (!Read (theData.Properties)
      || !Read (theData.EntityTypeStringID)
      || !Read (theData.ParentTypeStringID)
      || !Read (theData.EntityType)
      || !Read (theData.ParentType))
-        return Standard_False;
+        return false;
 
     if (myVersion > 6)
     {
       Jt_U16 aUserFlags;
       if (!Read (aUserFlags))
-        return Standard_False;
+        return false;
     }
 
-    return Standard_True;
+    return true;
   }
 
-  Standard_Boolean ReadObject (JtElement_MetaData_PMIManager& theData)
+  bool ReadObject (JtElement_MetaData_PMIManager& theData)
   {
     // Read additional version if JT version is 9.x or higher
     if (Model()->MajorVersion() > 8)
     {
       Jt_I16 aVersion;
       if (!Read (aVersion))
-        return Standard_False;
+        return false;
     }
 
     // Read permanent data
@@ -348,14 +348,14 @@ public:
      || !Read    (aPMIAssociations)
      || !Read    (theData.myUserAttributes)
      || !Read    (theData.myStringTable))
-      return Standard_False;
+      return false;
 
     // Read Model Views and Generic PMI Entities if present
     if (myVersion > 5)
     {
       if (!Read (theData.myModelViews)
        || !Read (theData.myEntities.GenericEntities))
-        return Standard_False;
+        return false;
     }
 
     // Read CAD Tag Data if present
@@ -364,49 +364,49 @@ public:
     {
       Jt_U32 aCADTagsFlag;
       if (!Read (aCADTagsFlag))
-        return Standard_False;
+        return false;
 
       if (aCADTagsFlag == 1)
       {
         Jt_VecI32 aCADTagIndices;
         if (!Read (aCADTagIndices))
-          return Standard_False;
+          return false;
 
         // read Compressed CAD Tag Data collection
-        Standard_Size aStartPos = GetPosition();
+        size_t aStartPos = GetPosition();
         if (Model()->MajorVersion() > 8)
         {
           Jt_I16 aVersion;
           if (!Read (aVersion))
-            return Standard_False;
+            return false;
         }
 
         Jt_I32 aDataLength, aVersionNumber, aCADTagCount;
         if (!Read (aDataLength) || !Read (aVersionNumber) || !Read (aCADTagCount))
-          return Standard_False;
+          return false;
 
         //anEntitiesSortedByCADTagIndices.Allocate (aCADTagCount);
         //if (!theData.SortEntities (EntitiesSorter (aCADTagIndices, anEntitiesSortedByCADTagIndices)))
-        //  return Standard_False;
+        //  return false;
 
         // skip reading the remaining Compressed CAD Tag Data
         if (!Skip (aDataLength - (GetPosition() - aStartPos)))
-          return Standard_False;
+          return false;
       }
     }
 
-    return Standard_True;
+    return true;
   }
 
 protected:
-  Standard_Integer myVersion;
+  int myVersion;
 };
 
 //=======================================================================
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtElement_MetaData_PMIManager::Read (JtData_Reader& theReader)
+bool JtElement_MetaData_PMIManager::Read (JtData_Reader& theReader)
 {
   return JtData_Object::Read (theReader)
     && PMIReader (theReader).Read (*this);
@@ -429,13 +429,13 @@ Standard_Boolean JtElement_MetaData_PMIManager::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtElement_MetaData_PMIManager::Dump (Standard_OStream& theStream) const
+int JtElement_MetaData_PMIManager::Dump (std::ostream& theStream) const
 {
   theStream << "JtElement_MetaData_PMIManager ";
   return JtData_Object::Dump (theStream);
 }
 
-Standard_Boolean JtElement_MetaData_PMIManager::SortEntities (EntitiesSorter theSorter) const
+bool JtElement_MetaData_PMIManager::SortEntities (EntitiesSorter theSorter) const
 {
   return theSorter (myEntities.LineWeldEntities)
       && theSorter (myEntities.SpotWeldEntities)

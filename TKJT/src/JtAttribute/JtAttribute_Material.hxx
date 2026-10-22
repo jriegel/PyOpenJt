@@ -24,13 +24,13 @@ class JtAttribute_Material : public JtAttribute_Base
 {
 public:
   //! Default constructor.
-  Standard_EXPORT JtAttribute_Material();
+  TKJT_EXPORT JtAttribute_Material();
 
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   //! Return ambient color.
   const Jt_F32* AmbientColor()  const { return myAmbientColor;  }

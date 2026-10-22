@@ -26,7 +26,7 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Shape_TriStripSet, "Tri-Strip Set Shape Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Shape_TriStripSet::Read (JtData_Reader& theReader)
+bool JtNode_Shape_TriStripSet::Read (JtData_Reader& theReader)
 {
   return JtNode_Shape_Vertex::Read (theReader);
 }
@@ -35,7 +35,7 @@ Standard_Boolean JtNode_Shape_TriStripSet::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Shape_TriStripSet::Dump (Standard_OStream& theStream) const
+int JtNode_Shape_TriStripSet::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_Shape_TriStripSet ";
   return JtNode_Shape_Vertex::Dump (theStream);

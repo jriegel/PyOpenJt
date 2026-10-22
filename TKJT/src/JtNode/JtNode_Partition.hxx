@@ -27,16 +27,16 @@ class JtNode_Partition : public JtNode_Group
 {
 public:
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   //! Load the referenced JT file and bind its LSG to this node.
-  Standard_EXPORT Standard_Boolean Load();
+  TKJT_EXPORT bool Load();
 
   //! Unbind children from this node and unload the referenced JT file.
-  Standard_EXPORT void Unload();
+  TKJT_EXPORT void Unload();
 
   //! Returns file name.
   const TCollection_ExtendedString& FileName() const { return myFileName; }

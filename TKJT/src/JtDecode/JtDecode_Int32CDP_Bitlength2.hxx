@@ -30,10 +30,10 @@ public:
 protected:
 
   //! Decode the data.
-  Standard_EXPORT void decode (int32_t* theResultPtr, int32_t* theResultEnd) Standard_OVERRIDE;
+  TKJT_EXPORT void decode (int32_t* theResultPtr, int32_t* theResultEnd) override;
 
-  Standard_EXPORT void decodeVariableWidth (int32_t* theResultPtr, int32_t* theResultEnd);
-  Standard_EXPORT void decodeFixedWidth    (int32_t* theResultPtr, int32_t* theResultEnd);
+  TKJT_EXPORT void decodeVariableWidth (int32_t* theResultPtr, int32_t* theResultEnd);
+  TKJT_EXPORT void decodeFixedWidth    (int32_t* theResultPtr, int32_t* theResultEnd);
 };
 
 #endif

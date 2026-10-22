@@ -30,32 +30,32 @@
 class HuffCodeData
 {
   public:
-  HuffCodeData (Standard_Integer theSymbol, Standard_Integer theAssValue)
+  HuffCodeData (int theSymbol, int theAssValue)
     : mySymbol (theSymbol), myValue (theAssValue), myCodeLength (0), myBitCode (0), myIndex (0) {}
 
-  HuffCodeData (Standard_Integer theSymbol, Standard_Integer theAssValue,
-                Standard_Integer theCodeLen, Standard_Integer theBitCode)
+  HuffCodeData (int theSymbol, int theAssValue,
+                int theCodeLen, int theBitCode)
     : mySymbol (theSymbol), myValue (theAssValue),
       myCodeLength (theCodeLen), myBitCode (theBitCode), myIndex (0) {}
 
-  Standard_Integer Symbol()   const {return mySymbol;}
-  Standard_Integer CodeLen()  const {return myCodeLength;}
-  Standard_Integer BitCode()  const {return myBitCode;}
-  Standard_Integer Value()    const {return myValue;}
-  Standard_Integer Index()    const {return myIndex;}
+  int Symbol()   const {return mySymbol;}
+  int CodeLen()  const {return myCodeLength;}
+  int BitCode()  const {return myBitCode;}
+  int Value()    const {return myValue;}
+  int Index()    const {return myIndex;}
 
-  void SetSymbol   (Standard_Integer theSymbol)   {mySymbol = theSymbol;}
-  void SetCodeLen  (Standard_Integer theCodeLen)  {myCodeLength = theCodeLen;}
-  void SetBitCode  (Standard_Integer theBitCode)  {myBitCode = theBitCode;}
-  void SetValue    (Standard_Integer theAssValue) {myValue = theAssValue;}
-  void SetIndex    (Standard_Integer theIndex)    {myIndex = theIndex;}
+  void SetSymbol   (int theSymbol)   {mySymbol = theSymbol;}
+  void SetCodeLen  (int theCodeLen)  {myCodeLength = theCodeLen;}
+  void SetBitCode  (int theBitCode)  {myBitCode = theBitCode;}
+  void SetValue    (int theAssValue) {myValue = theAssValue;}
+  void SetIndex    (int theIndex)    {myIndex = theIndex;}
 
 private:
-  Standard_Integer mySymbol;
-  Standard_Integer myValue;
-  Standard_Integer myCodeLength;
-  Standard_Integer myBitCode;
-  Standard_Integer myIndex;
+  int mySymbol;
+  int myValue;
+  int myCodeLength;
+  int myBitCode;
+  int myIndex;
 };
 
 bool compareCodes (const HuffCodeData* theData1, const HuffCodeData* theData2)
@@ -76,8 +76,8 @@ class HuffCodecContext
 public:
   HuffCodecContext() : myCode (0), myCodeLength (0) {}
 
-  Standard_Integer Code()    {return myCode;}
-  Standard_Integer CodeLen() {return myCodeLength;}
+  int Code()    {return myCode;}
+  int CodeLen() {return myCodeLength;}
 
   void LeftShift()       {myCode = (myCode << 1) & 0xFFFF;}
   void RightShift()      {myCode = myCode >> 1;}
@@ -92,8 +92,8 @@ public:
 
 private:
 
-  Standard_Integer myCode;       // Current code which is constructed
-  Standard_Integer myCodeLength; // Length of Huffman code currently constructed
+  int myCode;       // Current code which is constructed
+  int myCodeLength; // Length of Huffman code currently constructed
 
   std::list<HuffCodeData*> myCodes;
 };
@@ -117,17 +117,17 @@ public:
   HuffTreeNode*        Left()                {return left;}
   HuffTreeNode*        Right()               {return right;}
   HuffCodeData*        Data()                {return data;}
-  Standard_Integer     SymCount()            {return symCount;}
-  Standard_Integer     Symbol()              {return data->Symbol();}
-  Standard_Integer     AssociatedValue()     {return data->Value();}
+  int     SymCount()            {return symCount;}
+  int     Symbol()              {return data->Symbol();}
+  int     AssociatedValue()     {return data->Value();}
 
-  void SetCode    (Standard_Integer code)    {data->SetBitCode (code);}
-  void SetCodeLen (Standard_Integer codeLen) {data->SetCodeLen (codeLen);}
+  void SetCode    (int code)    {data->SetBitCode (code);}
+  void SetCodeLen (int codeLen) {data->SetCodeLen (codeLen);}
 
-  Standard_Boolean LowerThan (HuffTreeNode* o) {return symCount < o->symCount;}
-  Standard_Boolean IsLeaf()                    {return (left == NULL) && (right == NULL);}
+  bool LowerThan (HuffTreeNode* o) {return symCount < o->symCount;}
+  bool IsLeaf()                    {return (left == NULL) && (right == NULL);}
 
-  Standard_Integer DesscendantMaxDepth()
+  int DesscendantMaxDepth()
   {
     int l = 0;
     int r = 0;
@@ -155,7 +155,7 @@ public:
   HuffHeap() {}
 
   //! Returns the size of the heap.
-  Standard_Size Size()
+  size_t Size()
   {
     return _heap.size();
   }
@@ -165,7 +165,7 @@ public:
   {
     _heap.push_back (theHuffTreeNode);
 
-    Standard_Size i = _heap.size();
+    size_t i = _heap.size();
 
     while ((i != 1) && (_heap[(i / 2) - 1]->SymCount() > theHuffTreeNode->SymCount()))
     {
@@ -188,10 +188,10 @@ public:
       return;
     }
 
-    Standard_Size size = _heap.size();
+    size_t size = _heap.size();
     HuffTreeNode* y = _heap[size - 1];
-    Standard_Size i = 1;                // i is current "parent", which shall be removed / overwritten
-    Standard_Size ci = 2;                // ci is current "child"
+    size_t i = 1;                // i is current "parent", which shall be removed / overwritten
+    size_t ci = 2;                // ci is current "child"
     size -= 1;                // The new size is decremented by one
 
     while (ci <= size)

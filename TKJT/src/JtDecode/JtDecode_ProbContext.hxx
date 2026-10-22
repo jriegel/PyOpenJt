@@ -41,20 +41,20 @@ public:
   };
 
   //! Read the first probability table for Mark I codec.
-  Standard_Boolean ReadFirst (JtDecode_BitReader::Raw& theReader);
+  bool ReadFirst (JtDecode_BitReader::Raw& theReader);
 
   //! Read the next probability table for Mark I codec.
-  Standard_Boolean ReadNext  (JtDecode_BitReader::Raw& theReader,
+  bool ReadNext  (JtDecode_BitReader::Raw& theReader,
                               const JtDecode_ProbContextI32& theFirstContext);
 
   //! Read the probability table for Mark II codec.
-  Standard_Boolean ReadMk2   (JtDecode_BitReader::Raw& theReader);
+  bool ReadMk2   (JtDecode_BitReader::Raw& theReader);
 
   //! Fetch the entry.
-  const Entry& operator[] (Standard_Size theIndex) const { return myEntries[theIndex]; }
+  const Entry& operator[] (size_t theIndex) const { return myEntries[theIndex]; }
 
   //! Return number of entries.
-  Standard_Size Size()  const { return myEntries.Count(); }
+  size_t Size()  const { return myEntries.Count(); }
 
   //! Return total number of symbols.
   unsigned TotalCount() const { return myTotalCount; }
@@ -62,7 +62,7 @@ public:
 protected:
 
   //! Method reading arbitrary probability table defined by parameters.
-  Standard_Boolean read (JtDecode_BitReader::Raw& theReader,
+  bool read (JtDecode_BitReader::Raw& theReader,
                          const unsigned theEntryCountWidth,
                          const unsigned theSymBitsNumWidth,
                          const unsigned theOccBitsNumWidth,

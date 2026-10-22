@@ -27,19 +27,19 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Base, "Base node",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Base::Read (JtData_Reader& theReader)
+bool JtNode_Base::Read (JtData_Reader& theReader)
 {
   if (!JtData_Object::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   Jt_U32 aFlags;
   if (!theReader.ReadU32 (aFlags))
-    return Standard_False;
+    return false;
 
   return JtData_DeferredObject::ReadVec (theReader, myAttributes);
 }
@@ -48,7 +48,7 @@ Standard_Boolean JtNode_Base::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Base::Dump (Standard_OStream& theStream) const
+int JtNode_Base::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_Base ";
   if (!myAttributes.IsEmpty())

@@ -31,7 +31,7 @@
 //! For return values, use:
 //! - Mover class to return contents of a locally created vector;
 //! - Ref class to return a reference to an external vector's data.
-template <class ValT, class SizeT = Standard_Size>
+template <class ValT, class SizeT = size_t>
 class JtData_Vector : public JtData_VectorData<ValT, SizeT>::Base
 {
   friend class JtData_VectorMover <JtData_Vector>;
@@ -96,7 +96,7 @@ public:
 
   Mover Move() { return Mover (detached (*this)); }
 
-  Standard_Boolean Allocate (const SizeT theCount) { return data::reallocate (theCount); }
+  bool Allocate (const SizeT theCount) { return data::reallocate (theCount); }
 
   void Free() { data::free(); data::clear(); }
 

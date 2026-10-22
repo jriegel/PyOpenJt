@@ -30,7 +30,7 @@ public:
 protected:
 
   //! Decode the data.
-  Standard_EXPORT void decode (int32_t* theResultPtr, int32_t* theResultEnd) Standard_OVERRIDE;
+  TKJT_EXPORT void decode (int32_t* theResultPtr, int32_t* theResultEnd) override;
 
   static const int STEP_SIZE = 2;
 };

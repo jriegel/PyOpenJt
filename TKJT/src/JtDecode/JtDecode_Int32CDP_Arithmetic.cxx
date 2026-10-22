@@ -21,7 +21,7 @@ void JtDecode_Int32CDP_Arithmetic::decode (int32_t* theResultPtr,
                                      const int32_t* theOOBDataPtr)
 {
   // Initialize
-  Standard_Size aCurContextIdx = 0;
+  size_t aCurContextIdx = 0;
 
   uint16_t aLow  = 0x0000;
   uint16_t aHigh = 0xFFFF;

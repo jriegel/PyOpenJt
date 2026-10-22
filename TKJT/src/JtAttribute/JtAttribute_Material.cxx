@@ -25,23 +25,23 @@ IMPLEMENT_OBJECT_CLASS(JtAttribute_Material, "Material Object",
 namespace
 {
   //! Auxiliary function
-  static Standard_Boolean readColor (JtData_Reader&   theReader,
+  static bool readColor (JtData_Reader&   theReader,
                                      Jt_F32         (&theVector) [4],
-                                     Standard_Boolean theIsSingleF32 = Standard_False)
+                                     bool theIsSingleF32 = false)
   {
     if (!theIsSingleF32)
       return theReader.ReadArray (theVector);
 
     Jt_F32 aVal;
     if (!theReader.ReadF32 (aVal))
-      return Standard_False;
+      return false;
 
     theVector[0] = aVal;
     theVector[1] = aVal;
     theVector[2] = aVal;
     theVector[3] = 1.0;
 
-    return Standard_True;
+    return true;
   }
 }
 
@@ -56,14 +56,14 @@ JtAttribute_Material::JtAttribute_Material()
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtAttribute_Material::Read (JtData_Reader& theReader)
+bool JtAttribute_Material::Read (JtData_Reader& theReader)
 {
   if (!JtAttribute_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (myVersion))
-    return Standard_False;
+    return false;
 
   if (!theReader.ReadU16 (myDataFlags)
    || !readColor (theReader, myAmbientColor , (myDataFlags & 3) == 3)
@@ -71,20 +71,20 @@ Standard_Boolean JtAttribute_Material::Read (JtData_Reader& theReader)
    || !readColor (theReader, mySpecularColor, (myDataFlags & 5) == 5)
    || !readColor (theReader, myEmissionColor, (myDataFlags & 9) == 9)
    || !theReader.ReadF32 (myShininess))
-    return Standard_False;
+    return false;
 
   if (myVersion == 2
   && !theReader.ReadF32 (myReflectivity))
-    return Standard_False;
+    return false;
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtAttribute_Material::Dump (Standard_OStream& theStream) const
+int JtAttribute_Material::Dump (std::ostream& theStream) const
 {
   theStream << "JtAttribute_Material ";
   return JtAttribute_Base::Dump (theStream);

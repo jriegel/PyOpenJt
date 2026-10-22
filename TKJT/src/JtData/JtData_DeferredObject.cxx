@@ -23,15 +23,15 @@ IMPLEMENT_STANDARD_RTTIEXT(JtData_DeferredObject, JtData_Object)
 //function : Read
 //purpose  : Read a deferred object from a JT file
 //=======================================================================
-Standard_Boolean JtData_DeferredObject::Read (JtData_Reader&         theReader,
+bool JtData_DeferredObject::Read (JtData_Reader&         theReader,
                                               Handle(JtData_Object)& theResult)
 {
   Jt_I32 anObjectID;
   if (!theReader.ReadI32 (anObjectID))
-    return Standard_False;
+    return false;
 
   theResult = new JtData_DeferredObject (anObjectID);
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -52,12 +52,12 @@ void JtData_DeferredObject::Resolve (Handle(JtData_Object)& theObject,
 //function : ReadVec
 //purpose  : Read an array of deferred objects from a JT file
 //=======================================================================
-Standard_Boolean JtData_DeferredObject::ReadVec (JtData_Reader&   theReader,
+bool JtData_DeferredObject::ReadVec (JtData_Reader&   theReader,
                                                  VectorOfObjects& theResult)
 {
   Jt_I32 aCount;
   if (!theReader.ReadI32 (aCount))
-    return Standard_False;
+    return false;
 
   theResult.Allocate (aCount);
   for (Jt_I32 i = 0; i < aCount; i++)
@@ -65,11 +65,11 @@ Standard_Boolean JtData_DeferredObject::ReadVec (JtData_Reader&   theReader,
     if (!Read (theReader, theResult[i]))
     {
       theResult.Free();
-      return Standard_False;
+      return false;
     }
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================

@@ -49,18 +49,18 @@ public:
   typedef JtData_Vector<int32_t, int32_t> IndicesVec;
 
   //! Read encoded data from the stream.
-  Standard_EXPORT static InputData::Handle LoadInputData (JtData_Reader& theReader);
+  TKJT_EXPORT static InputData::Handle LoadInputData (JtData_Reader& theReader);
 
   //! Constructor.
-  Standard_EXPORT JtDecode_MeshCoderDriver() : _pMeshDecoder (NULL) {}
+  TKJT_EXPORT JtDecode_MeshCoderDriver() : _pMeshDecoder (NULL) {}
 
-  Standard_EXPORT ~JtDecode_MeshCoderDriver();
+  TKJT_EXPORT ~JtDecode_MeshCoderDriver();
   
   //! Decode and store input data.
-  Standard_EXPORT void SetInputData (InputData& theData);
+  TKJT_EXPORT void SetInputData (InputData& theData);
   
   //! Decodes the mesh.
-  Standard_EXPORT void Decode (IndicesVec* theVertexIndices, IndicesVec* theNormalIndices);
+  TKJT_EXPORT void Decode (IndicesVec* theVertexIndices, IndicesVec* theNormalIndices);
 
   int32_t _nextDegSymbol (int32_t iCCntx);
   int32_t _nextValSymbol();

@@ -27,15 +27,15 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Group, "Group Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Group::Read (JtData_Reader& theReader)
+bool JtNode_Group::Read (JtData_Reader& theReader)
 {
   if (!JtNode_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   return JtData_DeferredObject::ReadVec (theReader, myChildren);
 }
@@ -44,7 +44,7 @@ Standard_Boolean JtNode_Group::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Group::Dump (Standard_OStream& theStream) const
+int JtNode_Group::Dump (std::ostream& theStream) const
 {
   /*
 	theStream << "JtNode_Group { ";

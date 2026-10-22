@@ -26,24 +26,24 @@ IMPLEMENT_OBJECT_CLASS(JtElement_ShapeLOD_TriStripSet, "Tri-Strip Set Shape LOD 
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_TriStripSet::Read (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_TriStripSet::Read (JtData_Reader& theReader)
 {
   Jt_I16 aVersion;
-  if (!readVertexShapeLODData (theReader, Standard_True)
+  if (!readVertexShapeLODData (theReader, true)
    || !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   if (theReader.Model()->MajorVersion() < 9)
     return readVertexBasedShapeCompressedRepData (theReader);
   else
-    return Standard_True;
+    return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtElement_ShapeLOD_TriStripSet::Dump (Standard_OStream& theStream) const
+int JtElement_ShapeLOD_TriStripSet::Dump (std::ostream& theStream) const
 {
   theStream << "JtElement_ShapeLOD_TriStripSet ";
   return JtElement_ShapeLOD_Vertex::Dump (theStream);

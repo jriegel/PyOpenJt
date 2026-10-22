@@ -26,7 +26,7 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Part, "Part Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Part::Read (JtData_Reader& theReader)
+bool JtNode_Part::Read (JtData_Reader& theReader)
 {
   Jt_I16 aVersion;
   Jt_I32 aReserved;
@@ -39,7 +39,7 @@ Standard_Boolean JtNode_Part::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Part::Dump (Standard_OStream& theStream) const
+int JtNode_Part::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_Part ";
   return JtNode_MetaData::Dump (theStream);

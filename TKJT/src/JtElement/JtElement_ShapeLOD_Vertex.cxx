@@ -77,7 +77,7 @@ public:
 //function : QuantizationParams::Read
 //purpose  :
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::QuantizationParams::Read (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Vertex::QuantizationParams::Read (JtData_Reader& theReader)
 {
   return theReader.ReadUniformStruct<Jt_U8> (*this);
 }
@@ -86,11 +86,11 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::QuantizationParams::Read (JtData_Rea
 //function : VertexBinding1::Read
 //purpose  :
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding1::Read (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Vertex::VertexBinding1::Read (JtData_Reader& theReader)
 {
   uint8_t aBuffer[sizeof (Jt_I32)];
   if (!theReader.ReadArray (aBuffer))
-    return Standard_False;
+    return false;
 
   if (theReader.Model()->IsFileLE())
   {
@@ -105,14 +105,14 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding1::Read (JtData_Reader&
     myColorBinding     = aBuffer[1];
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : VertexBinding2::Read
 //purpose  :
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::Read (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Vertex::VertexBinding2::Read (JtData_Reader& theReader)
 {
   if (theReader.Model()->IsFileLE())
   {
@@ -134,7 +134,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::Read (JtData_Reader&
 //function : VertexBinding2::IsNormalBinding
 //purpose  :
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::IsNormalBinding()
+bool JtElement_ShapeLOD_Vertex::VertexBinding2::IsNormalBinding()
 {
   return myLSB.Normal;
 }
@@ -143,7 +143,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::IsNormalBinding()
 //function : VertexBinding2::IsFlagBinding
 //purpose  :
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::IsFlagBinding()
+bool JtElement_ShapeLOD_Vertex::VertexBinding2::IsFlagBinding()
 {
   return myLSB.Flag;
 }
@@ -152,7 +152,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::IsFlagBinding()
 //function : VertexBinding2::IsAuxFieldBinding
 //purpose  :
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::IsAuxFieldBinding()
+bool JtElement_ShapeLOD_Vertex::VertexBinding2::IsAuxFieldBinding()
 {
   return myMSB.Auxiliary;
 }
@@ -161,7 +161,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::VertexBinding2::IsAuxFieldBinding()
 //function : VertexBinding2::NbVertexCoordComponents
 //purpose  :
 //=======================================================================
-Standard_Size JtElement_ShapeLOD_Vertex::VertexBinding2::NbVertexCoordComponents()
+size_t JtElement_ShapeLOD_Vertex::VertexBinding2::NbVertexCoordComponents()
 {
   switch (myLSB.Vertex)
   {
@@ -176,7 +176,7 @@ Standard_Size JtElement_ShapeLOD_Vertex::VertexBinding2::NbVertexCoordComponents
 //function : VertexBinding2::NbColorComponents
 //purpose  :
 //=======================================================================
-Standard_Size JtElement_ShapeLOD_Vertex::VertexBinding2::NbColorComponents()
+size_t JtElement_ShapeLOD_Vertex::VertexBinding2::NbColorComponents()
 {
   switch (myLSB.Color)
   {
@@ -190,8 +190,8 @@ Standard_Size JtElement_ShapeLOD_Vertex::VertexBinding2::NbColorComponents()
 //function : VertexBinding2::NbTextCoordComponents
 //purpose  :
 //=======================================================================
-Standard_Size JtElement_ShapeLOD_Vertex::VertexBinding2::NbTextCoordComponents
-  (Standard_Size theTexture)
+size_t JtElement_ShapeLOD_Vertex::VertexBinding2::NbTextCoordComponents
+  (size_t theTexture)
 {
   switch ((myTextFlags >> (theTexture * 4)) & 0x0F)
   {
@@ -207,7 +207,7 @@ Standard_Size JtElement_ShapeLOD_Vertex::VertexBinding2::NbTextCoordComponents
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::Read (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Vertex::Read (JtData_Reader& theReader)
 {
   return readVertexShapeLODData (theReader);
 }
@@ -216,7 +216,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtElement_ShapeLOD_Vertex::Dump (Standard_OStream& theStream) const
+int JtElement_ShapeLOD_Vertex::Dump (std::ostream& theStream) const
 {
   theStream << "JtElement_ShapeLOD_Vertex ";
   return JtElement_ShapeLOD_Base::Dump (theStream);
@@ -226,9 +226,9 @@ Standard_Integer JtElement_ShapeLOD_Vertex::Dump (Standard_OStream& theStream) c
 //function : readVertexShapeLODData
 //purpose  : Read Vertex Shape LOD Data collection
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
+bool JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
   JtData_Reader&   theReader,
-  Standard_Boolean theIsTriStripSet)
+  bool theIsTriStripSet)
 {
   myIndices.Free();
   myVertices.Free();
@@ -237,13 +237,13 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
   if (theReader.Model()->MajorVersion() < 9)
   {
     if (!JtData_Object::Read (theReader))
-      return Standard_False;
+      return false;
 
     if (theReader.Model()->MajorVersion() > 7)
     {
       Jt_I16 aVersion;
       if (!theReader.ReadI16 (aVersion))
-        return Standard_False;
+        return false;
     }
 
     VertexBinding1     aVertexBinding;
@@ -265,14 +265,14 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
      || !theReader.ReadI32 (aTriID)
      || !theReader.ReadI16 (aVersion4))
     {
-      return Standard_False;
+      return false;
     }
 
     if (theIsTriStripSet)
       return readTopologicallyCompressedData (theReader);
     else
       // TODO: Read TopoMesh Compressed Rep Data
-      return Standard_True;
+      return true;
   }
 }
 
@@ -280,7 +280,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
 //function : readVertexBasedShapeCompressedRepData
 //purpose  : Read and decode Vertex Based Shape Compressed Rep Data collection
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepData (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepData (JtData_Reader& theReader)
 {
   // The Vertex Based Shape Compressed Rep Data collection is the
   // compressed and/or encoded representation of the vertex coordinates,
@@ -303,7 +303,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
    || !theReader.ReadU8  (aColorBinding)
    || !aQuantParam.Read  (theReader))
   {
-    return Standard_False;
+    return false;
   }
 
   /* Primitive List Indices is a vector of indices into the uncompressed
@@ -314,14 +314,14 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
   {
     JtDecode_Int32CDP anEncodedPimitiveListIndices;
     if (!anEncodedPimitiveListIndices.Load1 (theReader))
-        return Standard_False;
+        return false;
 
     aPimitiveListIndices = anEncodedPimitiveListIndices.DecodeI32 (JtDecode_Unpack_Stride1);
   }
   Jt_I32 aNbPrimitives = aPimitiveListIndices.Count() - 1;
   // In case 'aPimitiveListIndices' is empty
   if (aNbPrimitives < 0)
-    return Standard_False;
+    return false;
   Jt_I32 aNbFaces = aPimitiveListIndices.Last() - aPimitiveListIndices.First() - aNbPrimitives * 2;
 
   // Read raw vertex data
@@ -335,7 +335,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
     if (!theReader.ReadI32 (anUncompressedSize)
      || !theReader.ReadI32 (aCompressedSize))
     {
-      return Standard_False;
+      return false;
     }
 
     // select appropriate reader for reading the segment data
@@ -406,7 +406,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
         JtDecode_VertexData::LoadQuantizedCoords (theReader);
 
       if (!anEncodedVertices)
-        return Standard_False;
+        return false;
 
       aDecodeTasks.Run (VertexDataDecodeTask (anEncodedVertices, myVertices));
     }
@@ -418,7 +418,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
         JtDecode_VertexData::LoadQuantizedNormals (theReader);
 
       if (!anEncodedNormals)
-        return Standard_False;
+        return false;
 
       aDecodeTasks.Run (VertexDataDecodeTask (anEncodedNormals, myNormals));
     }
@@ -431,7 +431,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
     {
       JtDecode_Int32CDP anEncodedVertexDataIndices;
       if (!anEncodedVertexDataIndices.Load1 (theReader))
-          return Standard_False;
+          return false;
 
       aVertexDataIndices = anEncodedVertexDataIndices.DecodeI32 (JtDecode_Unpack_StripIdx);
     }
@@ -459,14 +459,14 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepDat
     aDecodeTasks.Wait();
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : readTopologicallyCompessedData
 //purpose  : Read and decode Topologically Compressed Rep Data collection
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtData_Reader& theReader)
 {
   // Create a TBB task group for parallel decoding of read data
   JtData_Parallel::TaskGroup aDecodeTasks;
@@ -476,7 +476,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtD
     JtDecode_MeshCoderDriver::LoadInputData (theReader);
 
   if (!aMeshData)
-    return Standard_False;
+    return false;
 
   IndicesVec aVertexIndices, aNormalIndices;
   aDecodeTasks.Run (MeshDecodeTask (aMeshData, aVertexIndices, aNormalIndices));
@@ -494,17 +494,17 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtD
    || !aQuantParam.Read     (theReader)
    || !theReader.ReadI32 (aNumberOfVert))
   {
-    return Standard_False;
+    return false;
   }
 
   if (aNumberOfVert == 0)
-    return Standard_True;
+    return true;
 
   if (!theReader.ReadI32 (aNumberOfAttr))
-    return Standard_False;
+    return false;
 
-  Standard_Boolean aCoordsPresent = (aVertexBindings.NbVertexCoordComponents() > 0);
-  Standard_Boolean aNormalsPresent = aVertexBindings.IsNormalBinding();
+  bool aCoordsPresent = (aVertexBindings.NbVertexCoordComponents() > 0);
+  bool aNormalsPresent = aVertexBindings.IsNormalBinding();
 
   // Read vertex coords data and start decoding it
   int32_t aUniqueVerticesCount = 0;
@@ -515,7 +515,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtD
       JtDecode_VertexData::LoadCompressedCoords (theReader);
 
     if (!anEncodedVertices)
-      return Standard_False;
+      return false;
 
     aUniqueVerticesCount = anEncodedVertices->GetOutVertexCount();
     aDecodeTasks.Run (VertexDataDecodeTask (anEncodedVertices, aUniqueVertices));
@@ -529,7 +529,7 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtD
       JtDecode_VertexData::LoadCompressedNormals (theReader);
 
     if (!anEncodedNormals)
-      return Standard_False;
+      return false;
 
     aDecodeTasks.Run (VertexDataDecodeTask (anEncodedNormals, aUniqueNormals));
   }
@@ -607,5 +607,5 @@ Standard_Boolean JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtD
   }
 
   // Success
-  return Standard_True;
+  return true;
 }

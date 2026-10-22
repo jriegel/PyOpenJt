@@ -22,19 +22,19 @@
 
 namespace
 {
-  static const Standard_Integer TABLE_BITS = 13;
+  static const int TABLE_BITS = 13;
 
   struct SinCos
   {
-    Standard_Real Sin, Cos;
-    void Set (Standard_Real aValue)
+    double Sin, Cos;
+    void Set (double aValue)
     {
       Sin = sin (aValue);
       Cos = cos (aValue);
     }
   };
 
-  static Standard_Real Phi[16]= {0.904837, 0.818731, 0.740818,	0.670320,	0.606531,	0.548812, 0.449329, 0.367879,
+  static double Phi[16]= {0.904837, 0.818731, 0.740818,	0.670320,	0.606531,	0.548812, 0.449329, 0.367879,
                                  0.22313,  0.135335, 0.090484,	0.163746,	0.222245,	0.268128,	0.303265,	0.329287};
   class LookupTable
   {
@@ -45,8 +45,8 @@ namespace
     SinCos Psi  [TABLE_SIZE + BITS_SIZE];
     LookupTable()
     {
-      Standard_Real aMaxPsi     = 0.615479709;
-      Standard_Real aTableSizeF = (Standard_Real) TABLE_SIZE;
+      double aMaxPsi     = 0.615479709;
+      double aTableSizeF = (double) TABLE_SIZE;
       size_t i = 0;
       for ( ; i <= TABLE_SIZE; ++i)
       {
@@ -70,7 +70,7 @@ JtDecode_VertexData_Deering::JtDecode_VertexData_Deering (const Jt_U8      theNb
   : JtDecode_VertexData (4, theUnpacker)
   , myNbBits (theNbBits) {}
 
-Standard_Integer JtDecode_VertexData_Deering::getOutCompCount (Standard_Size)
+int JtDecode_VertexData_Deering::getOutCompCount (size_t)
 {
   return 3;
 }
@@ -86,7 +86,7 @@ void JtDecode_VertexData_Deering::decode (Decoded::Ref theResults)
   aDecodeTasks.Run (getDecodingFunctor (3, aPsiCodes));
   aDecodeTasks.Wait();
 
-  Standard_Integer anOffset = TABLE_BITS - myNbBits;
+  int anOffset = TABLE_BITS - myNbBits;
   for (Decoded::SizeType i = 0; i < theResults.Count(); ++i)
   {
     Jt_U32 aSextant = aSextantCodes[i];

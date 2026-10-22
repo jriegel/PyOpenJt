@@ -37,14 +37,14 @@ public:
     Jt_U8 myBitsPerColor;
 
   public:
-    Standard_Boolean Read (JtData_Reader& theReader);
+    bool Read (JtData_Reader& theReader);
 
     Jt_U8 BitsPerVertex()       { return myBitsPerVertex; }
     Jt_U8 NormalBitsFactor()    { return myNormalBitsFactor; }
     Jt_U8 BitsPerTextureCoord() { return myBitsPerTextureCoord; }
     Jt_U8 BitsPerColor()        { return myBitsPerColor; }
 
-    Standard_Integer BitsPerNormal() { return 6 + 2 * (Standard_Integer) myNormalBitsFactor; }
+    int BitsPerNormal() { return 6 + 2 * (int) myNormalBitsFactor; }
   };
 
   class VertexBinding1
@@ -62,7 +62,7 @@ public:
       PerPrimitive = 3
     };
 
-    Standard_Boolean Read (JtData_Reader& theReader);
+    bool Read (JtData_Reader& theReader);
 
     BindingType NormalBinding()    { return (BindingType) myNormalBinding; }
     BindingType TextCoordBinding() { return (BindingType) myTextCoordBinding; }
@@ -76,22 +76,22 @@ public:
     struct {uint8_t Reserved:7, Auxiliary:1;}             myMSB;
 
   public:
-    Standard_Boolean Read (JtData_Reader& theReader);
+    bool Read (JtData_Reader& theReader);
 
-    Standard_Boolean IsNormalBinding();
-    Standard_Boolean IsFlagBinding();
-    Standard_Boolean IsAuxFieldBinding();
-    Standard_Size    NbVertexCoordComponents();
-    Standard_Size    NbColorComponents();
-    Standard_Size    NbTextCoordComponents (Standard_Size theTexture);
+    bool IsNormalBinding();
+    bool IsFlagBinding();
+    bool IsAuxFieldBinding();
+    size_t    NbVertexCoordComponents();
+    size_t    NbColorComponents();
+    size_t    NbTextCoordComponents (size_t theTexture);
   };
 
 public:
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader &theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader &theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& S) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& S) const override;
 
   //! Indices into the vertex parameters arrays.
   const IndicesVec& Indices()  const { return myIndices; }
@@ -109,12 +109,12 @@ protected:
   class VertexDataDecodeTask;
   class MeshDecodeTask;
 
-  Standard_Boolean readVertexShapeLODData (
+  bool readVertexShapeLODData (
     JtData_Reader&   theReader,
-    Standard_Boolean theIsTriStripSet = Standard_False);
+    bool theIsTriStripSet = false);
 
-  Standard_Boolean readVertexBasedShapeCompressedRepData (JtData_Reader& theReader);
-  Standard_Boolean readTopologicallyCompressedData       (JtData_Reader& theReader);
+  bool readVertexBasedShapeCompressedRepData (JtData_Reader& theReader);
+  bool readTopologicallyCompressedData       (JtData_Reader& theReader);
 
 protected:
   IndicesVec myIndices;  //!< Indices into the vertex parameters arrays

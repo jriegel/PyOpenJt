@@ -17,8 +17,11 @@
 #ifndef _JtData_Types_HeaderFile
 #define _JtData_Types_HeaderFile
 
-#include <Standard_Type.hxx>
-#include <Standard_Macro.hxx>
+#include <cstddef>
+#include <cstdint>
+#include <ostream>
+#include <istream>
+#include <JtData_Export.hxx>
 #include <JtData_Vector.hxx>
 
 // Basic JT data types
@@ -122,25 +125,25 @@ public:
 public:
   Jt_GUID() { memset (this, 0, sizeof (Jt_GUID)); }
 
-  Standard_EXPORT Jt_GUID (Jt_U32 theU32, Jt_U16 theU16_1, Jt_U16 theU16_2,
+  TKJT_EXPORT Jt_GUID (Jt_U32 theU32, Jt_U16 theU16_1, Jt_U16 theU16_2,
                            Jt_U8 theU8_1, Jt_U8 theU8_2, Jt_U8 theU8_3, Jt_U8 theU8_4,
                            Jt_U8 theU8_5, Jt_U8 theU8_6, Jt_U8 theU8_7, Jt_U8 theU8_8);
 
-  Standard_EXPORT Jt_GUID(const char* theString);
+  TKJT_EXPORT Jt_GUID(const char* theString);
 
-  Standard_EXPORT Jt_GUID(const Jt_GUID& theOther)
+  TKJT_EXPORT Jt_GUID(const Jt_GUID& theOther)
   {
       this->data.U64[0] = theOther.data.U64[0];
       this->data.U64[1] = theOther.data.U64[1];
   }
 
-  Standard_EXPORT Standard_Boolean ToString (char* theString) const;
+  TKJT_EXPORT bool ToString (char* theString) const;
 
-  Standard_Boolean operator == (const Jt_GUID& theOther) const
+  bool operator == (const Jt_GUID& theOther) const
   {
       return ((U64(0) ^ theOther.U64(0)) | (U64(1) ^ theOther.U64(1))) == 0;
   }
-  Standard_Boolean operator < (const Jt_GUID& theOther) const
+  bool operator < (const Jt_GUID& theOther) const
   {
       if (U64(0) < theOther.U64(0))
           return true;
@@ -150,7 +153,7 @@ public:
       return false;
   }
 
-  Standard_Boolean operator != (const Jt_GUID& theOther) const
+  bool operator != (const Jt_GUID& theOther) const
     { return !operator == (theOther); }
 
   Jt_I32 Hash (const Jt_I32 theUpper) const
@@ -166,10 +169,10 @@ public:
       return theKey1 == theKey2;
   }
 
-  static Standard_Integer HashCode (const Jt_GUID& theKey, const Standard_Integer theUpper)
+  static int HashCode (const Jt_GUID& theKey, const int theUpper)
     { return theKey.Hash (theUpper); }
 
-  static Standard_Boolean IsEqual (const Jt_GUID& theKey1, const Jt_GUID& theKey2)
+  static bool IsEqual (const Jt_GUID& theKey1, const Jt_GUID& theKey2)
     { return theKey1 == theKey2; }
 
 protected:

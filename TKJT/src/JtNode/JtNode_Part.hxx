@@ -25,10 +25,10 @@ class JtNode_Part : public JtNode_MetaData
 {
 public:
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   DEFINE_STANDARD_RTTIEXT(JtNode_Part,JtNode_MetaData)
   DEFINE_OBJECT_CLASS (JtNode_Part)

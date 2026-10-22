@@ -23,7 +23,7 @@
 //purpose  : Constructor
 //=======================================================================
 
-JtData_InflateLzma::JtData_InflateLzma(JtData_Reader& theReader, const Standard_Size theLength)
+JtData_InflateLzma::JtData_InflateLzma(JtData_Reader& theReader, const size_t theLength)
   : JtData_Reader (theReader.Model())
   , myReader      (&theReader)
   , myInBuffer    (0L)
@@ -79,7 +79,7 @@ JtData_InflateLzma::~JtData_InflateLzma()
 //purpose  : Buffered inflate raw bytes
 //=======================================================================
 
-Standard_Boolean JtData_InflateLzma::ReadBytes (void* theBuffer, Standard_Size theLength)
+bool JtData_InflateLzma::ReadBytes (void* theBuffer, size_t theLength)
 {
   // Do special actions if more data is needed than remains in the internal output buffer
   if (theLength > myOutBufRest)
@@ -103,7 +103,7 @@ Standard_Boolean JtData_InflateLzma::ReadBytes (void* theBuffer, Standard_Size t
     myOutBufPos  = myOutBuffer;
     myOutBufRest = read (myOutBuffer, sizeof (myOutBuffer));
     if (!myOutBufRest)
-      return Standard_False;
+      return false;
 
     // go down and copy the needed data remainder from the internal output buffer
   }
@@ -112,7 +112,7 @@ Standard_Boolean JtData_InflateLzma::ReadBytes (void* theBuffer, Standard_Size t
   memcpy (theBuffer, myOutBufPos, theLength);
   myOutBufPos  += theLength;
   myOutBufRest -= theLength;
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -120,7 +120,7 @@ Standard_Boolean JtData_InflateLzma::ReadBytes (void* theBuffer, Standard_Size t
 //purpose  : Skip some bytes
 //=======================================================================
 
-Standard_Boolean JtData_InflateLzma::SkipBytes (Standard_Size theLength)
+bool JtData_InflateLzma::SkipBytes (size_t theLength)
 {
   while (theLength > myOutBufRest)
   {
@@ -128,12 +128,12 @@ Standard_Boolean JtData_InflateLzma::SkipBytes (Standard_Size theLength)
     myOutBufPos  = myOutBuffer;
     myOutBufRest = read (myOutBuffer, sizeof (myOutBuffer));
     if (!myOutBufRest)
-      return Standard_False;
+      return false;
   }
 
   myOutBufPos  += theLength;
   myOutBufRest -= theLength;
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -141,7 +141,7 @@ Standard_Boolean JtData_InflateLzma::SkipBytes (Standard_Size theLength)
 //purpose  : Get absolute reading position in the inflated data
 //=======================================================================
 
-Standard_Size JtData_InflateLzma::GetPosition() const
+size_t JtData_InflateLzma::GetPosition() const
 {
   return myZStream.total_out - myOutBufRest;
 }
@@ -151,7 +151,7 @@ Standard_Size JtData_InflateLzma::GetPosition() const
 //purpose  : unbuffered inflate
 //=======================================================================
 
-Standard_Size JtData_InflateLzma::read (uint8_t* theBuffer, Standard_Size theLength)
+size_t JtData_InflateLzma::read (uint8_t* theBuffer, size_t theLength)
 {
   myZStream.next_out  = (uint8_t*)theBuffer;
   myZStream.avail_out = static_cast<unsigned>(theLength);
@@ -165,7 +165,7 @@ Standard_Size JtData_InflateLzma::read (uint8_t* theBuffer, Standard_Size theLen
       if (!myInputRest)
         break;
 
-      Standard_Size aBufSize = min (CHUNK, myInputRest);
+      size_t aBufSize = min (CHUNK, myInputRest);
       myInBuffer = static_cast <const uint8_t*> (myReader->Load (aBufSize));
       if (!myInBuffer)
         return 0;

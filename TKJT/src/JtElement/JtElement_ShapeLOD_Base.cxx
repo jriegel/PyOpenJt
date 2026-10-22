@@ -26,14 +26,14 @@ IMPLEMENT_OBJECT_CLASS(JtElement_ShapeLOD_Base, "Base Shape LOD Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtElement_ShapeLOD_Base::Read (JtData_Reader& theReader)
+bool JtElement_ShapeLOD_Base::Read (JtData_Reader& theReader)
 {
   if (!JtData_Object::Read (theReader))
-    return Standard_False;
+    return false;
 
   // Base Shape LOD Data collection is not used in JT version 8.x or lower
   if (theReader.Model()->MajorVersion() <= 8)
-    return Standard_True;
+    return true;
 
   Jt_I16 aVersion;
   return theReader.ReadI16 (aVersion);
@@ -43,7 +43,7 @@ Standard_Boolean JtElement_ShapeLOD_Base::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtElement_ShapeLOD_Base::Dump (Standard_OStream& theStream) const
+int JtElement_ShapeLOD_Base::Dump (std::ostream& theStream) const
 {
   theStream << "JtElement_ShapeLOD_Base ";
   return JtData_Object::Dump (theStream);

@@ -26,22 +26,22 @@ IMPLEMENT_OBJECT_CLASS(JtProperty_LateLoaded, "LateLoaded Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtProperty_LateLoaded::Read (JtData_Reader& theReader)
+bool JtProperty_LateLoaded::Read (JtData_Reader& theReader)
 {
   if (!JtProperty_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   Jt_GUID aGUID;
   Jt_I32  aType;
   if (!theReader.ReadGUID (aGUID)
    || !theReader.ReadI32  (aType))
   {
-    return Standard_False;
+    return false;
   }
 
   mySegmentType = aType;
@@ -52,20 +52,20 @@ Standard_Boolean JtProperty_LateLoaded::Read (JtData_Reader& theReader)
     if (!theReader.ReadI32 (aPayloadObjectID)
      || !theReader.ReadI32 (aReserved))
     {
-      return Standard_False;
+      return false;
     }
   }
 
   mySegModel = theReader.Model()->FindSegment (aGUID, mySegOffset);
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtProperty_LateLoaded::Dump (Standard_OStream& theStream) const
+int JtProperty_LateLoaded::Dump (std::ostream& theStream) const
 {
   return JtProperty_Base::Dump (theStream);
 }

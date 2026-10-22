@@ -16,33 +16,33 @@
 
 #include <JtDecode_ProbContext.hxx>
 
-Standard_Boolean JtDecode_ProbContextI32::ReadFirst (JtDecode_BitReader::Raw& theReader)
+bool JtDecode_ProbContextI32::ReadFirst (JtDecode_BitReader::Raw& theReader)
 {
   return read (theReader, 32, 6, 6, 6, 6, 32);
 }
 
-Standard_Boolean JtDecode_ProbContextI32::ReadNext (JtDecode_BitReader::Raw& theReader,
+bool JtDecode_ProbContextI32::ReadNext (JtDecode_BitReader::Raw& theReader,
                                                     const JtDecode_ProbContextI32& theFirstContext)
 {
   if (!read (theReader, 32, 6, 6, 0, 6, 0))
-    return Standard_False;
+    return false;
 
-  NCollection_DataMap<Standard_Integer, int32_t> aValuesMap;
-  Standard_Size i;
+  NCollection_DataMap<int, int32_t> aValuesMap;
+  size_t i;
   for (i = 0; i < theFirstContext.Size(); i++)
     aValuesMap.Bind (theFirstContext[i].symbol, theFirstContext[i].associatedValue);
   for (i = 0; i < Size(); i++)
     aValuesMap.Find (myEntries[i].symbol, myEntries[i].associatedValue);
 
-  return Standard_True;
+  return true;
 }
 
-Standard_Boolean JtDecode_ProbContextI32::ReadMk2 (JtDecode_BitReader::Raw& theReader)
+bool JtDecode_ProbContextI32::ReadMk2 (JtDecode_BitReader::Raw& theReader)
 {
   return read (theReader, 16, 6, 6, 6, 0, 32);
 }
 
-Standard_Boolean JtDecode_ProbContextI32::read (JtDecode_BitReader::Raw& theReader,
+bool JtDecode_ProbContextI32::read (JtDecode_BitReader::Raw& theReader,
                                                 const unsigned theEntryCountWidth,
                                                 const unsigned theSymBitsNumWidth,
                                                 const unsigned theOccBitsNumWidth,
@@ -52,7 +52,7 @@ Standard_Boolean JtDecode_ProbContextI32::read (JtDecode_BitReader::Raw& theRead
 {
   if (!theReader.Load (theEntryCountWidth + theSymBitsNumWidth + theOccBitsNumWidth
                      + theValBitsNumWidth + theNxtBitsNumWidth + theMinValueWidth))
-    return Standard_False;
+    return false;
 
   unsigned      anEntryCount = theReader.ReadU32Or0 (theEntryCountWidth);
   unsigned      aSymBits     = theReader.ReadU32Or0 (theSymBitsNumWidth);
@@ -62,12 +62,12 @@ Standard_Boolean JtDecode_ProbContextI32::read (JtDecode_BitReader::Raw& theRead
   int32_t       aMinValue    = theReader.ReadI32Or0 (theMinValueWidth);
 
   if (!theReader.Load (anEntryCount * (aSymBits + aOccBits + aValBits + aNxtBits)))
-    return Standard_False;
+    return false;
 
   myEntries.Allocate (anEntryCount);
   myTotalCount = 0;
 
-  for (Standard_Size i = 0; i < anEntryCount; i++)
+  for (size_t i = 0; i < anEntryCount; i++)
   {
     Entry& anEntry = myEntries[i];
 
@@ -79,5 +79,5 @@ Standard_Boolean JtDecode_ProbContextI32::read (JtDecode_BitReader::Raw& theRead
     myTotalCount += anEntry.occCount;
   }
 
-  return Standard_True;
+  return true;
 }

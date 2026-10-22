@@ -25,7 +25,7 @@ template <class ValT, class SizeT> class JtData_Vector;
 //! Can be used to get or set elements of a vector/array but not to allocate or deallocate it.
 //! Intended to be used primarily for function arguments.
 //! Also used to reference an element of a complex vector.
-template <class ValT, class SizeT = Standard_Size>
+template <class ValT, class SizeT = size_t>
 class JtData_VectorRef : public JtData_VectorData<ValT, SizeT>::Base
 {
 protected:

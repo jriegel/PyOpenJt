@@ -17,26 +17,26 @@
 #include <JtDecode_VertexData_Quantized.hxx>
 #include <JtData_VectorRef.hxx>
 
-Standard_Boolean JtDecode_VertexData_Quantized::UniformQuantizerData::Read (JtData_Reader& theReader)
+bool JtDecode_VertexData_Quantized::UniformQuantizerData::Read (JtData_Reader& theReader)
 {
   return theReader.ReadF32 (min) && theReader.ReadF32 (max) && theReader.ReadU8 (bits);
 }
 
-Standard_Boolean JtDecode_VertexData_Quantized::PointQuantizerData::Read (JtData_Reader& theReader)
+bool JtDecode_VertexData_Quantized::PointQuantizerData::Read (JtData_Reader& theReader)
 {
   return X.Read (theReader) && Y.Read (theReader) && Z.Read (theReader);
 }
 
 JtDecode_VertexData_Quantized::JtDecode_VertexData_Quantized (
                               const PointQuantizerData& theQuantizerData,
-                              const Standard_Size       theNbComponents,
+                              const size_t       theNbComponents,
                                     JtDecode_Unpack&    theUnpacker)
   : JtDecode_VertexData (theNbComponents, theUnpacker)
   , myQuantizerData     (theQuantizerData) {}
 
-Standard_Integer JtDecode_VertexData_Quantized::getOutCompCount (Standard_Size thePackageCount)
+int JtDecode_VertexData_Quantized::getOutCompCount (size_t thePackageCount)
 {
-  return static_cast<Standard_Integer>(thePackageCount);
+  return static_cast<int>(thePackageCount);
 }
 
 void JtDecode_VertexData_Quantized::decode (Decoded::Ref theResults)
@@ -48,16 +48,16 @@ void JtDecode_VertexData_Quantized::decode (Decoded::Ref theResults)
     const UniformQuantizerData& aCurQuantizerData =
       JtData_VectorRef<const UniformQuantizerData> (myQuantizerData)[j];
 
-    Standard_Real    aMin  = aCurQuantizerData.min;
-    Standard_Real    aMax  = aCurQuantizerData.max;
-    Standard_Integer aBits = aCurQuantizerData.bits;
+    double    aMin  = aCurQuantizerData.min;
+    double    aMax  = aCurQuantizerData.max;
+    int aBits = aCurQuantizerData.bits;
 
-    Standard_Real aMaxCode = aBits < 32 ? (1 << aBits) : 0xFFFFFFFF;
-    Standard_Real aDecodeMultiplier = (aMax - aMin) / aMaxCode;
+    double aMaxCode = aBits < 32 ? (1 << aBits) : 0xFFFFFFFF;
+    double aDecodeMultiplier = (aMax - aMin) / aMaxCode;
 
     for (Decoded::SizeType i = 0; i < theResults.Count(); i++)
     {
-      Standard_Real aValue = aMin + (static_cast<Jt_U32>(aCodes[i]) - 0.5) * aDecodeMultiplier;
+      double aValue = aMin + (static_cast<Jt_U32>(aCodes[i]) - 0.5) * aDecodeMultiplier;
       theResults[i][j] = static_cast <float> (aValue);
     }
   }

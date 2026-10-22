@@ -87,7 +87,7 @@ public:
 
   protected:
     //! Protected constructor.
-    Base (JtData_Reader& theReader, Standard_Boolean theNeedSwap);
+    Base (JtData_Reader& theReader, bool theNeedSwap);
 
     //! Load next 32 bits from the byte buffer to the bit buffer.
     inline void loadBits()
@@ -118,8 +118,8 @@ public:
       else
       {
         aResult = myBitsBuf;
-        Standard_Size aHeadSize = myBitsLoaded;
-        Standard_Size aTailSize = theBitsCount - aHeadSize;
+        size_t aHeadSize = myBitsLoaded;
+        size_t aTailSize = theBitsCount - aHeadSize;
         loadBits();
         aResult |= myBitsBuf >> aHeadSize;
         myBitsBuf  <<= aTailSize;
@@ -130,10 +130,10 @@ public:
 
   protected:
     JtData_Reader*   myReader;     //!< external reader
-    Standard_Boolean myNeedSwap;   //!< is byte swapping needed after reading from the external reader
+    bool myNeedSwap;   //!< is byte swapping needed after reading from the external reader
 
     uint32_t         myBitsBuf;    //!< bit buffer (32 bits) - acts as a queue: bits are left-shifted out when read
-    Standard_Size    myBitsLoaded; //!< number of bits rest in the bit buffer
+    size_t    myBitsLoaded; //!< number of bits rest in the bit buffer
 
     const void*      myByteBuf;    //!< byte buffer (allocated by the external reader)
     const uint32_t*  myNextDWord;  //!< address of the next double word to be read from the byte buffer
@@ -151,7 +151,7 @@ public:
     //! A subsequent call discards all previously loaded bits and
     //! loads new bits starting right after the last bit loaded by
     //! the previous call.
-    Standard_Boolean Load (const unsigned theBitsCount);
+    bool Load (const unsigned theBitsCount);
   };
 
   //! Implementation of U32 values loading behavior.
@@ -166,13 +166,13 @@ public:
     //! reading operations.
     //! A subsequent call discards all previously loaded bits and
     //! reads a new array.
-    Standard_Boolean Load (const Standard_Size theValuesCount);
+    bool Load (const size_t theValuesCount);
 
     //! Read a VecU32 from the external reader to internal buffer
     //! that supplies data for reading operations.
     //! A subsequent call discards all previously loaded bits and
     //! reads a new VecU32.
-    Standard_Boolean LoadVec();
+    bool LoadVec();
   };
 };
 

@@ -26,15 +26,15 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Shape_Base, "Base Shape Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Shape_Base::Read (JtData_Reader& theReader)
+bool JtNode_Shape_Base::Read (JtData_Reader& theReader)
 {
   if (!JtNode_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   return theReader.ReadUniformStruct<Jt_F32> (myReservedBnd)
       && theReader.ReadUniformStruct<Jt_F32> (myUntransBnd)
@@ -50,7 +50,7 @@ Standard_Boolean JtNode_Shape_Base::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Shape_Base::Dump (Standard_OStream& theStream) const
+int JtNode_Shape_Base::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_Shape_Base ";
   return JtNode_Base::Dump (theStream);

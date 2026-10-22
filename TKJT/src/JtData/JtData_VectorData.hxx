@@ -36,13 +36,13 @@ protected:
   struct Size
   {
     SizeT         ElemCount;
-    Standard_Size ValCount;
+    size_t ValCount;
 
     Size (SizeT theCount)
       : ElemCount (theCount), ValCount (theCount) {}
 
   protected:
-    Size (SizeT theElemCount, Standard_Size theValCount)
+    Size (SizeT theElemCount, size_t theValCount)
       : ElemCount (theElemCount), ValCount (theValCount) {}
   };
 
@@ -54,7 +54,7 @@ public:
     typedef SizeT SizeType;
 
     SizeT            Count()   const { return myCount; }
-    Standard_Boolean IsEmpty() const { return myCount == 0; }
+    bool IsEmpty() const { return myCount == 0; }
     ValT*            Data()    const { return myData; }
 
     ValT& operator[] (SizeT theIndex) const { return myData[theIndex]; }
@@ -69,13 +69,13 @@ public:
     }
 
     template <class Functor>
-    Standard_Boolean Process (Functor& theFunctor)
+    bool Process (Functor& theFunctor)
     {
       for (SizeT anIdx = 0; anIdx < myCount; anIdx++)
         if (!theFunctor (myData[anIdx]))
-          return Standard_False;
+          return false;
 
-      return Standard_True;
+      return true;
     }
 
   protected:
@@ -83,22 +83,22 @@ public:
 
     Base (ValT* theData, SizeT theCount) : myData (theData), myCount (theCount) {}
 
-    Standard_Boolean allocate (const Size& theSize)
+    bool allocate (const Size& theSize)
     {
       if (theSize.ValCount > 0)
       {
         myData = reinterpret_cast <ValT*> (new ValHolder[theSize.ValCount]);
         myCount = myData ? theSize.ElemCount : 0;
-        return Standard_True;
+        return true;
       }
       else
       {
         clear();
-        return Standard_False;
+        return false;
       }
     }
 
-    Standard_Boolean reallocate (const Size& theSize)
+    bool reallocate (const Size& theSize)
     {
       free();
       return !allocate (theSize) || myData != 0L;

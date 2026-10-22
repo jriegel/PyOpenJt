@@ -124,16 +124,16 @@ JtDecode_VertexData::Handle JtDecode_VertexData::LoadCompressedNormals (JtData_R
   return aData;
 }
 
-Standard_Boolean JtDecode_VertexData::load (JtData_Reader&               theReader,
+bool JtDecode_VertexData::load (JtData_Reader&               theReader,
                                             JtDecode_Int32CDP::LoadFnPtr theLoader,
                                             const Jt_I32                 theVertexCount)
 {
-  for (Standard_Size i = 0; i < myPackages.Count(); i++)
+  for (size_t i = 0; i < myPackages.Count(); i++)
   {
     if (!(myPackages[i].*theLoader) (theReader)
        || myPackages[i].GetOutValCount() != theVertexCount)
-      return Standard_False;
+      return false;
   }
 
-  return Standard_True;
+  return true;
 }

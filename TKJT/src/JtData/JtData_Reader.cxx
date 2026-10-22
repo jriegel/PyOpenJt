@@ -38,7 +38,7 @@ JtData_Reader::~JtData_Reader() {}
 //purpose  : Load/map raw bytes from the stream to memory
 //=======================================================================
 
-const void* JtData_Reader::LoadBytes (const Standard_Size theLength)
+const void* JtData_Reader::LoadBytes (const size_t theLength)
 {
   void* aBuffer = Standard::Allocate (theLength);
   if (!aBuffer)
@@ -69,20 +69,20 @@ void JtData_Reader::UnloadBytes (const void* theAddress)
 //purpose  : Read a 1-byte character string
 //=======================================================================
 
-Standard_Boolean JtData_Reader::ReadSbString (TCollection_AsciiString& theString)
+bool JtData_Reader::ReadSbString (TCollection_AsciiString& theString)
 {
   Jt_I32 aCount;
   if (!ReadI32 (aCount))
-    return Standard_False;
+    return false;
 
-  Standard_Character* aStrBuffer = new Standard_Character[aCount + 1];
+  char* aStrBuffer = new char[aCount + 1];
   if (!Read (aStrBuffer, aCount))
-    return Standard_False;
+    return false;
   aStrBuffer[aCount] = '\0';
   theString = aStrBuffer;
   delete[] aStrBuffer;
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -90,20 +90,20 @@ Standard_Boolean JtData_Reader::ReadSbString (TCollection_AsciiString& theString
 //purpose  : Read a 2-byte character string
 //=======================================================================
 
-Standard_Boolean JtData_Reader::ReadMbString(TCollection_ExtendedString& theString)
+bool JtData_Reader::ReadMbString(TCollection_ExtendedString& theString)
 {
     Jt_I32 aCount;
     if (!ReadI32(aCount))
-        return Standard_False;
+        return false;
 
     Standard_ExtCharacter* aStrBuffer = new Standard_ExtCharacter[aCount + 1];
     if (!ReadArray(aStrBuffer, aCount))
-        return Standard_False;
+        return false;
     aStrBuffer[aCount] = '\0';
     theString = aStrBuffer;
     delete[] aStrBuffer;
 
-    return Standard_True;
+    return true;
 }
 
 
@@ -112,18 +112,18 @@ Standard_Boolean JtData_Reader::ReadMbString(TCollection_ExtendedString& theStri
 //purpose  : Read a 2-byte character string into a std::wstring
 //=======================================================================
 
-Standard_Boolean JtData_Reader::ReadMbString(std::wstring& theString)
+bool JtData_Reader::ReadMbString(std::wstring& theString)
 { 
     Jt_I32 aCount;
     if (!ReadI32(aCount))
-        return Standard_False;
+        return false;
 
     theString.clear();
-    Standard_Integer Char;
+    int Char;
     for (int i = 0; i < aCount; i++) {
         ReadI16(Char);
         theString.push_back((wchar_t) Char);
     }
 
-    return Standard_True;
+    return true;
 }

@@ -39,96 +39,96 @@ public:
   }
 
   //! Read raw bytes from the stream.
-  Standard_Boolean Read(void *theBuffer, Standard_Size theLength)
+  bool Read(void *theBuffer, size_t theLength)
   {
     return reader().ReadBytes(theBuffer, theLength);
   }
 
   //! Skip some bytes.
-  Standard_Boolean Skip(Standard_Size theLength)
+  bool Skip(size_t theLength)
   {
     return reader().SkipBytes(theLength);
   }
 
   //! Get absolute reading position.
-  Standard_Size GetPosition() const
+  size_t GetPosition() const
   {
     return reader().GetPosition();
   }
 
   //! Read a primitive value from the stream.
   template <class Type>
-  Standard_Boolean ReadValue(Type &theValue)
+  bool ReadValue(Type &theValue)
   {
     return reader().ReadPrimitiveValue(theValue);
   }
 
   //! Read given number of signed bytes.
   template <class SizeT>
-  Standard_Boolean ReadArray(int8_t *theArray, const SizeT theLength)
+  bool ReadArray(int8_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of unsigned bytes.
   template <class SizeT>
-  Standard_Boolean ReadArray(uint8_t *theArray, const SizeT theLength)
+  bool ReadArray(uint8_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of signed 16-bit integer values.
   template <class SizeT>
-  Standard_Boolean ReadArray(int16_t *theArray, const SizeT theLength)
+  bool ReadArray(int16_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of unsigned 16-bit integer values.
   template <class SizeT>
-  Standard_Boolean ReadArray(uint16_t *theArray, const SizeT theLength)
+  bool ReadArray(uint16_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of signed 32-bit integer values.
   template <class SizeT>
-  Standard_Boolean ReadArray(int32_t *theArray, const SizeT theLength)
+  bool ReadArray(int32_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of unsigned 32-bit integer values.
   template <class SizeT>
-  Standard_Boolean ReadArray(uint32_t *theArray, const SizeT theLength)
+  bool ReadArray(uint32_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of signed 64-bit integer values.
   template <class SizeT>
-  Standard_Boolean ReadArray(int64_t *theArray, const SizeT theLength)
+  bool ReadArray(int64_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of unsigned 64-bit integer values.
   template <class SizeT>
-  Standard_Boolean ReadArray(uint64_t *theArray, const SizeT theLength)
+  bool ReadArray(uint64_t *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of float values.
   template <class SizeT>
-  Standard_Boolean ReadArray(float *theArray, const SizeT theLength)
+  bool ReadArray(float *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
 
   //! Read given number of double values.
   template <class SizeT>
-  Standard_Boolean ReadArray(double *theArray, const SizeT theLength)
+  bool ReadArray(double *theArray, const SizeT theLength)
   {
     return reader().ReadPrimitiveArray(theArray, theLength);
   }
@@ -136,18 +136,18 @@ public:
   //! Read given number of objects all having the same type
   //! using a user-defined ReadObject method to read every object.
   template <class Object, class SizeT>
-  Standard_Boolean ReadArray(Object *theArray, const SizeT theLength)
+  bool ReadArray(Object *theArray, const SizeT theLength)
   {
     for (SizeT i = 0; i < theLength; i++)
       if (!Read(theArray[i]))
-        return Standard_False;
+        return false;
 
-    return Standard_True;
+    return true;
   }
 
   //! Load/map raw bytes from the stream to memory
   //! and return a pointer to access the data.
-  const void *Load(const Standard_Size theLength)
+  const void *Load(const size_t theLength)
   {
     return reader().LoadBytes(theLength);
   }
@@ -159,50 +159,50 @@ public:
   }
 
   //! Read a 1-byte character string.
-  Standard_Boolean ReadString(TCollection_AsciiString &theString)
+  bool ReadString(TCollection_AsciiString &theString)
   {
     return reader().ReadSbString(theString);
   }
 
   //! Read a 2-byte character string.
-  Standard_Boolean ReadMbString(TCollection_ExtendedString &theString)
+  bool ReadMbString(TCollection_ExtendedString &theString)
   {
     return reader().ReadMbString(theString);
   }
 
   //! Read a primitive value and convert it to another type.
   template <class SrcType, class DstType>
-  Standard_Boolean ReadValue(SrcType theSrc, DstType &theDst)
+  bool ReadValue(SrcType theSrc, DstType &theDst)
   {
-    Standard_Boolean aResult = ReadValue(theSrc);
+    bool aResult = ReadValue(theSrc);
     theDst = theSrc;
     return aResult;
   }
 
   //! Read a referenced array.
   template <class Type, class SizeT>
-  Standard_Boolean ReadArray(JtData_VectorRef<Type, SizeT> theArray)
+  bool ReadArray(JtData_VectorRef<Type, SizeT> theArray)
   {
     return ReadArray(theArray.Data(), theArray.Count());
   }
 
   //! Read a fixed-size array.
-  template <class Type, Standard_Size N>
-  Standard_Boolean ReadArray(Type (&theArray)[N])
+  template <class Type, size_t N>
+  bool ReadArray(Type (&theArray)[N])
   {
     return ReadArray(theArray, N);
   }
 
   //! Read a structure consisting of elements of the same type.
   template <class ElemType, class Struct>
-  Standard_Boolean ReadUniformStruct(Struct &theStruct, const ElemType & = ElemType())
+  bool ReadUniformStruct(Struct &theStruct, const ElemType & = ElemType())
   {
     return ReadArray(JtData_VectorRef<ElemType>(theStruct));
   }
 
   //! Allocate a vector and read given number of values to it.
   template <class Type, class VecSizeT, class SizeT>
-  Standard_Boolean ReadVec(JtData_Vector<Type, VecSizeT> &theVector, const SizeT theLength)
+  bool ReadVec(JtData_Vector<Type, VecSizeT> &theVector, const SizeT theLength)
   {
     theVector.Allocate(theLength);
     return ReadArray(theVector.Data(), theLength);
@@ -210,107 +210,107 @@ public:
 
   //! Read a vector.
   template <class Type, class SizeT>
-  Standard_Boolean ReadVec(JtData_Vector<Type, SizeT> &theVector)
+  bool ReadVec(JtData_Vector<Type, SizeT> &theVector)
   {
     SizeT aLength;
     if (!ReadValue(aLength))
-      return Standard_False;
+      return false;
 
     if (!aLength)
     {
       theVector.Free();
-      return Standard_True;
+      return true;
     }
 
     return ReadVec(theVector, aLength);
   }
 
   //! Read a GUID.
-  Standard_EXPORT Standard_Boolean ReadGUID(Jt_GUID &theGUID)
+  TKJT_EXPORT bool ReadGUID(Jt_GUID &theGUID)
   {
     return ReadValue(theGUID.data.codes.U32) && ReadArray(theGUID.data.codes.U16) && ReadArray(theGUID.data.codes.U8);
   }
 
   // Explicit reading of basic JT data types
-  Standard_Boolean ReadUChar(Jt_UChar &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadU8(Jt_U8 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadU16(Jt_U16 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadU32(Jt_U32 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadU64(Jt_U64 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadI16(Jt_I16 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadI32(Jt_I32 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadI64(Jt_I64 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadF32(Jt_F32 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean ReadF64(Jt_F64 &theValue) { return ReadValue(theValue); }
+  bool ReadUChar(Jt_UChar &theValue) { return ReadValue(theValue); }
+  bool ReadU8(Jt_U8 &theValue) { return ReadValue(theValue); }
+  bool ReadU16(Jt_U16 &theValue) { return ReadValue(theValue); }
+  bool ReadU32(Jt_U32 &theValue) { return ReadValue(theValue); }
+  bool ReadU64(Jt_U64 &theValue) { return ReadValue(theValue); }
+  bool ReadI16(Jt_I16 &theValue) { return ReadValue(theValue); }
+  bool ReadI32(Jt_I32 &theValue) { return ReadValue(theValue); }
+  bool ReadI64(Jt_I64 &theValue) { return ReadValue(theValue); }
+  bool ReadF32(Jt_F32 &theValue) { return ReadValue(theValue); }
+  bool ReadF64(Jt_F64 &theValue) { return ReadValue(theValue); }
 
   // Reading with conversion to a more precise data type
-  Standard_Boolean ReadU8(Standard_Integer &theValue) { return ReadValue(Jt_U8(), theValue); }
-  Standard_Boolean ReadU8(Standard_Size &theValue) { return ReadValue(Jt_U8(), theValue); }
-  Standard_Boolean ReadU16(Standard_Integer &theValue) { return ReadValue(Jt_U16(), theValue); }
-  Standard_Boolean ReadU16(Standard_Size &theValue) { return ReadValue(Jt_U16(), theValue); }
-  Standard_Boolean ReadI16(Standard_Integer &theValue) { return ReadValue(Jt_I16(), theValue); }
-  Standard_Boolean ReadF32(Standard_Real &theValue) { return ReadValue(Jt_F32(), theValue); }
+  bool ReadU8(int &theValue) { return ReadValue(Jt_U8(), theValue); }
+  bool ReadU8(size_t &theValue) { return ReadValue(Jt_U8(), theValue); }
+  bool ReadU16(int &theValue) { return ReadValue(Jt_U16(), theValue); }
+  bool ReadU16(size_t &theValue) { return ReadValue(Jt_U16(), theValue); }
+  bool ReadI16(int &theValue) { return ReadValue(Jt_I16(), theValue); }
+  bool ReadF32(double &theValue) { return ReadValue(Jt_F32(), theValue); }
 
   // Abstract reading of basic JT data types
-  Standard_Boolean Read(Jt_U8 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_U16 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_U32 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_U64 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_I16 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_I32 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_I64 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_F32 &theValue) { return ReadValue(theValue); }
-  Standard_Boolean Read(Jt_F64 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_U8 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_U16 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_U32 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_U64 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_I16 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_I32 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_I64 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_F32 &theValue) { return ReadValue(theValue); }
+  bool Read(Jt_F64 &theValue) { return ReadValue(theValue); }
 
   //! Read a referenced array.
   template <class Type, class SizeT>
-  Standard_Boolean Read(JtData_VectorRef<Type, SizeT> theArray)
+  bool Read(JtData_VectorRef<Type, SizeT> theArray)
   {
     return ReadArray(theArray);
   }
 
   //! Read a fixed-size array.
-  template <class Type, Standard_Size N>
-  Standard_Boolean Read(Type (&theArray)[N])
+  template <class Type, size_t N>
+  bool Read(Type (&theArray)[N])
   {
     return ReadArray(theArray);
   }
 
   //! Read a vector.
   template <class Type, class SizeT>
-  Standard_Boolean Read(JtData_Vector<Type, SizeT> &theVector)
+  bool Read(JtData_Vector<Type, SizeT> &theVector)
   {
     return ReadVec(theVector);
   }
 
   //! Read an XYZ type.
   template <class Type>
-  Standard_Boolean Read(Jt_XYZ<Type> &theXYZ)
+  bool Read(Jt_XYZ<Type> &theXYZ)
   {
     return ReadUniformStruct<Type>(theXYZ);
   }
 
   //! Read a GUID.
-  Standard_Boolean Read(Jt_GUID &theGUID)
+  bool Read(Jt_GUID &theGUID)
   {
     return ReadGUID(theGUID);
   }
 
   //! Read a 1-byte character string.
-  Standard_Boolean Read(TCollection_AsciiString &theString)
+  bool Read(TCollection_AsciiString &theString)
   {
     return ReadString(theString);
   }
 
   //! Read a 2-byte character string.
-  Standard_Boolean Read(TCollection_ExtendedString &theString)
+  bool Read(TCollection_ExtendedString &theString)
   {
     return ReadMbString(theString);
   }
 
   //! Read an object using a user-defined ReadObject method.
   template <class Object>
-  Standard_Boolean Read(Object &theObject)
+  bool Read(Object &theObject)
   {
     return static_cast<Derived *>(this)->ReadObject(theObject);
   }

@@ -23,13 +23,13 @@ class JtProperty_Base : public JtData_Object
 {
 public:
   //! Default constructor.
-  Standard_EXPORT JtProperty_Base();
+  TKJT_EXPORT JtProperty_Base();
 
   //! Read this entity from a JT file.
-  Standard_EXPORT Standard_Boolean Read (JtData_Reader& theReader) Standard_OVERRIDE;
+  TKJT_EXPORT bool Read (JtData_Reader& theReader) override;
 
   //! Dump this entity.
-  Standard_EXPORT Standard_Integer Dump (Standard_OStream& theStream) const Standard_OVERRIDE;
+  TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   DEFINE_STANDARD_RTTIEXT(JtProperty_Base,JtData_Object)
   DEFINE_OBJECT_CLASS (JtProperty_Base)

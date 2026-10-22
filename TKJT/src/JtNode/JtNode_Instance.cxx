@@ -27,15 +27,15 @@ IMPLEMENT_OBJECT_CLASS(JtNode_Instance, "Instance Object",
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtNode_Instance::Read (JtData_Reader& theReader)
+bool JtNode_Instance::Read (JtData_Reader& theReader)
 {
   if (!JtNode_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
   return JtData_DeferredObject::Read (theReader, myObject);
 }
@@ -44,7 +44,7 @@ Standard_Boolean JtNode_Instance::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtNode_Instance::Dump (Standard_OStream& theStream) const
+int JtNode_Instance::Dump (std::ostream& theStream) const
 {
   theStream << "JtNode_Instance ";
   return JtNode_Base::Dump (theStream);

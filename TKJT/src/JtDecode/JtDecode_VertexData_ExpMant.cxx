@@ -19,13 +19,13 @@
 //#define NO_JT_MULTITHREADING
 #include <JtData_Parallel.hxx>
 
-JtDecode_VertexData_ExpMant::JtDecode_VertexData_ExpMant (const Standard_Size theNbComponents,
+JtDecode_VertexData_ExpMant::JtDecode_VertexData_ExpMant (const size_t theNbComponents,
                                                                 JtDecode_Unpack& theUnpacker)
   : JtDecode_VertexData (theNbComponents * 2, theUnpacker) {}
 
-Standard_Integer JtDecode_VertexData_ExpMant::getOutCompCount (Standard_Size thePackageCount)
+int JtDecode_VertexData_ExpMant::getOutCompCount (size_t thePackageCount)
 {
-  return static_cast<Standard_Integer>(thePackageCount) / 2;
+  return static_cast<int>(thePackageCount) / 2;
 }
 
 void JtDecode_VertexData_ExpMant::decode (Decoded::Ref theResults)

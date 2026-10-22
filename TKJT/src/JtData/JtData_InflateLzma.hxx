@@ -25,35 +25,35 @@ class JtData_InflateLzma : public JtData_Reader
 {
 public:
   //! Constructor.
-  Standard_EXPORT JtData_InflateLzma(JtData_Reader& theReader, const Standard_Size theLength);
+  TKJT_EXPORT JtData_InflateLzma(JtData_Reader& theReader, const size_t theLength);
 
   //! Destructor.
-  Standard_EXPORT virtual ~JtData_InflateLzma();
+  TKJT_EXPORT virtual ~JtData_InflateLzma();
 
   //! Buffered inflate raw bytes.
-  Standard_EXPORT Standard_Boolean ReadBytes (void* theBuffer, Standard_Size theLength) Standard_OVERRIDE;
+  TKJT_EXPORT bool ReadBytes (void* theBuffer, size_t theLength) override;
 
   //! Skip some bytes.
-  Standard_EXPORT Standard_Boolean SkipBytes (Standard_Size theLength) Standard_OVERRIDE;
+  TKJT_EXPORT bool SkipBytes (size_t theLength) override;
 
   //! Get absolute reading position in the inflated data.
-  Standard_EXPORT Standard_Size GetPosition() const Standard_OVERRIDE;
+  TKJT_EXPORT size_t GetPosition() const override;
 
 protected:
-  Standard_Size read (uint8_t* theBuffer, Standard_Size theLength);
+  size_t read (uint8_t* theBuffer, size_t theLength);
 
 protected:
-  static const Standard_Size CHUNK = 32768;
+  static const size_t CHUNK = 32768;
 
   JtData_Reader* myReader;
   lzma_stream    myZStream;
 
   const uint8_t*    myInBuffer;
-  Standard_Size  myInputRest;
+  size_t  myInputRest;
 
   uint8_t           myOutBuffer[CHUNK];
   const uint8_t*    myOutBufPos;
-  Standard_Size  myOutBufRest;
+  size_t  myOutBufRest;
 };
 
 

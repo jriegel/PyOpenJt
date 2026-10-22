@@ -35,7 +35,7 @@ char strBuf[1024 * 64 + 2] ;
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtElement_ProxyMetaData::Read (JtData_Reader& theReader)
+bool JtElement_ProxyMetaData::Read (JtData_Reader& theReader)
 {
 #if 0
     bool ok = true;
@@ -69,7 +69,7 @@ Standard_Boolean JtElement_ProxyMetaData::Read (JtData_Reader& theReader)
       keyValueStream.push_back('\0');
 
       /*assert(PropertyKey.LengthOfCString() < strBufSize);
-      Standard_PCharacter mchastr = strBuf;
+      char* mchastr = strBuf;
       int length = PropertyKey.ToUTF8CString(mchastr);
 
       size_t i = 0;
@@ -149,7 +149,7 @@ Standard_Boolean JtElement_ProxyMetaData::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtElement_ProxyMetaData::Dump (Standard_OStream& theStream) const
+int JtElement_ProxyMetaData::Dump (std::ostream& theStream) const
 {
   theStream << "JtElement_ProxyMetaData ";
   return JtData_Object::Dump (theStream);

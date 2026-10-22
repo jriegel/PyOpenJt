@@ -24,18 +24,18 @@ class JtData_FileReader : public JtData_Reader
 {
 public:
   //! Constructor.
-  Standard_EXPORT JtData_FileReader (std::ifstream&                theFile,
+  TKJT_EXPORT JtData_FileReader (std::ifstream&                theFile,
                                      const Handle(JtData_Model)&   theModel,
                                      const std::ifstream::pos_type theOffset = -1);
 
   //! Read raw bytes from the stream.
-  Standard_EXPORT Standard_Boolean ReadBytes (void* theBuffer, Standard_Size theLength) Standard_OVERRIDE;
+  TKJT_EXPORT bool ReadBytes (void* theBuffer, size_t theLength) override;
 
   //! Skip some bytes.
-  Standard_EXPORT Standard_Boolean SkipBytes (Standard_Size theLength) Standard_OVERRIDE;
+  TKJT_EXPORT bool SkipBytes (size_t theLength) override;
 
   //! Get absolute reading position.
-  Standard_EXPORT Standard_Size GetPosition() const Standard_OVERRIDE;
+  TKJT_EXPORT size_t GetPosition() const override;
 
 protected:
   std::ifstream* myFile;

@@ -1159,7 +1159,7 @@ int32_t JtDecode_MeshDecoder::ioSplitFace (int32_t /*iVtx*/, int32_t /*jFSlot*/)
     // Use the offset to index into the active face queue
     // to determine the actual face number.
     int32_t iOffset = eSym;
-    Standard_Size cLen = _viActiveFaces.size();
+    size_t cLen = _viActiveFaces.size();
 
     Standard_ASSERT_RETURN (iOffset > 0 && iOffset <= static_cast<int32_t>(cLen), "Error", -1);
     iFace = _viActiveFaces[cLen - iOffset];
@@ -1199,7 +1199,7 @@ JtDecode_MeshCoderDriver::LoadInputData (JtData_Reader& theReader)
   InputData::Handle aData (new InputData);
 
   JtData_VectorRef<JtDecode_Int32CDP> aVectorRef (*aData);
-  for (Standard_Size i = 0; i < aVectorRef.Count(); i++)
+  for (size_t i = 0; i < aVectorRef.Count(); i++)
   {
     if (!aVectorRef[i].Load2 (theReader))
       return (InputData::Handle)0;
@@ -1225,7 +1225,7 @@ void JtDecode_MeshCoderDriver::SetInputData (InputData& theData)
   aScheduler.Run (theData._viOutSplitVtxSyms    , _viOutSplitVtxSyms      , JtDecode_Unpack_Lag1);
   aScheduler.Run (theData._viOutSplitPosSyms    , _viOutSplitPosSyms);
 
-  for (Standard_Size i = 0; i < 8; i++)
+  for (size_t i = 0; i < 8; i++)
   {
     aScheduler.Run (theData._viOutDegSyms   [i], _viOutDegSyms   [i]);
     aScheduler.Run (theData._vvuOutAttrMasks[i], _vvuOutAttrMasks[i]);
@@ -1313,7 +1313,7 @@ void JtDecode_MeshCoderDriver::Decode (IndicesVec* theVertexIndices, IndicesVec*
   _pMeshDecoder->run();
 
   // Assert that ALL symbols have been consumed
-  for (Standard_Integer i = 0; i < 8; ++i)
+  for (int i = 0; i < 8; ++i)
   {
     if (_iDegReadPos[i]      != _viOutDegSyms[i].Count() ||
         _iAttrMaskReadPos[i] != _vvuOutAttrMasks[i].Count())

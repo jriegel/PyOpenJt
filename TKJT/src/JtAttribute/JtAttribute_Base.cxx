@@ -32,14 +32,14 @@ JtAttribute_Base::JtAttribute_Base()
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtAttribute_Base::Read (JtData_Reader& theReader)
+bool JtAttribute_Base::Read (JtData_Reader& theReader)
 {
   if (!JtData_Object::Read (theReader))
-    return Standard_False;
+    return false;
 
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (myVersion))
-    return Standard_False;
+    return false;
 
   return theReader.ReadU8  (myStateFlags)
       && theReader.ReadU32 (myFieldInhibitFlags);
@@ -49,7 +49,7 @@ Standard_Boolean JtAttribute_Base::Read (JtData_Reader& theReader)
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtAttribute_Base::Dump (Standard_OStream& theStream) const
+int JtAttribute_Base::Dump (std::ostream& theStream) const
 {
   theStream << "JtAttribute_Base ";
   return JtData_Object::Dump (theStream);

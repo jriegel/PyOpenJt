@@ -29,7 +29,7 @@ IMPLEMENT_OBJECT_CLASS(JtAttribute_GeometricTransform, "Attribute Object",
 namespace
 {
   // Identity matrix
-  static const Standard_Real THE_IDENTITY[16] =
+  static const double THE_IDENTITY[16] =
   {
     1., 0., 0., 0.,
     0., 1., 0., 0.,
@@ -42,33 +42,33 @@ namespace
 //function : Read
 //purpose  : Read this entity from a translate file
 //=======================================================================
-Standard_Boolean JtAttribute_GeometricTransform::Read (JtData_Reader& theReader)
+bool JtAttribute_GeometricTransform::Read (JtData_Reader& theReader)
 {
   if (!JtAttribute_Base::Read (theReader))
-    return Standard_False;
+    return false;
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
   && !theReader.ReadI16 (aVersion))
-    return Standard_False;
+    return false;
 
-  Standard_Integer aStoredValuesMask;
+  int aStoredValuesMask;
   if (!theReader.ReadU16 (aStoredValuesMask))
-    return Standard_False;
+    return false;
 
-  Standard_Boolean (JtData_Reader::*ReadFunc) (Standard_Real&);
+  bool (JtData_Reader::*ReadFunc) (double&);
   if (theReader.Model()->MajorVersion() <= 8)
     ReadFunc = &JtData_Reader::ReadF32;
   else
     ReadFunc = &JtData_Reader::ReadF64;
 
-  Standard_Integer aMask = 0x8000;
-  for (Standard_Integer anIter = 0; anIter < 16; ++anIter, aMask >>= 1)
+  int aMask = 0x8000;
+  for (int anIter = 0; anIter < 16; ++anIter, aMask >>= 1)
   {
     if (aStoredValuesMask & aMask)
     {
       if (!(theReader.*ReadFunc) (myTransform[anIter]))
-        return Standard_False;
+        return false;
     }
     else
     {
@@ -76,14 +76,14 @@ Standard_Boolean JtAttribute_GeometricTransform::Read (JtData_Reader& theReader)
     }
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 //function : Dump
 //purpose  :
 //=======================================================================
-Standard_Integer JtAttribute_GeometricTransform::Dump (Standard_OStream& theStream) const
+int JtAttribute_GeometricTransform::Dump (std::ostream& theStream) const
 {
   theStream << "JtAttribute_GeometricTransform ";
   return JtAttribute_Base::Dump (theStream);

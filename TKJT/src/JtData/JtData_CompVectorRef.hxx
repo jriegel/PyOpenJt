@@ -24,7 +24,7 @@ template <class ValT, class SizeT, class CompCountT> class JtData_CompVector;
 //! Reference to a complex vector's data or just to a complex array in memory.
 //! Can be used to get or set elements of a vector/array but not to allocate or deallocate it.
 //! Intended to be used primarily for function arguments.
-template <class ValT, class SizeT = Standard_Size, class CompCountT = SizeT>
+template <class ValT, class SizeT = size_t, class CompCountT = SizeT>
 class JtData_CompVectorRef : public JtData_CompVectorData<ValT, SizeT, CompCountT>::Base
 {
 protected:

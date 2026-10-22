@@ -23,7 +23,7 @@
 //purpose  : Constructor
 //=======================================================================
 
-JtData_Inflate::JtData_Inflate (JtData_Reader& theReader, const Standard_Size theLength)
+JtData_Inflate::JtData_Inflate (JtData_Reader& theReader, const size_t theLength)
   : JtData_Reader (theReader.Model())
   , myReader      (&theReader)
   , myInBuffer    (0L)
@@ -56,7 +56,7 @@ JtData_Inflate::~JtData_Inflate()
 //purpose  : Buffered inflate raw bytes
 //=======================================================================
 
-Standard_Boolean JtData_Inflate::ReadBytes (void* theBuffer, Standard_Size theLength)
+bool JtData_Inflate::ReadBytes (void* theBuffer, size_t theLength)
 {
   // Do special actions if more data is needed than remains in the internal output buffer
   if (theLength > myOutBufRest)
@@ -80,7 +80,7 @@ Standard_Boolean JtData_Inflate::ReadBytes (void* theBuffer, Standard_Size theLe
     myOutBufPos  = myOutBuffer;
     myOutBufRest = read (myOutBuffer, sizeof (myOutBuffer));
     if (!myOutBufRest)
-      return Standard_False;
+      return false;
 
     // go down and copy the needed data remainder from the internal output buffer
   }
@@ -89,7 +89,7 @@ Standard_Boolean JtData_Inflate::ReadBytes (void* theBuffer, Standard_Size theLe
   memcpy (theBuffer, myOutBufPos, theLength);
   myOutBufPos  += theLength;
   myOutBufRest -= theLength;
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -97,7 +97,7 @@ Standard_Boolean JtData_Inflate::ReadBytes (void* theBuffer, Standard_Size theLe
 //purpose  : Skip some bytes
 //=======================================================================
 
-Standard_Boolean JtData_Inflate::SkipBytes (Standard_Size theLength)
+bool JtData_Inflate::SkipBytes (size_t theLength)
 {
   while (theLength > myOutBufRest)
   {
@@ -105,12 +105,12 @@ Standard_Boolean JtData_Inflate::SkipBytes (Standard_Size theLength)
     myOutBufPos  = myOutBuffer;
     myOutBufRest = read (myOutBuffer, sizeof (myOutBuffer));
     if (!myOutBufRest)
-      return Standard_False;
+      return false;
   }
 
   myOutBufPos  += theLength;
   myOutBufRest -= theLength;
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -118,7 +118,7 @@ Standard_Boolean JtData_Inflate::SkipBytes (Standard_Size theLength)
 //purpose  : Get absolute reading position in the inflated data
 //=======================================================================
 
-Standard_Size JtData_Inflate::GetPosition() const
+size_t JtData_Inflate::GetPosition() const
 {
   return myZStream.total_out - myOutBufRest;
 }
@@ -128,7 +128,7 @@ Standard_Size JtData_Inflate::GetPosition() const
 //purpose  : unbuffered inflate
 //=======================================================================
 
-Standard_Size JtData_Inflate::read (Bytef* theBuffer, Standard_Size theLength)
+size_t JtData_Inflate::read (Bytef* theBuffer, size_t theLength)
 {
   myZStream.next_out  = theBuffer;
   myZStream.avail_out = static_cast<unsigned>(theLength);
@@ -142,7 +142,7 @@ Standard_Size JtData_Inflate::read (Bytef* theBuffer, Standard_Size theLength)
       if (!myInputRest)
         break;
 
-      Standard_Size aBufSize = min (CHUNK, myInputRest);
+      size_t aBufSize = min (CHUNK, myInputRest);
       myInBuffer = static_cast <const Bytef*> (myReader->Load (aBufSize));
       if (!myInBuffer)
         return 0;

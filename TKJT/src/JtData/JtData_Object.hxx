@@ -40,7 +40,7 @@ public:
   //! @param theGUID - Jt object's type GUID.
   static const ClassInfo* FindClass (const Jt_GUID& theGUID) { return ClassInfo::Find (theGUID); }
 
-  typedef NCollection_DataMap <Standard_Integer, Handle(JtData_Object)> MapOfObjects;
+  typedef NCollection_DataMap <int, Handle(JtData_Object)> MapOfObjects;
   typedef JtData_Vector       <Handle(JtData_Object)>                   VectorOfObjects;
   typedef NCollection_List    <Handle(JtProperty_LateLoaded)>           ListOfLateLoads;
   typedef JtData_Vector       <Handle(JtProperty_LateLoaded)>           VectorOfLateLoads;
@@ -48,19 +48,19 @@ public:
 public:
   //! Read this entity from a JT file.
   //! @param theReader - current Jt file reader.
-  Standard_EXPORT virtual Standard_Boolean Read (JtData_Reader& theReader);
+  TKJT_EXPORT virtual bool Read (JtData_Reader& theReader);
 
   //! Dump this entity.
-  Standard_EXPORT virtual Standard_Integer Dump (Standard_OStream& S) const;
+  TKJT_EXPORT virtual int Dump (std::ostream& S) const;
 
   //! Bind other objects to the object.
-  Standard_EXPORT virtual void BindObjects (const MapOfObjects& theObjectsMap);
+  TKJT_EXPORT virtual void BindObjects (const MapOfObjects& theObjectsMap);
 
   //! Bind a late loaded property to the object.
-  Standard_EXPORT virtual void BindLateLoads (const ListOfLateLoads& theLateLoads);
+  TKJT_EXPORT virtual void BindLateLoads (const ListOfLateLoads& theLateLoads);
 
   //! Bind a name to the object.
-  Standard_EXPORT virtual void BindName (const TCollection_ExtendedString& theName);
+  TKJT_EXPORT virtual void BindName (const TCollection_ExtendedString& theName);
 
   DEFINE_STANDARD_RTTIEXT(JtData_Object,Standard_Transient)
 };

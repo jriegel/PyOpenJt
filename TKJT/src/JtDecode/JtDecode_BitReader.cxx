@@ -20,7 +20,7 @@
 //function : Base Constructor
 //purpose  : Initialize the reader
 //=======================================================================
-JtDecode_BitReader::Base::Base (JtData_Reader& theReader, Standard_Boolean theNeedSwap)
+JtDecode_BitReader::Base::Base (JtData_Reader& theReader, bool theNeedSwap)
 : myReader     (&theReader)
 , myNeedSwap   (theNeedSwap)
 , myBitsBuf    (0)
@@ -52,29 +52,29 @@ JtDecode_BitReader::Raw::Raw (JtData_Reader& theReader)
 //           loads new bits starting right after the last bit loaded by
 //           the previous call.
 //=======================================================================
-Standard_Boolean JtDecode_BitReader::Raw::Load (const unsigned theBitsCount)
+bool JtDecode_BitReader::Raw::Load (const unsigned theBitsCount)
 {
   // Calculate number of bytes that should be read to new byte buffer
   // to provide the requested number of bits
-  Standard_Size aNewBytesCount = (theBitsCount - myBitsLoaded + 7) / 8;
+  size_t aNewBytesCount = (theBitsCount - myBitsLoaded + 7) / 8;
   if (aNewBytesCount > 0)
   {
     // Calculate size of data to preload from the byte buffer in order to
     // leave an integer number of double words in it
-    Standard_Size aPreloadBytesCount = aNewBytesCount % sizeof (uint32_t);
-    Standard_Size aPreloadBitsCount  = aPreloadBytesCount * 8;
+    size_t aPreloadBytesCount = aNewBytesCount % sizeof (uint32_t);
+    size_t aPreloadBitsCount  = aPreloadBytesCount * 8;
 
     // Check if there is enough space in the bit buffer to store the preloaded bits
     if (myBitsLoaded + aPreloadBitsCount > 32)
-      return Standard_False;
+      return false;
 
     // Read the needed number of bytes to the byte buffer
     if (!myReader)
-      return Standard_False;
+      return false;
     myReader->Unload (myByteBuf);
     myByteBuf = myReader->Load (aNewBytesCount);
     if (!myByteBuf)
-      return Standard_False;
+      return false;
 
     // Load the first incomplete double word from the byte buffer to the bit buffer
     uint32_t aFirstBytes = 0;
@@ -99,7 +99,7 @@ Standard_Boolean JtDecode_BitReader::Raw::Load (const unsigned theBitsCount)
   }
 
   // Done
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
@@ -117,7 +117,7 @@ JtDecode_BitReader::U32::U32 (JtData_Reader& theReader)
 //           A subsequent call discards all previously loaded bits and
 //           reads a new array.
 //=======================================================================
-Standard_Boolean JtDecode_BitReader::U32::Load (const Standard_Size theValuesCount)
+bool JtDecode_BitReader::U32::Load (const size_t theValuesCount)
 {
   // Free the byte buffer if any
   myReader->Unload (myByteBuf);
@@ -139,7 +139,7 @@ Standard_Boolean JtDecode_BitReader::U32::Load (const Standard_Size theValuesCou
 //           A subsequent call discards all previously loaded bits and
 //           reads a new VecU32.
 //=======================================================================
-Standard_Boolean JtDecode_BitReader::U32::LoadVec()
+bool JtDecode_BitReader::U32::LoadVec()
 {
   // Read the U32 values count and load array with corresponding size
   Jt_I32 aValuesCount;

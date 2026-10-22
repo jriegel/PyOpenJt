@@ -33,22 +33,22 @@ public:
   typedef JtData_CompVector<float, int32_t> Decoded;
 
   //! Load lossy quantized vertex coords data.
-  Standard_EXPORT static Handle LoadQuantizedCoords   (JtData_Reader& theReader);
+  TKJT_EXPORT static Handle LoadQuantizedCoords   (JtData_Reader& theReader);
 
   //! Load lossless compressed vertex coords data.
-  Standard_EXPORT static Handle LoadCompressedCoords  (JtData_Reader& theReader);
+  TKJT_EXPORT static Handle LoadCompressedCoords  (JtData_Reader& theReader);
 
   //! Load lossy quantized vertex normals data.
-  Standard_EXPORT static Handle LoadQuantizedNormals  (JtData_Reader& theReader);
+  TKJT_EXPORT static Handle LoadQuantizedNormals  (JtData_Reader& theReader);
 
   //! Load lossless compressed vertex normals data.
-  Standard_EXPORT static Handle LoadCompressedNormals (JtData_Reader& theReader);
+  TKJT_EXPORT static Handle LoadCompressedNormals (JtData_Reader& theReader);
 
   //! Get expected count of output vertices.
   int32_t GetOutVertexCount() { return myPackages.IsEmpty() ? 0 : myPackages[0].GetOutValCount(); }
 
   //! Get expected count of components in the output vertices.
-  Standard_Integer GetOutCompCount() { return getOutCompCount (myPackages.Count()); }
+  int GetOutCompCount() { return getOutCompCount (myPackages.Count()); }
 
   //! Decode the loaded data. Can be called only once for an instance.
   Decoded::Mover Decode()
@@ -68,32 +68,32 @@ protected:
   JtDecode_VertexData() {}
 
   //! Initialize data consisting of the given number of packages.
-  JtDecode_VertexData (const Standard_Size theNbPackages, JtDecode_Unpack& theUnpacker)
+  JtDecode_VertexData (const size_t theNbPackages, JtDecode_Unpack& theUnpacker)
     : myPackages (theNbPackages), myUnpacker (&theUnpacker) {}
 
   //! Decode a package with the given index.
-  Jt_VecI32::Mover decodePackage (const Standard_Size thePackageNum)
+  Jt_VecI32::Mover decodePackage (const size_t thePackageNum)
   {
     return myPackages[thePackageNum].DecodeU32 (*myUnpacker);
   }
 
   //! Create a decoding functor for package with the given index.
-  JtDecode_Int32CDP::DecodingFunctor getDecodingFunctor (const Standard_Size thePackageNum,
+  JtDecode_Int32CDP::DecodingFunctor getDecodingFunctor (const size_t thePackageNum,
                                                                Jt_VecU32&    theResult)
   {
     return myPackages[thePackageNum].GetDecodingFunctor (theResult, *myUnpacker);
   }
 
   //! Get expected count of output components; to be reimplemented in derived classes.
-  Standard_EXPORT virtual Standard_Integer getOutCompCount (Standard_Size thePackageCount) = 0;
+  TKJT_EXPORT virtual int getOutCompCount (size_t thePackageCount) = 0;
 
   //! Decode the whole data; to be reimplemented in derived classes.
-  Standard_EXPORT virtual void decode (Decoded::Ref theResults) = 0;
+  TKJT_EXPORT virtual void decode (Decoded::Ref theResults) = 0;
 
 private:
 
   //! Load the data packages.
-  Standard_Boolean load (JtData_Reader&               theReader,
+  bool load (JtData_Reader&               theReader,
                          JtDecode_Int32CDP::LoadFnPtr theLoader,
                          const Jt_I32                 theVertexCount);
 
