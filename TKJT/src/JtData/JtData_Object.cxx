@@ -56,6 +56,6 @@ void JtData_Object::BindLateLoads (const ListOfLateLoads&)
 //function : BindName
 //purpose  : Bind a name to the object
 //=======================================================================
-void JtData_Object::BindName (const TCollection_ExtendedString&)
+void JtData_Object::BindName (const std::wstring&)
 {
 }

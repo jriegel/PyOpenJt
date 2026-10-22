@@ -2,6 +2,7 @@
 #include <Python.h>
 #include <string>
 #include <sstream>      // std::stringstream
+#include <filesystem>
 
 #include <JtData_Model.hxx>
 #include <JtNode_Base.hxx>
@@ -70,7 +71,7 @@ JtFile_open(JtFileObject* self, PyObject* , PyObject*)
 
     Py_BEGIN_ALLOW_THREADS;
 
-    TCollection_ExtendedString aFileName(self->FileName.c_str(), Standard_True);
+    std::wstring aFileName = std::filesystem::u8path(self->FileName).wstring();
 
     self->rootModel = std::make_shared<JtData_Model>(aFileName);
 

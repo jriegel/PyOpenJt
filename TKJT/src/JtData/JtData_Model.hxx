@@ -20,7 +20,7 @@
 #include <JtData_Types.hxx>
 #include <JtData_Object.hxx>
 
-#include <TCollection_ExtendedString.hxx>
+#include <string>
 
 #include <ostream>
 #include <NCollection_DataMap.hxx>
@@ -42,7 +42,7 @@ public:
   //! Constructor initializing model by specified file
   //! @param theFileName - name of Jt file
   //! @param theParent - the parent model in case of non monolythic assembly.
-  TKJT_EXPORT JtData_Model (const TCollection_ExtendedString& theFileName,
+  TKJT_EXPORT JtData_Model (const std::wstring& theFileName,
                                 const std::shared_ptr<JtData_Model>& theParent = std::shared_ptr<JtData_Model>());
 
   //! Read JT file header, TOC and LSG and return a handle to the root LSG node.
@@ -61,7 +61,7 @@ public:
   TKJT_EXPORT int Dump (std::ostream& theStream) const;
 
   //! Return file name.
-  const TCollection_ExtendedString& FileName()     const { return myFileName; }
+  const std::wstring& FileName()     const { return myFileName; }
 
   //! Return Little Endian state.
   bool                  IsFileLE()     const { return myIsFileLE; }
@@ -119,7 +119,7 @@ protected:
 protected:
   std::shared_ptr<JtData_Model>       myParent;
 
-  TCollection_ExtendedString myFileName;
+  std::wstring myFileName;
   bool           myIsFileLE;
 
   int           myMajorVersion;

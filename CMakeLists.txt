@@ -4,6 +4,11 @@ cmake_minimum_required(VERSION 3.14.0)
 
 project (PyOpenJt)
 
+set (CMAKE_CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD_REQUIRED ON)
+# vmmlib still uses std::binary_function
+add_compile_definitions (_HAS_DEPRECATED_RESULT_OF=1 _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS _HAS_AUTO_PTR_ETC=1)
+
 # =============================================================================
 # Configure CMake
 # =============================================================================

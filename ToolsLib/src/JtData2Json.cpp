@@ -25,6 +25,8 @@
 #include "JtLayer.h"
 
 #include <assert.h>
+#include <codecvt>
+#include <locale>
 
 using namespace std;
 
@@ -69,14 +71,10 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
     return str;
 }
 
-std::ostream& operator<<(std::ostream& os, const TCollection_ExtendedString& extstr)
+std::ostream& operator<<(std::ostream& os, const std::wstring& extstr)
 {
-	static char str[2048];
-	assert(extstr.LengthOfCString() < 2048);
-	Standard_PCharacter mchastr = str;
-	extstr.ToUTF8CString(mchastr);
-    string temp = mchastr;
-    auto res = ReplaceAll(temp, "\\", "\\\\");
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> toUTF8;
+    auto res = ReplaceAll(toUTF8.to_bytes(extstr), "\\", "\\\\");
 
 	return (os << res);
 }

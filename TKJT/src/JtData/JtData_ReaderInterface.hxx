@@ -21,8 +21,7 @@
 #include <JtData_Types.hxx>
 #include <JtData_Model.hxx>
 
-#include <TCollection_AsciiString.hxx>
-#include <TCollection_ExtendedString.hxx>
+#include <string>
 
 //! Static virtual class JtData_ReaderInterface:
 //! provides data reading methods for the derived reader class.
@@ -159,13 +158,13 @@ public:
   }
 
   //! Read a 1-byte character string.
-  bool ReadString(TCollection_AsciiString &theString)
+  bool ReadString(std::string &theString)
   {
     return reader().ReadSbString(theString);
   }
 
   //! Read a 2-byte character string.
-  bool ReadMbString(TCollection_ExtendedString &theString)
+  bool ReadMbString(std::wstring &theString)
   {
     return reader().ReadMbString(theString);
   }
@@ -297,13 +296,13 @@ public:
   }
 
   //! Read a 1-byte character string.
-  bool Read(TCollection_AsciiString &theString)
+  bool Read(std::string &theString)
   {
     return ReadString(theString);
   }
 
   //! Read a 2-byte character string.
-  bool Read(TCollection_ExtendedString &theString)
+  bool Read(std::wstring &theString)
   {
     return ReadMbString(theString);
   }

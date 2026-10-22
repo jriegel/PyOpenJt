@@ -11,9 +11,10 @@
 #include <JtNode_MetaData.hxx>
 
 #include <ostream>
+#include <string>
 #include <vector>
 
-std::ostream& operator<<(std::ostream& os, const TCollection_ExtendedString& extstr);
+std::ostream& operator<<(std::ostream& os, const std::wstring& extstr);
 
 enum dumpConfig {
 	dump_TOC = 1,

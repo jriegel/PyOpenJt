@@ -68,7 +68,14 @@ void JtNode_Base::BindObjects (const MapOfObjects& theObjectsMap)
 //function : BindName
 //purpose  : Bind a name to the object
 //=======================================================================
-void JtNode_Base::BindName (const TCollection_ExtendedString& theName)
+void JtNode_Base::BindName (const std::wstring& theName)
 {
-  myName = theName.Token ((Standard_ExtString)L";");
+  // keep only the first ';'-separated token
+  const size_t aStart = theName.find_first_not_of (L';');
+  if (aStart == std::wstring::npos)
+  {
+    myName.clear();
+    return;
+  }
+  myName = theName.substr (aStart, theName.find (L';', aStart) - aStart);
 }

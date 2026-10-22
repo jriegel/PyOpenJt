@@ -19,7 +19,7 @@
 
 #include <memory>
 #include <NCollection_List.hxx>
-#include <TCollection_ExtendedString.hxx>
+#include <string>
 
 #include <JtData_Vector.hxx>
 #include <JtData_ClassInfo.hxx>
@@ -60,7 +60,7 @@ public:
   TKJT_EXPORT virtual void BindLateLoads (const ListOfLateLoads& theLateLoads);
 
   //! Bind a name to the object.
-  TKJT_EXPORT virtual void BindName (const TCollection_ExtendedString& theName);
+  TKJT_EXPORT virtual void BindName (const std::wstring& theName);
 
 };
 

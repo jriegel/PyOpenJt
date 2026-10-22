@@ -21,6 +21,7 @@
 #include <JtElement_ProxyMetaData.hxx>
 #include <JtElement_ShapeLOD_Vertex.hxx>
 
+#include "JtData2Json.h"
 #include "JtUtils.h"
 #include "JtLayer.h"
 

@@ -34,19 +34,19 @@ public:
   TKJT_EXPORT void BindObjects (const MapOfObjects& theObjectsMap) override;
 
   //! Bind a name to the object.
-  TKJT_EXPORT void BindName (const TCollection_ExtendedString& theName) override;
+  TKJT_EXPORT void BindName (const std::wstring& theName) override;
 
   //! Return object's attributes.
   const VectorOfObjects& Attributes() const { return myAttributes; }
 
   //! Return node's name.
-  const TCollection_ExtendedString& Name() const { return myName; }
+  const std::wstring& Name() const { return myName; }
 
   DEFINE_OBJECT_CLASS (JtNode_Base)
 
 protected:
   VectorOfObjects myAttributes;
-  TCollection_ExtendedString myName;
+  std::wstring myName;
 };
 
 

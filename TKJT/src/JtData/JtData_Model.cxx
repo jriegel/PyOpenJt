@@ -25,17 +25,17 @@
 #include <JtProperty_LateLoaded.hxx>
 #include <JtProperty_String.hxx>
 
-#include <Image_PixMap.hxx>
-
 #include <NCollection_DataMap.hxx>
-#include <TCollection_AsciiString.hxx>
-#include <TColStd_SequenceOfInteger.hxx>
+#include <string>
+#include <sstream>
+#include <charconv>
+#include <filesystem>
+#include <bit>
 #include <JtData_Object.hxx>
 
 using namespace std;
 
-const bool JtData_Model::IsLittleEndianHost =
-    Image_PixMap::IsBigEndianHost() ? false : true;
+const bool JtData_Model::IsLittleEndianHost = std::endian::native == std::endian::little;
 
 static const Jt_GUID EOEMarkerGUID("ffffffff-ffff-ffff-ff-ff-ff-ff-ff-ff-ff-ff");
 
@@ -44,7 +44,7 @@ static const Jt_GUID EOEMarkerGUID("ffffffff-ffff-ffff-ff-ff-ff-ff-ff-ff-ff-ff")
 //function : JtData_Model
 //purpose  : Constructor
 //=======================================================================
-JtData_Model::JtData_Model(const TCollection_ExtendedString &theFileName,
+JtData_Model::JtData_Model(const std::wstring &theFileName,
                            const std::shared_ptr<JtData_Model> & theParent)
     : myParent(theParent), myFileName(theFileName), myIsFileLE(false), myMajorVersion(0), myMinorVersion(0) {}
 
@@ -68,32 +68,43 @@ std::shared_ptr<JtNode_Partition> JtData_Model::Init()
   char vstr[81] = {};
   aFile.read(vstr, 80);
 
-  TCollection_AsciiString aMajorVersionStr(vstr);
-  int aPos = aMajorVersionStr.Search("Version");
-  if (aPos < 1)
+  std::string aMajorVersionStr(vstr);
+  if (aMajorVersionStr.find("Version") == std::string::npos)
   {
     ALARM("Error: Failed to read Jt file version");
     return std::shared_ptr<JtNode_Partition>();
   }
 
-  aMajorVersionStr = aMajorVersionStr.Token(" \t", 2);
-  aPos = aMajorVersionStr.Search(".");
-  if (aPos <= 1)
+  // the second whitespace-separated token holds "<major>.<minor>"
+  {
+    std::istringstream aTokens(aMajorVersionStr);
+    std::string aFirst, aSecond;
+    aTokens >> aFirst >> aSecond;
+    aMajorVersionStr = aSecond;
+  }
+
+  size_t aDot = aMajorVersionStr.find('.');
+  if (aDot == std::string::npos || aDot < 1)
   {
     ALARM("Error: Failed to read Jt file version");
     return std::shared_ptr<JtNode_Partition>();
   }
 
-  TCollection_AsciiString aMinorVersionStr = aMajorVersionStr.Split(aPos - 1);
-  aMinorVersionStr.Remove(1);
-  if (!aMajorVersionStr.IsIntegerValue() || !aMinorVersionStr.IsIntegerValue())
+  std::string aMinorVersionStr = aMajorVersionStr.substr(aDot + 1);
+  aMajorVersionStr.resize(aDot);
+
+  auto aParseInt = [](const std::string& theStr, int& theValue)
+  {
+    const char* aEnd = theStr.data() + theStr.size();
+    auto aRes = std::from_chars(theStr.data(), aEnd, theValue);
+    return !theStr.empty() && aRes.ec == std::errc() && aRes.ptr == aEnd;
+  };
+  if (!aParseInt(aMajorVersionStr, myMajorVersion) || !aParseInt(aMinorVersionStr, myMinorVersion))
   {
     ALARM("Error: Failed to read Jt file version");
     return std::shared_ptr<JtNode_Partition>();
   }
 
-  myMajorVersion = aMajorVersionStr.IntegerValue();
-  myMinorVersion = aMinorVersionStr.IntegerValue();
   TRACE(std::string("\n\nInfo: File version = ") + std::to_string(myMajorVersion) + "." + std::to_string(myMinorVersion));
 
   // Read byte order
@@ -163,13 +174,7 @@ std::shared_ptr<JtNode_Partition> JtData_Model::Init()
 //=======================================================================
 bool JtData_Model::open(ifstream &aFile) const
 {
-#ifdef WNT
-  aFile.open(reinterpret_cast<const wchar_t *>(myFileName.ToExtString()),
-             ios::binary | ios::in);
-#else
-  TCollection_AsciiString anAsciiName(myFileName, ' ');
-  aFile.open(anAsciiName.ToCString(), ios::binary | ios::in);
-#endif
+  aFile.open(std::filesystem::path(myFileName), ios::binary | ios::in);
 
   return aFile.is_open();
 }
@@ -454,7 +459,7 @@ std::shared_ptr<JtData_Object> JtData_Model::readSegmentDump(std::ifstream& theF
 bool JtData_Model::readLSGData(JtData_Reader &theReader,
                                            std::shared_ptr<JtData_Object> & theFirstObject) const
 {
-  const TCollection_ExtendedString anObjectNameKey = "JT_PROP_NAME";
+  const std::wstring anObjectNameKey = L"JT_PROP_NAME";
 
   // Read graph elements
   JtData_Object::MapOfObjects aMapObjects;

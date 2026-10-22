@@ -69,18 +69,16 @@ void JtData_Reader::UnloadBytes (const void* theAddress)
 //purpose  : Read a 1-byte character string
 //=======================================================================
 
-bool JtData_Reader::ReadSbString (TCollection_AsciiString& theString)
+bool JtData_Reader::ReadSbString (std::string& theString)
 {
   Jt_I32 aCount;
   if (!ReadI32 (aCount))
     return false;
 
-  char* aStrBuffer = new char[aCount + 1];
-  if (!Read (aStrBuffer, aCount))
+  std::vector<char> aStrBuffer (static_cast<size_t> (aCount) + 1, '\0');
+  if (!Read (aStrBuffer.data(), aCount))
     return false;
-  aStrBuffer[aCount] = '\0';
-  theString = aStrBuffer;
-  delete[] aStrBuffer;
+  theString = aStrBuffer.data();
 
   return true;
 }
@@ -90,40 +88,19 @@ bool JtData_Reader::ReadSbString (TCollection_AsciiString& theString)
 //purpose  : Read a 2-byte character string
 //=======================================================================
 
-bool JtData_Reader::ReadMbString(TCollection_ExtendedString& theString)
+bool JtData_Reader::ReadMbString(std::wstring& theString)
 {
     Jt_I32 aCount;
     if (!ReadI32(aCount))
         return false;
 
-    Standard_ExtCharacter* aStrBuffer = new Standard_ExtCharacter[aCount + 1];
-    if (!ReadArray(aStrBuffer, aCount))
-        return false;
-    aStrBuffer[aCount] = '\0';
-    theString = aStrBuffer;
-    delete[] aStrBuffer;
-
-    return true;
-}
-
-
-//=======================================================================
-//function : ReadMbStringStd
-//purpose  : Read a 2-byte character string into a std::wstring
-//=======================================================================
-
-bool JtData_Reader::ReadMbString(std::wstring& theString)
-{ 
-    Jt_I32 aCount;
-    if (!ReadI32(aCount))
+    std::vector<char16_t> aStrBuffer (static_cast<size_t> (aCount) + 1, u'\0');
+    if (!ReadArray(aStrBuffer.data(), aCount))
         return false;
 
     theString.clear();
-    int Char;
-    for (int i = 0; i < aCount; i++) {
-        ReadI16(Char);
-        theString.push_back((wchar_t) Char);
-    }
+    for (const char16_t* aChar = aStrBuffer.data(); *aChar != u'\0'; ++aChar)
+        theString.push_back(static_cast<wchar_t>(*aChar));
 
     return true;
 }

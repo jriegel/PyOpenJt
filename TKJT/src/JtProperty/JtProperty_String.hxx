@@ -18,7 +18,7 @@
 #define _JtProperty_String_HeaderFile
 
 #include <JtProperty_Base.hxx>
-#include <TCollection_ExtendedString.hxx>
+#include <string>
 
 class JtProperty_String : public JtProperty_Base
 {
@@ -30,12 +30,12 @@ public:
   TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
   //! Get the property value.
-  const TCollection_ExtendedString& Value() const { return myValue; }
+  const std::wstring& Value() const { return myValue; }
 
   DEFINE_OBJECT_CLASS (JtProperty_String)
 
 protected:
-  TCollection_ExtendedString myValue;
+  std::wstring myValue;
 };
 
 

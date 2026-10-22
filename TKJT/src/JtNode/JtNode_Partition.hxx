@@ -20,7 +20,7 @@
 #include <JtNode_Group.hxx>
 #include <JtData_Model.hxx>
 
-#include <TCollection_ExtendedString.hxx>
+#include <string>
 
 //! Leaf node representing the external JT file reference.
 class JtNode_Partition : public JtNode_Group
@@ -39,13 +39,13 @@ public:
   TKJT_EXPORT void Unload();
 
   //! Returns file name.
-  const TCollection_ExtendedString& FileName() const { return myFileName; }
+  const std::wstring& FileName() const { return myFileName; }
 
   DEFINE_OBJECT_CLASS (JtNode_Partition)
 
 protected:
   std::shared_ptr<JtData_Model>       myModel;
-  TCollection_ExtendedString myFileName;
+  std::wstring myFileName;
 };
 
 

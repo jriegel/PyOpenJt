@@ -17,8 +17,6 @@
 #ifndef _JtData_Message_HeaderFile
 #define _JtData_Message_HeaderFile
 
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
 #include <iostream>
 
 #ifdef TKJT_CERRTRACING
@@ -29,17 +27,10 @@
     #define FAIL(msg)    std::cerr << "FAIL: " << msg << '\n';
 
 #else
-    #ifdef OCCT_DEBUG
-      #define MESSAGE(msg, type) \
-        ::Message::DefaultMessenger()->Send (TCollection_ExtendedString() + msg, type)
-    #else
-      #define MESSAGE(msg, type)
-    #endif
-
-    #define TRACE(msg)   MESSAGE(msg, Message_Trace)
-    #define INFO(msg)    MESSAGE(msg, Message_Info)
-    #define WARNING(msg) MESSAGE(msg, Message_Warning)
-    #define ALARM(msg)   MESSAGE(msg, Message_Alarm)
-    #define FAIL(msg)    MESSAGE(msg, Message_Fail)
+    #define TRACE(msg)
+    #define INFO(msg)
+    #define WARNING(msg)
+    #define ALARM(msg)
+    #define FAIL(msg)
 #endif
 #endif // _JtData_Message_HeaderFile

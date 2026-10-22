@@ -288,7 +288,7 @@ public:
 
   bool ReadObject (PropertyAtom& theData)
   {
-    if (!Read (static_cast <TCollection_ExtendedString&> (theData)))
+    if (!Read (static_cast <std::wstring&> (theData)))
       return false;
 
     if (myVersion > 6)

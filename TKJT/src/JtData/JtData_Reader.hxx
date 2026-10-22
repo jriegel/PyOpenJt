@@ -113,13 +113,10 @@ public:
   void UnloadBytes (const void* theAddress);
 
   //! Read a 1-byte character string.
-  bool ReadSbString (TCollection_AsciiString& theString);
+  bool ReadSbString (std::string& theString);
 
   //! Read a 2-byte character string.
-  bool ReadMbString (TCollection_ExtendedString& theString);
-
-  //! Read a 2-byte character string into a std::wstring
-  bool ReadMbString(std::wstring& theString);
+  bool ReadMbString (std::wstring& theString);
 
   bool ReadObject(char16_t &theObject)
   {

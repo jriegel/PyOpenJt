@@ -19,8 +19,8 @@
 
 #include <JtData_Object.hxx>
 
-#include <TCollection_AsciiString.hxx>
-#include <TCollection_ExtendedString.hxx>
+#include <string>
+#include <string>
 
 class JtElement_MetaData_PMIManager : public JtData_Object
 {
@@ -162,7 +162,7 @@ public:
     Jt_I32 NameStringID;
   };
 
-  struct PropertyAtom : TCollection_ExtendedString
+  struct PropertyAtom : std::wstring
   {
   };
 
@@ -197,7 +197,7 @@ public:
   const Entities& GetEntities() const { return myEntities; }
 
   //! Obtain string by ID.
-  const TCollection_AsciiString& String (Jt_I32 theID) const { return myStringTable[theID]; }
+  const std::string& String (Jt_I32 theID) const { return myStringTable[theID]; }
 
   DEFINE_OBJECT_CLASS (JtElement_MetaData_PMIManager)
 
@@ -207,7 +207,7 @@ protected:
 protected:
   Entities myEntities;
   JtData_Vector <UserAttribute          , Jt_I32> myUserAttributes;
-  JtData_Vector <TCollection_AsciiString, Jt_I32> myStringTable;
+  JtData_Vector <std::string, Jt_I32> myStringTable;
   JtData_Vector <ModelView              , Jt_I32> myModelViews;
 };
 

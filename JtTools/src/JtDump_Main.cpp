@@ -36,6 +36,7 @@
 #include <iomanip>
 #include <assert.h>
 #include <fstream>
+#include <filesystem>
 #include <regex>
 #include <string>
 #include <vector>
@@ -125,7 +126,7 @@ int main(int argc, char* argv[])
         *outStream << '{' << std::endl;
         indention++;
 
-        TCollection_ExtendedString aFileName(fileName.c_str());
+        std::wstring aFileName = std::filesystem::path(fileName).wstring();
 
         std::shared_ptr<JtData_Model> rootModel = std::make_shared<JtData_Model>(aFileName);
 
