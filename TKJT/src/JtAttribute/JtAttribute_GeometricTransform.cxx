@@ -17,10 +17,6 @@
 #include <JtAttribute_GeometricTransform.hxx>
 #include <JtData_Reader.hxx>
 
-#include <Standard_Version.hxx>
-#include <gp_Trsf.hxx>
-#include <Precision.hxx>
-
 
 IMPLEMENT_OBJECT_CLASS(JtAttribute_GeometricTransform, "Attribute Object",
                        "10dd1083-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")
@@ -86,19 +82,4 @@ int JtAttribute_GeometricTransform::Dump (std::ostream& theStream) const
 {
   theStream << "JtAttribute_GeometricTransform ";
   return JtAttribute_Base::Dump (theStream);
-}
-
-//=======================================================================
-//function : GetTrsf
-//purpose  :
-//=======================================================================
-void JtAttribute_GeometricTransform::GetTrsf (gp_Trsf& theTrsf) const
-{
-  theTrsf.SetValues (myTransform[0], myTransform[4], myTransform[ 8], myTransform[12],
-                     myTransform[1], myTransform[5], myTransform[ 9], myTransform[13],
-                     myTransform[2], myTransform[6], myTransform[10], myTransform[14]
-#if OCC_VERSION_HEX < 0x060800
-                     , Precision::Angular(), 1.e-6
-#endif
-                     );
 }

@@ -19,7 +19,7 @@
 
 #include <JtAttribute_Base.hxx>
 
-class gp_Trsf;
+#include <Eigen/Core>
 
 //! Class representing Jt transformation attribute.
 class JtAttribute_GeometricTransform : public JtAttribute_Base
@@ -31,8 +31,8 @@ public:
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
-  //! Return transformation.
-  TKJT_EXPORT void GetTrsf (gp_Trsf& theTrsf) const;
+  //! Return transformation as 4x4 matrix (translation in the last column).
+  Eigen::Matrix4d GetMatrix() const { return Eigen::Map<const Eigen::Matrix4d> (myTransform); }
 
   //! Return transformationy.
   const double* GetTrsf() const { return myTransform; }
