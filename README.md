@@ -50,7 +50,7 @@ caring the code through time.
 - [ ] Python PLMXML parser
 - [ ] Upgrade TKJT to Jt 10.5 specification 
 - [ ] PyPI Package
-- [ ] Remove OpenCascade dependency 
+- [x] Remove OpenCascade dependency 
 
 
 ## Jt 

@@ -12,21 +12,10 @@ if (NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
   endif()
 endif()
 
-add_definitions (-DCSFDB)
 if (WIN32)
-  add_definitions (/DWNT -wd4996)
-elseif (APPLE)
-  add_definitions (-fexceptions -fPIC -DHAVE_WOK_CONFIG_H -DHAVE_CONFIG_H)
+  add_definitions (-wd4996)
 else()
-  add_definitions (-fexceptions -fPIC -DHAVE_WOK_CONFIG_H -DHAVE_CONFIG_H -DLIN)
-endif()
-
-# enable structured exceptions for MSVC
-string (REGEX MATCH "EHsc" ISFLAG "${CMAKE_CXX_FLAGS}")
-if (ISFLAG)
-  string (REGEX REPLACE "EHsc" "EHa" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-elseif (WIN32)
-  set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -EHa")
+  add_definitions (-fexceptions -fPIC)
 endif()
 
 # remove DEBUG flag if it exists
@@ -61,9 +50,3 @@ if (MSVC)
 elseif (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 endif()
-
-set (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNo_Exception")
-set (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -DNo_Exception")
-
-set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEB")
-set (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -DDEB")
