@@ -7,7 +7,7 @@ static PyObject *PyOpenJtError;
 
 
 // forwards of the addition of class handlers
-void addJtFileClass(PyObject *module);
+int addJtFileClass(PyObject *module);
 
 
 
@@ -69,9 +69,11 @@ PyInit_PyOpenJt(void)
     PyModule_AddObject(module, "error", PyOpenJtError);
 
     // add the JT file class
-    addJtFileClass(module);
+    if (addJtFileClass(module) < 0) {
+        Py_DECREF(module);
+        return NULL;
+    }
 
  
     return module; 
 }
-

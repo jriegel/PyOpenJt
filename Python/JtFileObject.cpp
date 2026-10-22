@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>      // std::stringstream
 #include <filesystem>
+#include <memory>
+#include <new>
 
 #include <JtData_Model.hxx>
 #include <JtNode_Base.hxx>
@@ -14,8 +16,6 @@
 using namespace std;
 
 const char* JtFile_doc = "Object representing an open JT file";
-extern PyTypeObject JtFileClassType;
-PyObject *JtFile_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 
 typedef struct {
     PyObject_HEAD;
@@ -35,12 +35,21 @@ JtFile_getFileName(JtFileObject *self, void *)
 
 int JtFile_setFileName(JtFileObject* self, PyObject* value, void* )
 {
-    self->FileName = PyUnicode_AsUTF8AndSize(value,0);
-    if (PyErr_Occurred()) {
+    PyObject* encoded = PyUnicode_AsEncodedString(value, "utf-8", "strict");
+    if (encoded == nullptr) {
         PyErr_SetString(PyExc_ValueError, "Parameter have to be Unicode string!");
         return -1;
     }
 
+    char* fileName;
+    Py_ssize_t fileNameSize;
+    if (PyBytes_AsStringAndSize(encoded, &fileName, &fileNameSize) < 0) {
+        Py_DECREF(encoded);
+        return -1;
+    }
+
+    self->FileName.assign(fileName, static_cast<size_t>(fileNameSize));
+    Py_DECREF(encoded);
     return 0;
 }
 
@@ -153,69 +162,53 @@ static PyMethodDef JtFile_methods[] = {
 static void
 JtFile_dealloc(JtFileObject* self)
 {
-    Py_TYPE(self)->tp_free((PyObject*)self);
+    std::destroy_at(&self->rootModel);
+    std::destroy_at(&self->PartitionNode);
+    std::destroy_at(&self->FileName);
+    PyObject_Free(reinterpret_cast<PyObject*>(self));
 }
 
-PyObject *
-JtFile_new(PyTypeObject *type, PyObject *args, PyObject *kwds)
+static PyObject*
+JtFile_new(PyTypeObject* type, PyObject*, PyObject*)
 {
-    kwds; args;
-    JtFileObject *self;
+    auto* self = reinterpret_cast<JtFileObject*>(PyType_GenericAlloc(type, 0));
+    if (self == nullptr)
+        return nullptr;
 
-    self = (JtFileObject *)type->tp_alloc(type, 0);
-    
-    return (PyObject *)self;
+    new (&self->FileName) std::string();
+    new (&self->PartitionNode) std::shared_ptr<JtNode_Partition>();
+    new (&self->rootModel) std::shared_ptr<JtData_Model>();
+    return reinterpret_cast<PyObject*>(self);
 }
 
-PyTypeObject JtFileClassType = {
-    PyVarObject_HEAD_INIT(NULL, 0)
-    "pyopenjt.JtFile",      /* tp_name */
-    sizeof(JtFileObject),   /* tp_basicsize */
-    0,                         /* tp_itemsize */
-    (destructor)JtFile_dealloc, /* tp_dealloc */
-    0,                         /* tp_print */
-    0,                         /* tp_getattr */
-    0,                         /* tp_setattr */
-    0,                         /* tp_reserved */
-    0,                         /* tp_repr */
-    0,                         /* tp_as_number */
-    0,                         /* tp_as_sequence */
-    0,                         /* tp_as_mapping */
-    0,                         /* tp_hash  */
-    0,                         /* tp_call */
-    0,                         /* tp_str */
-    0,                         /* tp_getattro */
-    0,                         /* tp_setattro */
-    0,                         /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT,        /* tp_flags */
-    JtFile_doc,                 /* tp_doc */
-    0,                         /* tp_traverse */
-    0,                         /* tp_clear */
-    0,                         /* tp_richcompare */
-    0,                         /* tp_weaklistoffset */
-    0,                         /* tp_iter */
-    0,                         /* tp_iternext */
-    JtFile_methods,             /* tp_methods */
-    0,                         /* tp_members */
-    JtFile_getseters,           /* tp_getset */
-    0,                         /* tp_base */
-    0,                         /* tp_dict */
-    0,                         /* tp_descr_get */
-    0,                         /* tp_descr_set */
-    0,                         /* tp_dictoffset */
-    (initproc)JtFile_init,      /* tp_init */
-    0,                         /* tp_alloc */
-    JtFile_new,                 /* tp_new */
+static PyType_Slot JtFile_slots[] = {
+    {Py_tp_dealloc, reinterpret_cast<void*>(JtFile_dealloc)},
+    {Py_tp_doc, const_cast<char*>(JtFile_doc)},
+    {Py_tp_methods, JtFile_methods},
+    {Py_tp_getset, JtFile_getseters},
+    {Py_tp_init, reinterpret_cast<void*>(JtFile_init)},
+    {Py_tp_new, reinterpret_cast<void*>(JtFile_new)},
+    {0, nullptr}
 };
 
+static PyType_Spec JtFile_spec = {
+    "pyopenjt.JtFile",
+    sizeof(JtFileObject),
+    0,
+    Py_TPFLAGS_DEFAULT,
+    JtFile_slots
+};
 
-void addJtFileClass(PyObject * module)
+int addJtFileClass(PyObject* module)
 {
-	JtFileClassType.tp_new = PyType_GenericNew;
-	if (PyType_Ready(&JtFileClassType) < 0)
-		return;
-	Py_INCREF(&JtFileClassType);
-	PyModule_AddObject(module, "JtFile", (PyObject *)&JtFileClassType);
+    PyObject* jtFileType = PyType_FromSpec(&JtFile_spec);
+    if (jtFileType == nullptr)
+        return -1;
+
+    if (PyModule_AddObject(module, "JtFile", jtFileType) < 0) {
+        Py_DECREF(jtFileType);
+        return -1;
+    }
+
+    return 0;
 }
-
-

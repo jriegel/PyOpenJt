@@ -19,6 +19,8 @@ First step is to build a Python library which read Jt and output a general mesh 
 [USD](https://en.wikipedia.org/wiki/Universal_Scene_Description) and gives enough control for the translation process 
 to account for saddle differences how Parts are formulated in companies. 
 
+The Python extension uses CPython's stable ABI with a Python 3.9 minimum, so a built extension can be used by CPython 3.9 and newer on the same platform and architecture.
+
 This leads to Use Pythons scripts to break down common PDM Assembly formats, like [PLMXML]() and [STEP](https://en.wikipedia.org/wiki/ISO_10303) to underlying Jt Parts and perform certain transformations:
 * Merge Solids and Parts to bigger mesh structures
 * Filter large PDM Graphs with configurations information
@@ -68,6 +70,7 @@ https://www.ps-ent-2023.de/fileadmin/prod-download/PSI14_1_V3_JTIAP_Format_Descr
 ### Windows
 
 This library uses a modern cMake approach and defines all dependencies via VCPKG. 
+CMake 3.26 or newer is required to build the Python stable-ABI module.
 
 1. Install and bootstrap VCPKG from https://github.com/microsoft/vcpkg
 2. Run Setup.bat from the root folder of the library

@@ -1,14 +1,13 @@
 
 
 
-# Try to find the stable ABI for linking
-#set (Python3_FIND_ABI "ANY" "ANY" "ANY" "ANY")
+include(GNUInstallDirs)
 
-find_package(Python3 COMPONENTS Development REQUIRED)
+find_package(Python3 3.9 COMPONENTS Interpreter Development.SABIModule REQUIRED)
 
- message(STATUS "******** PYTHON3_VERSION ${Python3_VERSION}")
- message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
- message(STATUS "******** PYTHON_LIBRARIES ${Python3_LIBRARIES}")
+message(STATUS "******** PYTHON3_VERSION ${Python3_VERSION}")
+message(STATUS "******** PYTHON_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+message(STATUS "******** PYTHON_SABI_LIBRARIES ${Python3_SABI_LIBRARIES}")
 
 
 if(MSVC)
@@ -48,29 +47,26 @@ include_directories(
 
 
 
-link_directories(${PYTHON_INCLUDE_DIR}/../libs)
-
-
-add_library(PyOpenJt SHARED 
+Python3_add_library(PyOpenJt MODULE USE_SABI 3.9 WITH_SOABI
 	PyOpenJt.cpp
     JtFileObject.cpp
 )
-# use stable ABI of 3.7
-#target_compile_definitions(PyOpenJt PUBLIC -DPy_LIMITED_API=0x030A0000)
+
+set_property(TARGET Python3::SABIModule PROPERTY MAP_IMPORTED_CONFIG_DEBUG RELEASE)
 
 add_dependencies (PyOpenJt TKJT)
 add_dependencies (PyOpenJt ToolsLib)
 
 
 target_link_libraries(PyOpenJt PRIVATE 
-    Python3::Python 
     TKJT 
     ToolsLib
 )
 
 if(MSVC)
-	set_target_properties(PyOpenJt PROPERTIES SUFFIX ".pyd")
-endif(MSVC)
+    set(PYTHON_DEBUG_LIBRARY_NAME "python${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}_d.lib")
+    target_link_options(PyOpenJt PRIVATE "$<$<CONFIG:Debug>:/NODEFAULTLIB:${PYTHON_DEBUG_LIBRARY_NAME}>")
+endif()
 
 set_target_properties(PyOpenJt PROPERTIES RUNTIME_OUTPUT_DIRECTORY         ${CMAKE_BINARY_DIR})
 set_target_properties(PyOpenJt PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/Release)
@@ -81,20 +77,12 @@ set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMA
 set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO ${CMAKE_BINARY_DIR}/RelWithDebInfo/lib)
 set_target_properties(PyOpenJt PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG   ${CMAKE_BINARY_DIR}/Debug/lib)
 set_target_properties(PyOpenJt PROPERTIES OUTPUT_NAME PyOpenJt)
-set_target_properties(PyOpenJt PROPERTIES DEBUG_OUTPUT_NAME PyOpenJt_d)
+set_target_properties(PyOpenJt PROPERTIES DEBUG_POSTFIX "")
 set_target_properties(PyOpenJt PROPERTIES PREFIX "")
 
 
 
-if(WIN32)
-    INSTALL(TARGETS PyOpenJt
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION ${CMAKE_INSTALL_BINDIR}
-    )
-else(WIN32)
-    INSTALL(TARGETS PyOpenJt
-        RUNTIME DESTINATION ~/bin
-        LIBRARY DESTINATION ~/lib
-        ARCHIVE DESTINATION ~/lib
-   )
-endif(WIN32)
+install(TARGETS PyOpenJt
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)

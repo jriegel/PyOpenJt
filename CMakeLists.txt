@@ -1,6 +1,6 @@
 
 
-cmake_minimum_required(VERSION 3.14.0)
+cmake_minimum_required(VERSION 3.26.0)
 
 project (PyOpenJt)
 
@@ -36,4 +36,3 @@ if (BUILD_JTASSISTANT)
   add_subdirectory (JTAssistant)
 endif()
 add_subdirectory (Python)
-
