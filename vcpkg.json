@@ -2,14 +2,30 @@
   "name": "pyopenjt",
   "version-string": "0.0.0",
   "dependencies": [
-    "qt5-base",
-    "qt5-tools",
     "eigen3",
     "tbb",
     "tinygltf",
     "liblzma",
     "zlib",
-    "draco",
-    "cli11"
-  ]
+    "draco"
+  ],
+  "default-features": [
+    "tools",
+    "viewer"
+  ],
+  "features": {
+    "tools": {
+      "description": "Command line tools (JtDump)",
+      "dependencies": [
+        "cli11"
+      ]
+    },
+    "viewer": {
+      "description": "JTAssistant Qt viewer",
+      "dependencies": [
+        "qt5-base",
+        "qt5-tools"
+      ]
+    }
+  }
 }

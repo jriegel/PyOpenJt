@@ -102,3 +102,13 @@ See:
 https://community.fsfe.org/t/question-about-usage-of-a-gpl-licensed-library-in-a-proprietary-product/364
 
 Since I'm not a lawyer, this is my opinion and no legal advise.  
+## Python wheels
+
+A single abi3 wheel (CPython >= 3.9) is built per platform with scikit-build-core and vcpkg:
+
+    pip install build delvewheel
+    set CMAKE_TOOLCHAIN_FILE=<vcpkg>/scripts/buildsystems/vcpkg.cmake
+    set VCPKG_DEFAULT_TRIPLET=x64-windows   (x64-linux-dynamic on Linux)
+    python -m build --wheel
+
+CI builds Windows and manylinux wheels via cibuildwheel (.github/workflows/wheels.yml). The Linux build has not been tested locally.

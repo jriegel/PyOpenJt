@@ -82,7 +82,20 @@ set_target_properties(PyOpenJt PROPERTIES PREFIX "")
 
 
 
-install(TARGETS PyOpenJt
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+if(SKBUILD)
+    # Wheel layout: the module and TKJT sit side by side in site-packages.
+    if(UNIX)
+        set_target_properties(PyOpenJt TKJT PROPERTIES
+            INSTALL_RPATH "$ORIGIN"
+            BUILD_WITH_INSTALL_RPATH ON)
+    endif()
+    install(TARGETS PyOpenJt TKJT
+        RUNTIME DESTINATION .
+        LIBRARY DESTINATION .
+    )
+else()
+    install(TARGETS PyOpenJt
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    )
+endif()

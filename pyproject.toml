@@ -1,0 +1,56 @@
+[build-system]
+requires = ["scikit-build-core>=0.10"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "pyopenjt"
+version = "0.1.0"
+description = "Read OpenJT (Jupiter Tessellation) files from Python"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "GPL-2.0-only" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: C++",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Topic :: Multimedia :: Graphics :: 3D Modeling",
+]
+
+[project.urls]
+Homepage = "https://github.com/jriegel/PyOpenJt"
+
+[tool.scikit-build]
+# One abi3 wheel serves every CPython >= 3.9.
+wheel.py-api = "cp39"
+wheel.packages = []
+build-dir = "build/wheel"
+cmake.version = ">=3.26"
+cmake.build-type = "Release"
+build.targets = ["PyOpenJt"]
+sdist.include = ["Data/ExampleFiles/example_block_jt*.jt", "tests/*.py"]
+sdist.exclude = ["WinBuild", "build", "Documents", "Data/ExampleFiles/fmsr_*", "Data/ExampleFiles/*.gltf"]
+
+[tool.scikit-build.cmake.define]
+BUILD_JTASSISTANT = "OFF"
+BUILD_JTTOOLS = "OFF"
+VCPKG_MANIFEST_NO_DEFAULT_FEATURES = "ON"
+
+[tool.cibuildwheel]
+# abi3: build once on the oldest supported Python.
+build = "cp39-*"
+skip = "*-musllinux_* *-win32 *-manylinux_i686"
+archs = ["auto64"]
+build-verbosity = 1
+test-command = "python {project}/tests/test_smoke.py {project}/Data/ExampleFiles/example_block_jt9.5.jt"
+
+[tool.cibuildwheel.windows]
+environment = { VCPKG_ROOT = "C:/vcpkg", CMAKE_TOOLCHAIN_FILE = "C:/vcpkg/scripts/buildsystems/vcpkg.cmake", VCPKG_DEFAULT_TRIPLET = "x64-windows" }
+before-build = "pip install delvewheel"
+repair-wheel-command = "delvewheel repair -w {dest_dir} {wheel} --add-path {project}/build/wheel/vcpkg_installed/x64-windows/bin;{project}/build/wheel/Release"
+
+[tool.cibuildwheel.linux]
+manylinux-x86_64-image = "manylinux_2_28"
+environment = { VCPKG_ROOT = "/opt/vcpkg", CMAKE_TOOLCHAIN_FILE = "/opt/vcpkg/scripts/buildsystems/vcpkg.cmake", VCPKG_DEFAULT_TRIPLET = "x64-linux-dynamic", VCPKG_FORCE_SYSTEM_BINARIES = "1", LD_LIBRARY_PATH = "/project/build/wheel/vcpkg_installed/x64-linux-dynamic/lib" }
+before-all = "yum install -y zip unzip tar curl perl-IPC-Cmd && git clone --depth 1 https://github.com/microsoft/vcpkg /opt/vcpkg && /opt/vcpkg/bootstrap-vcpkg.sh -disableMetrics"
+repair-wheel-command = "auditwheel repair -w {dest_dir} {wheel}"
