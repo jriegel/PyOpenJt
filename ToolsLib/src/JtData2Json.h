@@ -22,11 +22,11 @@ enum dumpConfig {
 	dump_all  = INT_MAX
 };
 
-int writeModel(Handle(JtData_Model) model, std::ostream& out, int indent = 0, int config = 0);
+int writeModel(std::shared_ptr<JtData_Model> model, std::ostream& out, int indent = 0, int config = 0);
 
-//int writePart(Handle(JtNode_Partition) model, std::ostream& out, int indent = 0, int config = 0);
+//int writePart(std::shared_ptr<JtNode_Partition> model, std::ostream& out, int indent = 0, int config = 0);
 
-//int writeMetaData(Handle(JtNode_MetaData) model, std::ostream& out, int indent = 0, int config = 0);
+//int writeMetaData(std::shared_ptr<JtNode_MetaData> model, std::ostream& out, int indent = 0, int config = 0);
 
 
 int writeKeyValueStream(const std::vector<char> &stream, std::ostream& out, int indent = 0);
@@ -45,12 +45,12 @@ inline std::ostream& operator<<(std::ostream& stream, const indentOp& val) {
 	return stream;
 }
 
-void WriteMeshesWithoutLSG(dumpConfig config, std::ostream& outStream, Handle(JtData_Model) rootModel, const std::string& fileName);
+void WriteMeshesWithoutLSG(dumpConfig config, std::ostream& outStream, std::shared_ptr<JtData_Model> rootModel, const std::string& fileName);
 
-void RecurseDownTheTreeJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix);
+void RecurseDownTheTreeJson(dumpConfig config, int& indention, std::ostream& outStream, const std::shared_ptr<JtNode_Base>& theNodeRecord, const std::string& thePrefix);
 
-void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord);
+void HandleAttributesJson(dumpConfig config, int& indention, std::ostream& outStream, const std::shared_ptr<JtNode_Base>& theNodeRecord);
 
-void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix);
+void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outStream, const std::shared_ptr<JtNode_Group>& theGroupRecord, const std::string& thePrefix);
 
 

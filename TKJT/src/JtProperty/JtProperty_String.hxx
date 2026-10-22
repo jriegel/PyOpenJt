@@ -32,13 +32,11 @@ public:
   //! Get the property value.
   const TCollection_ExtendedString& Value() const { return myValue; }
 
-  DEFINE_STANDARD_RTTIEXT(JtProperty_String,JtProperty_Base)
   DEFINE_OBJECT_CLASS (JtProperty_String)
 
 protected:
   TCollection_ExtendedString myValue;
 };
 
-DEFINE_STANDARD_HANDLE(JtProperty_String, JtProperty_Base)
 
 #endif // _JtProperty_String_HeaderFile

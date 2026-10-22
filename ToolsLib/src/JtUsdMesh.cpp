@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void writeUsdMesh(Handle(JtElement_ShapeLOD_Vertex) vertexElement, std::string name)
+void writeUsdMesh(std::shared_ptr<JtElement_ShapeLOD_Vertex> vertexElement, std::string name)
 {
     static int counter = 0;
 

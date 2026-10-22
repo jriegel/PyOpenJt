@@ -17,8 +17,7 @@
 #ifndef _JtData_Object_HeaderFile
 #define _JtData_Object_HeaderFile
 
-#include <Standard_Transient.hxx>
-#include <Standard_DefineHandle.hxx>
+#include <memory>
 #include <NCollection_List.hxx>
 #include <TCollection_ExtendedString.hxx>
 
@@ -28,22 +27,23 @@
 class JtData_Reader;
 class JtProperty_LateLoaded;
 
-DEFINE_STANDARD_HANDLE(JtData_Object, Standard_Transient)
 
 //! The base class representing Jt entity.
-class JtData_Object : public Standard_Transient
+class JtData_Object
 {
 public:
+  virtual ~JtData_Object() = default;
+
   typedef JtData_ClassInfo <JtData_Object> ClassInfo;
 
   //! Return class by Jt Object type ID.
   //! @param theGUID - Jt object's type GUID.
   static const ClassInfo* FindClass (const Jt_GUID& theGUID) { return ClassInfo::Find (theGUID); }
 
-  typedef NCollection_DataMap <int, Handle(JtData_Object)> MapOfObjects;
-  typedef JtData_Vector       <Handle(JtData_Object)>                   VectorOfObjects;
-  typedef NCollection_List    <Handle(JtProperty_LateLoaded)>           ListOfLateLoads;
-  typedef JtData_Vector       <Handle(JtProperty_LateLoaded)>           VectorOfLateLoads;
+  typedef NCollection_DataMap <int, std::shared_ptr<JtData_Object>> MapOfObjects;
+  typedef JtData_Vector       <std::shared_ptr<JtData_Object>>                   VectorOfObjects;
+  typedef NCollection_List    <std::shared_ptr<JtProperty_LateLoaded>>           ListOfLateLoads;
+  typedef JtData_Vector       <std::shared_ptr<JtProperty_LateLoaded>>           VectorOfLateLoads;
 
 public:
   //! Read this entity from a JT file.
@@ -62,7 +62,6 @@ public:
   //! Bind a name to the object.
   TKJT_EXPORT virtual void BindName (const TCollection_ExtendedString& theName);
 
-  DEFINE_STANDARD_RTTIEXT(JtData_Object,Standard_Transient)
 };
 
 #define DEFINE_OBJECT_CLASS(Class) \

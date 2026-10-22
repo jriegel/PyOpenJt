@@ -22,7 +22,7 @@
 //purpose  : Constructor
 //=======================================================================
 
-JtData_Reader::JtData_Reader (const Handle(JtData_Model)& theModel)
+JtData_Reader::JtData_Reader (const std::shared_ptr<JtData_Model>& theModel)
   : myModel    (theModel)
   , myNeedSwap (theModel->IsFileLE() != JtData_Model::IsLittleEndianHost) {}
 

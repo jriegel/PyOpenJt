@@ -7,8 +7,6 @@
 #include <JtElement_MetaData_PMIManager.hxx>
 #include <JtProperty_LateLoaded.hxx>
 
-static Handle(Standard_Type) TypeOf_JtElement_ProxyMetaData = STANDARD_TYPE(JtElement_ProxyMetaData);
-static Handle(Standard_Type) TypeOf_JtElement_MetaData_PMIManager = STANDARD_TYPE(JtElement_MetaData_PMIManager);
 
 using namespace std;
 
@@ -20,14 +18,14 @@ const std::vector<char> HandleLateLoadsMeta(const JtData_Object::VectorOfLateLoa
 
     for (int i = 0; i < aLateLoaded.Count(); i++) {
         if (aLateLoaded[i]->getSegmentType() == SegmentType::Meta_Data) {
-            if (aLateLoaded[i]->DefferedObject().IsNull())
+            if (!aLateLoaded[i]->DefferedObject())
                 aLateLoaded[i]->Load();
             //aLateLoaded[i]->LoadDump();
 
-            Handle(JtData_Object)  prop = aLateLoaded[i]->DefferedObject();
-            if (!prop.IsNull() && prop->IsKind(TypeOf_JtElement_ProxyMetaData)) {
-                Handle(JtElement_ProxyMetaData) aProxyMetaDataElement =
-                    Handle(JtElement_ProxyMetaData)::DownCast(prop);
+            std::shared_ptr<JtData_Object>  prop = aLateLoaded[i]->DefferedObject();
+            if (prop && (dynamic_cast<const JtElement_ProxyMetaData*>(prop.get()) != nullptr)) {
+                std::shared_ptr<JtElement_ProxyMetaData> aProxyMetaDataElement =
+                    std::dynamic_pointer_cast<JtElement_ProxyMetaData>(prop);
 
                 auto values = aProxyMetaDataElement->getKeyValueStream();
                 ResultStream.insert(ResultStream.end(), values.begin(), values.end());
@@ -40,13 +38,13 @@ const std::vector<char> HandleLateLoadsMeta(const JtData_Object::VectorOfLateLoa
             }
         }
         else if (aLateLoaded[i]->getSegmentType() == SegmentType::PMI_Data) {
-            if (aLateLoaded[i]->DefferedObject().IsNull())
+            if (!aLateLoaded[i]->DefferedObject())
                 aLateLoaded[i]->Load();
 
-            Handle(JtData_Object)  prop = aLateLoaded[i]->DefferedObject();
-            if (!prop.IsNull() && prop->IsKind(TypeOf_JtElement_MetaData_PMIManager)) {
-                Handle(JtElement_MetaData_PMIManager) aPMIManager =
-                    Handle(JtElement_MetaData_PMIManager)::DownCast(prop);
+            std::shared_ptr<JtData_Object>  prop = aLateLoaded[i]->DefferedObject();
+            if (prop && (dynamic_cast<const JtElement_MetaData_PMIManager*>(prop.get()) != nullptr)) {
+                std::shared_ptr<JtElement_MetaData_PMIManager> aPMIManager =
+                    std::dynamic_pointer_cast<JtElement_MetaData_PMIManager>(prop);
 
                 //aPMIManager->Dump(std::cout);
                 //return aProxyMetaDataElement->getKeyValueStream();

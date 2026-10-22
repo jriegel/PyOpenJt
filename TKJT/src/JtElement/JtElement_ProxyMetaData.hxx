@@ -35,13 +35,11 @@ public:
 
   const std::vector<char>& getKeyValueStream() { return keyValueStream; }
 
-  DEFINE_STANDARD_RTTIEXT(JtElement_ProxyMetaData,JtData_Object)
   DEFINE_OBJECT_CLASS (JtElement_ProxyMetaData)
 
 private:
 	std::vector<char> keyValueStream = std::vector<char>(2048,'\0');
 };
 
-DEFINE_STANDARD_HANDLE(JtElement_ProxyMetaData, JtData_Object)
 
 #endif // _JtElement_ProxyMetaData_HeaderFile

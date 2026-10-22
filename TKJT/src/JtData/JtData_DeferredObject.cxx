@@ -17,20 +17,19 @@
 #include <JtData_DeferredObject.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtData_DeferredObject, JtData_Object)
 
 //=======================================================================
 //function : Read
 //purpose  : Read a deferred object from a JT file
 //=======================================================================
 bool JtData_DeferredObject::Read (JtData_Reader&         theReader,
-                                              Handle(JtData_Object)& theResult)
+                                              std::shared_ptr<JtData_Object>& theResult)
 {
   Jt_I32 anObjectID;
   if (!theReader.ReadI32 (anObjectID))
     return false;
 
-  theResult = new JtData_DeferredObject (anObjectID);
+  theResult = std::make_shared<JtData_DeferredObject> (anObjectID);
   return true;
 }
 
@@ -38,11 +37,11 @@ bool JtData_DeferredObject::Read (JtData_Reader&         theReader,
 //function : Resolve
 //purpose  : Replace the deferred object by the corresponding object from the given map
 //=======================================================================
-void JtData_DeferredObject::Resolve (Handle(JtData_Object)& theObject,
+void JtData_DeferredObject::Resolve (std::shared_ptr<JtData_Object>& theObject,
                                      const MapOfObjects&    theObjectsMap)
 {
-  Handle(JtData_DeferredObject) aDeferred = Handle(JtData_DeferredObject)::DownCast (theObject);
-  if (!aDeferred.IsNull())
+  std::shared_ptr<JtData_DeferredObject> aDeferred = std::dynamic_pointer_cast<JtData_DeferredObject>(theObject);
+  if (aDeferred)
   {
     theObjectsMap.Find (aDeferred->myObjectID, theObject);
   }

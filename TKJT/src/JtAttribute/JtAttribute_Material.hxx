@@ -50,7 +50,6 @@ public:
   //! Return reflectivity.
   Jt_F32        Reflectivity()  const { return myReflectivity;  }
 
-  DEFINE_STANDARD_RTTIEXT(JtAttribute_Material,JtAttribute_Base)
   DEFINE_OBJECT_CLASS (JtAttribute_Material)
 
 protected:
@@ -64,6 +63,5 @@ protected:
   Jt_F32 myReflectivity;
 };
 
-DEFINE_STANDARD_HANDLE(JtAttribute_Material,JtAttribute_Base)
 
 #endif // _JtAttribute_Material_HeaderFile

@@ -35,7 +35,6 @@ public:
   //! Get the late loaded properties associated with this node.
   const VectorOfLateLoads& LateLoads() const { return myLateLoads; }
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Shape_Base,JtNode_Base)
   DEFINE_OBJECT_CLASS (JtNode_Shape_Base)
 
 protected:
@@ -51,6 +50,5 @@ protected:
   Jt_F32     myCompression;
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Shape_Base, JtNode_Base)
 
 #endif // _JtNode_Shape_Base_HeaderFile

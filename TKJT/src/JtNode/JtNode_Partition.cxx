@@ -17,7 +17,6 @@
 #include <JtNode_Partition.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtNode_Partition, JtNode_Group)
 
 IMPLEMENT_OBJECT_CLASS(JtNode_Partition, "Partition Object",
                        "10dd103e-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")
@@ -81,9 +80,9 @@ int JtNode_Partition::Dump (std::ostream& theStream) const
 //=======================================================================
 bool JtNode_Partition::Load()
 {
-  Handle(JtData_Model)     aModel    = new JtData_Model (myFileName, myModel);
-  Handle(JtNode_Partition) aRootNode = aModel->Init();
-  if (aRootNode.IsNull())
+  std::shared_ptr<JtData_Model>     aModel    = std::make_shared<JtData_Model> (myFileName, myModel);
+  std::shared_ptr<JtNode_Partition> aRootNode = aModel->Init();
+  if (!aRootNode)
     return false;
 
   myChildren = aRootNode->Children();

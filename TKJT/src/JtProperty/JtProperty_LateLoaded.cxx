@@ -17,7 +17,6 @@
 #include <JtProperty_LateLoaded.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtProperty_LateLoaded, JtProperty_Base)
 
 IMPLEMENT_OBJECT_CLASS(JtProperty_LateLoaded, "LateLoaded Object",
                        "e0b05be5-fbbd-11d1-a3-a7-00-aa-00-d1-09-54")

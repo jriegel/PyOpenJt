@@ -22,7 +22,7 @@
 //=======================================================================
 
 JtData_FileReader::JtData_FileReader (std::ifstream&                theFile,
-                                      const Handle(JtData_Model)&   theModel,
+                                      const std::shared_ptr<JtData_Model>&   theModel,
                                       const std::ifstream::pos_type theOffset)
   : JtData_Reader (theModel)
   , myFile        (&theFile)

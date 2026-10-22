@@ -17,7 +17,6 @@
 #include <JtElement_MetaData_PMIManager.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtElement_MetaData_PMIManager, JtData_Object)
 
 IMPLEMENT_OBJECT_CLASS(JtElement_MetaData_PMIManager, "PMI Manager Meta Data Object",
                        "ce357249-38fb-11d1-a5-06-00-60-97-bd-c6-e1")

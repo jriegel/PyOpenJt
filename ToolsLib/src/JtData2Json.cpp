@@ -89,7 +89,7 @@ std::ostream& operator<<(std::ostream& os, const Jt_GUID& extstr)
 }
 
 
-int writeModel(Handle(JtData_Model) model, std::ostream& out, int indent /* = 0 */ , int config /* = 0 */)
+int writeModel(std::shared_ptr<JtData_Model> model, std::ostream& out, int indent /* = 0 */ , int config /* = 0 */)
 {
 	out << indentOp(indent) << "\"FileName\":\"" << model->FileName() << "\",\n";
 	out << indentOp(indent) << "\"MajorVersion\":\"" << model->MajorVersion() << "\",\n";
@@ -166,21 +166,8 @@ int writeKeyValueStream(const std::vector<char>& stream, std::ostream& out, int 
 }
 
 
-static Handle(Standard_Type) TypeOf_JtNode_Partition = STANDARD_TYPE(JtNode_Partition);
-static Handle(Standard_Type) TypeOf_JtNode_Part = STANDARD_TYPE(JtNode_Part);
-static Handle(Standard_Type) TypeOf_JtNode_RangeLOD = STANDARD_TYPE(JtNode_RangeLOD);
-static Handle(Standard_Type) TypeOf_JtNode_LOD = STANDARD_TYPE(JtNode_LOD);
-static Handle(Standard_Type) TypeOf_JtNode_Group = STANDARD_TYPE(JtNode_Group);
-static Handle(Standard_Type) TypeOf_JtNode_Instance = STANDARD_TYPE(JtNode_Instance);
-static Handle(Standard_Type) TypeOf_JtNode_Shape_Vertex = STANDARD_TYPE(JtNode_Shape_Vertex);
-static Handle(Standard_Type) TypeOf_JtNode_MetaData = STANDARD_TYPE(JtNode_MetaData);
-static Handle(Standard_Type) TypeOf_JtNode_Shape_TriStripSet = STANDARD_TYPE(JtNode_Shape_TriStripSet);
-static Handle(Standard_Type) TypeOf_JtAttribute_Material = STANDARD_TYPE(JtAttribute_Material);
-static Handle(Standard_Type) TypeOf_JtAttribute_GeometricTransform = STANDARD_TYPE(JtAttribute_GeometricTransform);
-static Handle(Standard_Type) TypeOf_JtElement_ProxyMetaData = STANDARD_TYPE(JtElement_ProxyMetaData);
-static Handle(Standard_Type) TypeOf_JtElement_ShapeLOD_Vertex = STANDARD_TYPE(JtElement_ShapeLOD_Vertex);
 
-void WriteMeshesWithoutLSG(dumpConfig , std::ostream& outStream, Handle(JtData_Model) rootModel, const std::string& )
+void WriteMeshesWithoutLSG(dumpConfig , std::ostream& outStream, std::shared_ptr<JtData_Model> rootModel, const std::string& )
 {
     auto toc = rootModel->getTOC();
 
@@ -208,13 +195,13 @@ void WriteMeshesWithoutLSG(dumpConfig , std::ostream& outStream, Handle(JtData_M
 
 }
 
-void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord, const std::string& thePrefix)
+void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& outStream, const std::shared_ptr<JtNode_Base>& theNodeRecord, const std::string& thePrefix)
 {
 
     // Handle all different types of LSG Nodes
-    if (theNodeRecord->IsKind(TypeOf_JtNode_Partition))
+    if ((dynamic_cast<const JtNode_Partition*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_Partition) aPartitionRecord = Handle(JtNode_Partition)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Partition> aPartitionRecord = std::dynamic_pointer_cast<JtNode_Partition>(theNodeRecord);
 
         outStream << indentOp(indention) << "\"LSG\":\n";
         outStream << indentOp(indention) << "{\n";
@@ -228,10 +215,10 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         indention--;
         outStream << indentOp(indention) << "}\n";
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Part))
+    else if ((dynamic_cast<const JtNode_Part*>(theNodeRecord.get()) != nullptr))
     {
         // cast to actuall type
-        Handle(JtNode_Part) aPartRecord = Handle(JtNode_Part)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Part> aPartRecord = std::dynamic_pointer_cast<JtNode_Part>(theNodeRecord);
         const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
 
         outStream << indentOp(indention) << "{\n";
@@ -260,15 +247,15 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         }
 
         HandleAttributesJson(config, indention, outStream, theNodeRecord);
-        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAllChildrenJson(config, indention, outStream, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_MetaData))
+    else if ((dynamic_cast<const JtNode_MetaData*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_MetaData) aPartRecord = Handle(JtNode_MetaData)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_MetaData> aPartRecord = std::dynamic_pointer_cast<JtNode_MetaData>(theNodeRecord);
         const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
 
         outStream << indentOp(indention) << "{\n";
@@ -307,16 +294,16 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         }
 
         HandleAttributesJson(config, indention, outStream, theNodeRecord);
-        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAllChildrenJson(config, indention, outStream, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_RangeLOD))
+    else if ((dynamic_cast<const JtNode_RangeLOD*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_RangeLOD) aRangeLODRecord =
-            Handle(JtNode_RangeLOD)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_RangeLOD> aRangeLODRecord =
+            std::dynamic_pointer_cast<JtNode_RangeLOD>(theNodeRecord);
 
         outStream << indentOp(indention) << "{\n";
         indention++;
@@ -347,7 +334,7 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         outStream << indentOp(indention) << "}\n";
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_LOD))
+    else if ((dynamic_cast<const JtNode_LOD*>(theNodeRecord.get()) != nullptr))
     {
         outStream << indentOp(indention) << "{\n";
         indention++;
@@ -355,13 +342,13 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         outStream << indentOp(indention) << "\"name\":\"" << theNodeRecord->Name() << "\",\n";
 
         HandleAttributesJson(config, indention, outStream, theNodeRecord);
-        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAllChildrenJson(config, indention, outStream, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Group))
+    else if ((dynamic_cast<const JtNode_Group*>(theNodeRecord.get()) != nullptr))
     {
         outStream << indentOp(indention) << "{\n";
         indention++;
@@ -369,14 +356,14 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
         outStream << indentOp(indention) << "\"name\":\"" << theNodeRecord->Name() << "\",\n";
 
         HandleAttributesJson(config, indention, outStream, theNodeRecord);
-        HandleAllChildrenJson(config, indention, outStream, Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+        HandleAllChildrenJson(config, indention, outStream, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Instance))
+    else if ((dynamic_cast<const JtNode_Instance*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_Instance) anInstance = Handle(JtNode_Instance)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Instance> anInstance = std::dynamic_pointer_cast<JtNode_Instance>(theNodeRecord);
 
         outStream << indentOp(indention) << "{\n";
         indention++;
@@ -386,20 +373,20 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
 
         HandleAttributesJson(config, indention, outStream, theNodeRecord);
 
-        Handle(JtNode_Base) aNode = Handle(JtNode_Base)::DownCast(anInstance->Object());
+        std::shared_ptr<JtNode_Base> aNode = std::dynamic_pointer_cast<JtNode_Base>(anInstance->Object());
         outStream << indentOp(indention) << "\"InstancedObject\":\n";
         RecurseDownTheTreeJson(config, indention, outStream, aNode, thePrefix);
 
         indention--;
         outStream << indentOp(indention) << "}\n";
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Shape_Vertex))
+    else if ((dynamic_cast<const JtNode_Shape_Vertex*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_Shape_Vertex) aShapeRecord = Handle(JtNode_Shape_Vertex)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Shape_Vertex> aShapeRecord = std::dynamic_pointer_cast<JtNode_Shape_Vertex>(theNodeRecord);
 
-        if (aShapeRecord->IsKind(TypeOf_JtNode_Shape_TriStripSet))
+        if ((dynamic_cast<const JtNode_Shape_TriStripSet*>(aShapeRecord.get()) != nullptr))
         {
-            Handle(JtNode_Shape_TriStripSet) aMeshRecord = Handle(JtNode_Shape_TriStripSet)::DownCast(aShapeRecord);
+            std::shared_ptr<JtNode_Shape_TriStripSet> aMeshRecord = std::dynamic_pointer_cast<JtNode_Shape_TriStripSet>(aShapeRecord);
 
             outStream << indentOp(indention) << "{\n";
             indention++;
@@ -415,12 +402,12 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
 
             for (int i = 0; i < aLateLoaded.Count(); i++) {
                 //cerr << "TriStripSet Late load SegType: " << aLateLoaded[i]->getSegmentType() << '\n';
-                if (aLateLoaded[i]->DefferedObject().IsNull())
+                if (!aLateLoaded[i]->DefferedObject())
                     aLateLoaded[i]->Load();
 
-                Handle(JtData_Object) prop = aLateLoaded[i]->DefferedObject();
-                if (!prop.IsNull() && prop->IsKind(TypeOf_JtElement_ShapeLOD_Vertex)) {
-                    Handle(JtElement_ShapeLOD_Vertex) aProxyMetaDataElement = Handle(JtElement_ShapeLOD_Vertex)::DownCast(prop);
+                std::shared_ptr<JtData_Object> prop = aLateLoaded[i]->DefferedObject();
+                if (prop && (dynamic_cast<const JtElement_ShapeLOD_Vertex*>(prop.get()) != nullptr)) {
+                    std::shared_ptr<JtElement_ShapeLOD_Vertex> aProxyMetaDataElement = std::dynamic_pointer_cast<JtElement_ShapeLOD_Vertex>(prop);
 
                     //writeUsdMesh(aProxyMetaDataElement, "TestMesh");
 
@@ -517,7 +504,7 @@ void RecurseDownTheTreeJson(dumpConfig config, int & indention, std::ostream& ou
 }
 
 
-void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, const Handle(JtNode_Base)& theNodeRecord)
+void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, const std::shared_ptr<JtNode_Base>& theNodeRecord)
 {
     // Extract attributes
 
@@ -526,21 +513,21 @@ void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, 
 
     for (Standard_Integer anIdx = 0; anIdx < (Standard_Integer)theNodeRecord->Attributes().Count(); ++anIdx)
     {
-        const Handle(JtData_Object)& anObject = theNodeRecord->Attributes()[anIdx];
+        const std::shared_ptr<JtData_Object>& anObject = theNodeRecord->Attributes()[anIdx];
 
-        if (anObject.IsNull())
+        if (!anObject)
             continue;
 
-        Handle(JtAttribute_Base) anAttrib = Handle(JtAttribute_Base)::DownCast(anObject);
+        std::shared_ptr<JtAttribute_Base> anAttrib = std::dynamic_pointer_cast<JtAttribute_Base>(anObject);
 
-        if (anAttrib.IsNull())
+        if (!anAttrib)
             cerr << "Error! Invalid node attribute\n";
 
 
-        if (anAttrib->IsKind(TypeOf_JtAttribute_GeometricTransform))
+        if ((dynamic_cast<const JtAttribute_GeometricTransform*>(anAttrib.get()) != nullptr))
         {
-            Handle(JtAttribute_GeometricTransform) aTransform =
-                Handle(JtAttribute_GeometricTransform)::DownCast(anAttrib);
+            std::shared_ptr<JtAttribute_GeometricTransform> aTransform =
+                std::dynamic_pointer_cast<JtAttribute_GeometricTransform>(anAttrib);
 
             outStream << indentOp(indention) << "\"Attribute_GeometricTransform\": [";
             bool first = true;
@@ -554,10 +541,10 @@ void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, 
             outStream << "],\n";
 
         }
-        else if (anAttrib->IsKind(TypeOf_JtAttribute_Material))
+        else if ((dynamic_cast<const JtAttribute_Material*>(anAttrib.get()) != nullptr))
         {
-            Handle(JtAttribute_Material) aMaterial =
-                Handle(JtAttribute_Material)::DownCast(anAttrib);
+            std::shared_ptr<JtAttribute_Material> aMaterial =
+                std::dynamic_pointer_cast<JtAttribute_Material>(anAttrib);
 
             outStream << indentOp(indention) << "\"Attribute_MaterialDiffuseColor\": [";
             bool first = true;
@@ -613,7 +600,7 @@ void HandleAttributesJson(dumpConfig , int& indention, std::ostream& outStream, 
 
 }
 
-void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outStream, const Handle(JtNode_Group)& theGroupRecord, const std::string& thePrefix)
+void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outStream, const std::shared_ptr<JtNode_Group>& theGroupRecord, const std::string& thePrefix)
 {
     if (theGroupRecord->Children().IsEmpty())
         return;
@@ -631,9 +618,9 @@ void HandleAllChildrenJson(dumpConfig config, int& indention, std::ostream& outS
         else
             outStream << indentOp(indention) << ",\n";
 
-        Handle(JtNode_Base) aChildRecord = Handle(JtNode_Base)::DownCast(theGroupRecord->Children()[aChildIdx]);
+        std::shared_ptr<JtNode_Base> aChildRecord = std::dynamic_pointer_cast<JtNode_Base>(theGroupRecord->Children()[aChildIdx]);
 
-        if (aChildRecord.IsNull())
+        if (!aChildRecord)
         {
             outStream << indentOp(indention) << "{}";
             continue;

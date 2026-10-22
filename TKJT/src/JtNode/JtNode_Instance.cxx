@@ -18,7 +18,6 @@
 #include <JtData_Reader.hxx>
 #include <JtData_DeferredObject.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtNode_Instance, JtNode_Base)
 
 IMPLEMENT_OBJECT_CLASS(JtNode_Instance, "Instance Object",
                        "10dd102a-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")

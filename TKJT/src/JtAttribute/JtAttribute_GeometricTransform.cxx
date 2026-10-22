@@ -21,7 +21,6 @@
 #include <gp_Trsf.hxx>
 #include <Precision.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtAttribute_GeometricTransform, JtAttribute_Base)
 
 IMPLEMENT_OBJECT_CLASS(JtAttribute_GeometricTransform, "Attribute Object",
                        "10dd1083-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")

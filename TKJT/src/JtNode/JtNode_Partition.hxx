@@ -41,14 +41,12 @@ public:
   //! Returns file name.
   const TCollection_ExtendedString& FileName() const { return myFileName; }
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Partition,JtNode_Group)
   DEFINE_OBJECT_CLASS (JtNode_Partition)
 
 protected:
-  Handle(JtData_Model)       myModel;
+  std::shared_ptr<JtData_Model>       myModel;
   TCollection_ExtendedString myFileName;
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Partition, JtNode_Group)
 
 #endif // _JtNode_Partition_HeaderFile

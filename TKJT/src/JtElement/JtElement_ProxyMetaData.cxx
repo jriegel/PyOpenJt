@@ -22,7 +22,6 @@
 #include <codecvt>
 #include <string>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtElement_ProxyMetaData, JtData_Object)
 
 IMPLEMENT_OBJECT_CLASS(JtElement_ProxyMetaData, "Base Shape LOD Object",
     "ce357247-38fb-11d1-a5-06-00-60-97-bd-c6-e1")

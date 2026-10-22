@@ -683,7 +683,7 @@ protected:
 void JtDecode_MeshCodec::run()
 {
   // Assert state is consistent and ready to co/dec
-  if (_pDstVFM.IsNull())
+  if (!_pDstVFM)
     _pDstVFM = new JtDecode_DualVFMesh();
 
   //Standard_ASSERT_RETURN (_pDstVFM != NULL, "Error", );

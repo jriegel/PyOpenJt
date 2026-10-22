@@ -35,15 +35,13 @@ public:
   TKJT_EXPORT void BindObjects (const MapOfObjects& theObjectsMap) override;
 
   //! Return referenced object.
-  const Handle(JtData_Object)& Object() const { return myObject; }
+  const std::shared_ptr<JtData_Object>& Object() const { return myObject; }
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Instance,JtNode_Base)
   DEFINE_OBJECT_CLASS (JtNode_Instance)
 
 protected:
-  Handle(JtData_Object) myObject;
+  std::shared_ptr<JtData_Object> myObject;
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Instance, JtNode_Base)
 
 #endif

@@ -30,10 +30,8 @@ public:
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
-  DEFINE_STANDARD_RTTIEXT(JtElement_ShapeLOD_TriStripSet,JtElement_ShapeLOD_Vertex)
   DEFINE_OBJECT_CLASS (JtElement_ShapeLOD_TriStripSet)
 };
 
-DEFINE_STANDARD_HANDLE(JtElement_ShapeLOD_TriStripSet, JtElement_ShapeLOD_Vertex)
 
 #endif // _JtElement_ShapeLOD_TriStripSet_HeaderFile

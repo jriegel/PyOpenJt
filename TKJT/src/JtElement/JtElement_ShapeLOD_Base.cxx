@@ -17,7 +17,6 @@
 #include <JtElement_ShapeLOD_Base.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtElement_ShapeLOD_Base, JtData_Object)
 
 IMPLEMENT_OBJECT_CLASS(JtElement_ShapeLOD_Base, "Base Shape LOD Object",
                        "10dd10a4-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")

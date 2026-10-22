@@ -34,10 +34,8 @@ public:
   //! Bind a late loaded property to the object.
   TKJT_EXPORT void BindLateLoads (const ListOfLateLoads& theLateLoads) override;
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Shape_TriStripSet,JtNode_Shape_Vertex)
   DEFINE_OBJECT_CLASS (JtNode_Shape_TriStripSet)
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Shape_TriStripSet, JtNode_Shape_Vertex)
 
 #endif // _JtNode_Shape_TriStripSet_HeaderFile

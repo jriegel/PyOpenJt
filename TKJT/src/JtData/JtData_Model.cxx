@@ -39,28 +39,27 @@ const bool JtData_Model::IsLittleEndianHost =
 
 static const Jt_GUID EOEMarkerGUID("ffffffff-ffff-ffff-ff-ff-ff-ff-ff-ff-ff-ff");
 
-IMPLEMENT_STANDARD_RTTIEXT(JtData_Model, Standard_Transient)
 
 //=======================================================================
 //function : JtData_Model
 //purpose  : Constructor
 //=======================================================================
 JtData_Model::JtData_Model(const TCollection_ExtendedString &theFileName,
-                           const Handle(JtData_Model) & theParent)
+                           const std::shared_ptr<JtData_Model> & theParent)
     : myParent(theParent), myFileName(theFileName), myIsFileLE(false), myMajorVersion(0), myMinorVersion(0) {}
 
 //=======================================================================
 //function : Init
 //purpose  : Read JT file header, TOC and LSG and return a handle to the root LSG node
 //=======================================================================
-Handle(JtNode_Partition) JtData_Model::Init()
+std::shared_ptr<JtNode_Partition> JtData_Model::Init()
 {
   // Open the file
   std::ifstream aFile;
   if (!open(aFile))
   {
     ALARM("Error: Failed to open Jt file");
-    return Handle(JtNode_Partition)();
+    return std::shared_ptr<JtNode_Partition>();
   }
 
   // Read File Header
@@ -74,7 +73,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
   if (aPos < 1)
   {
     ALARM("Error: Failed to read Jt file version");
-    return Handle(JtNode_Partition)();
+    return std::shared_ptr<JtNode_Partition>();
   }
 
   aMajorVersionStr = aMajorVersionStr.Token(" \t", 2);
@@ -82,7 +81,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
   if (aPos <= 1)
   {
     ALARM("Error: Failed to read Jt file version");
-    return Handle(JtNode_Partition)();
+    return std::shared_ptr<JtNode_Partition>();
   }
 
   TCollection_AsciiString aMinorVersionStr = aMajorVersionStr.Split(aPos - 1);
@@ -90,7 +89,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
   if (!aMajorVersionStr.IsIntegerValue() || !aMinorVersionStr.IsIntegerValue())
   {
     ALARM("Error: Failed to read Jt file version");
-    return Handle(JtNode_Partition)();
+    return std::shared_ptr<JtNode_Partition>();
   }
 
   myMajorVersion = aMajorVersionStr.IntegerValue();
@@ -109,14 +108,14 @@ Handle(JtNode_Partition) JtData_Model::Init()
   Jt_U64 aTOCOffset;
   Jt_GUID anLSGSegmentGUID;
   {
-    JtData_FileReader aReader(aFile, this);
+    JtData_FileReader aReader(aFile, self());
 
     if (myMajorVersion < 10) {
         Jt_I32 oldTocOffset;
         if (!aReader.ReadI32(aReservedField) || !aReader.ReadI32(oldTocOffset) || !aReader.ReadGUID(anLSGSegmentGUID))
         {
             ALARM("Error: Failed to read TOC offset and LSG segment ID");
-            return Handle(JtNode_Partition)();
+            return std::shared_ptr<JtNode_Partition>();
         }
         aTOCOffset = oldTocOffset;
     }
@@ -124,7 +123,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
         if (!aReader.ReadI32(aReservedField) || !aReader.ReadU64(aTOCOffset) || !aReader.ReadGUID(anLSGSegmentGUID))
         {
             ALARM("Error: Failed to read TOC offset and LSG segment ID");
-            return Handle(JtNode_Partition)();
+            return std::shared_ptr<JtNode_Partition>();
         }
     }
   }
@@ -136,7 +135,7 @@ Handle(JtNode_Partition) JtData_Model::Init()
   if (!readTOC(aFile, aTOCOffset))
   {
     ALARM("Error: Failed to read TOC");
-    return Handle(JtNode_Partition)();
+    return std::shared_ptr<JtNode_Partition>();
   }
 
   // Find and read LSG segment
@@ -144,18 +143,18 @@ Handle(JtNode_Partition) JtData_Model::Init()
   if (!myTOC.Find(anLSGSegmentGUID, anLSGSegmentOffset))
   {
     cerr << "No LSG segment, TODO: Read only Meshes plain...\n";
-    return Handle(JtNode_Partition)();
+    return std::shared_ptr<JtNode_Partition>();
   }
   else
   {
     TRACE("Info: LSG segment is found at offset " + anLSGSegmentOffset);
   }
 
-  Handle(JtData_Object) aRootNode = readSegment(aFile, anLSGSegmentOffset, true);
+  std::shared_ptr<JtData_Object> aRootNode = readSegment(aFile, anLSGSegmentOffset, true);
 
   aFile.close();
 
-  return Handle(JtNode_Partition)::DownCast(aRootNode);
+  return std::dynamic_pointer_cast<JtNode_Partition>(aRootNode);
 }
 
 //=======================================================================
@@ -181,7 +180,7 @@ bool JtData_Model::open(ifstream &aFile) const
 //=======================================================================
 bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
 {
-  JtData_FileReader aReader(theFile, this, theOffset);
+  JtData_FileReader aReader(theFile, self(), theOffset);
 
   // Read entry count
   Jt_I32 aCount;
@@ -252,11 +251,11 @@ bool JtData_Model::readTOC(std::ifstream &theFile, const Jt_U64 theOffset)
 //function : readSegment
 //purpose  : Read objects from a JT file segment
 //=======================================================================
-Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
+std::shared_ptr<JtData_Object> JtData_Model::readSegment(std::ifstream &theFile,
                                                 const Jt_U64 theOffset,
                                                 const bool theIsLSG) const
 {
-  JtData_FileReader aReader(theFile, this, theOffset);
+  JtData_FileReader aReader(theFile, self(), theOffset);
 
   size_t aSegStart = aReader.GetPosition();
 
@@ -267,7 +266,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
   if (!aReader.ReadGUID(aGUID) || !aReader.ReadI32(aType) || !aReader.ReadI32(aSize))
   {
     ALARM("Error: Failed to read header of segment with offset " + theOffset);
-    return Handle(JtData_Object)();
+    return std::shared_ptr<JtData_Object>();
   }
 
   // Select appropriate reader for reading the segment data:
@@ -292,7 +291,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
         if (!aReader.ReadU32(aFlag) || !aReader.ReadI32(aDataLength) || !aReader.ReadU8(aAlgorithm))
         {
           ALARM("Error: Failed to read compression flags of segment with offset " + theOffset);
-          return Handle(JtData_Object)();
+          return std::shared_ptr<JtData_Object>();
         }
 
         // if compressed, replace the reader by a JtData_Inflate instance
@@ -304,7 +303,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
   }
 
   // Read the segment data
-  Handle(JtData_Object) aFirstObject;
+  std::shared_ptr<JtData_Object> aFirstObject;
   bool aResult;
 
   if (theIsLSG)
@@ -320,7 +319,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
   if (!aResult)
   {
     ALARM("Error: Segment data reading failed");
-    return Handle(JtData_Object)();
+    return std::shared_ptr<JtData_Object>();
   }
 
   // Check the loaded data length
@@ -330,7 +329,7 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
   {
     size_t aBytesRest = aBytesSpec - aReaderPos;
     ALARM("Error: " + std::to_string(aBytesRest) + " extra bytes were read after end of the segment");
-    return Handle(JtData_Object)();
+    return std::shared_ptr<JtData_Object>();
   }
   if (aBytesSpec > aReaderPos)
   {
@@ -346,11 +345,11 @@ Handle(JtData_Object) JtData_Model::readSegment(std::ifstream &theFile,
 //function : readSegment
 //purpose  : Read objects from a JT file segment
 //=======================================================================
-Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
+std::shared_ptr<JtData_Object> JtData_Model::readSegmentDump(std::ifstream& theFile,
     const Jt_U64 theOffset,
     const bool ) const
 {
-    JtData_FileReader aReader(theFile, this, theOffset);
+    JtData_FileReader aReader(theFile, self(), theOffset);
 
     size_t aSegStart = aReader.GetPosition();
 
@@ -361,7 +360,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
     if (!aReader.ReadGUID(aGUID) || !aReader.ReadI32(aType) || !aReader.ReadI32(aSize))
     {
         ALARM("Error: Failed to read header of segment with offset " + theOffset);
-        return Handle(JtData_Object)();
+        return std::shared_ptr<JtData_Object>();
     }
 
     // Select appropriate reader for reading the segment data:
@@ -386,7 +385,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
         if (!aReader.ReadI32(aFlag) || !aReader.ReadI32(aDataLength) || !aReader.ReadU8(aAlgorithm))
         {
             ALARM("Error: Failed to read compression flags of segment with offset " + theOffset);
-            return Handle(JtData_Object)();
+            return std::shared_ptr<JtData_Object>();
         }
 
         // if compressed, replace the reader by a JtData_Inflate instance
@@ -398,7 +397,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
     }
 
     //// Read the segment data
-    Handle(JtData_Object) aFirstObject;
+    std::shared_ptr<JtData_Object> aFirstObject;
     //bool aResult;
 
     //if (theIsLSG)
@@ -411,7 +410,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
     //if (!aResult)
     //{
     //    ALARM("Error: Segment data reading failed");
-    //    return Handle(JtData_Object)();
+    //    return std::shared_ptr<JtData_Object>();
     //}
 
     uint8_t theValue;
@@ -436,7 +435,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
     {
         size_t aBytesRest = aBytesSpec - aReaderPos;
         ALARM("Error: " + std::to_string(aBytesRest) + " extra bytes were read after end of the segment");
-        return Handle(JtData_Object)();
+        return std::shared_ptr<JtData_Object>();
     }
     if (aBytesSpec > aReaderPos)
     {
@@ -453,7 +452,7 @@ Handle(JtData_Object) JtData_Model::readSegmentDump(std::ifstream& theFile,
 //purpose  : Read LSG segment data
 //=======================================================================
 bool JtData_Model::readLSGData(JtData_Reader &theReader,
-                                           Handle(JtData_Object) & theFirstObject) const
+                                           std::shared_ptr<JtData_Object> & theFirstObject) const
 {
   const TCollection_ExtendedString anObjectNameKey = "JT_PROP_NAME";
 
@@ -496,7 +495,7 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
       return false;
     }
 
-    Handle(JtData_Object) anObject;
+    std::shared_ptr<JtData_Object> anObject;
     aMapObjects.Find(anObjectId, anObject);
 
     // read (key,value) pairs
@@ -522,27 +521,27 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
       }
 
       // analyse the value
-      Handle(JtData_Object) aProperty;
+      std::shared_ptr<JtData_Object> aProperty;
       if (aMapProperties.Find(aValue, aProperty))
       {
         // if this is late loaded property, add it to a list
-        Handle(JtProperty_LateLoaded) aLateProp =
-            Handle(JtProperty_LateLoaded)::DownCast(aProperty);
-        if (!aLateProp.IsNull())
+        std::shared_ptr<JtProperty_LateLoaded> aLateProp =
+            std::dynamic_pointer_cast<JtProperty_LateLoaded>(aProperty);
+        if (aLateProp)
           aLateLoads.Append(aLateProp);
         // if this is a string property with key = "JT_PROP_NAME", bind it to the object
         else
         {
-          Handle(JtProperty_String) aStringProp =
-              Handle(JtProperty_String)::DownCast(aProperty);
-          if (!aStringProp.IsNull())
+          std::shared_ptr<JtProperty_String> aStringProp =
+              std::dynamic_pointer_cast<JtProperty_String>(aProperty);
+          if (aStringProp)
           {
-            Handle(JtData_Object) aKeyProperty;
+            std::shared_ptr<JtData_Object> aKeyProperty;
             if (aMapProperties.Find(aKey, aKeyProperty))
             {
-              Handle(JtProperty_String) aKeyStringProp =
-                  Handle(JtProperty_String)::DownCast(aKeyProperty);
-              if (!aKeyStringProp.IsNull() && aKeyStringProp->Value() == anObjectNameKey)
+              std::shared_ptr<JtProperty_String> aKeyStringProp =
+                  std::dynamic_pointer_cast<JtProperty_String>(aKeyProperty);
+              if (aKeyStringProp && aKeyStringProp->Value() == anObjectNameKey)
                 anObject->BindName(aStringProp->Value());
             }
           }//else
@@ -556,7 +555,7 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
     }
 
     // bind the late loaded properties to the object
-    if (!anObject.IsNull() && !aLateLoads.IsEmpty())
+    if (anObject && !aLateLoads.IsEmpty())
       anObject->BindLateLoads(aLateLoads);
   }
 
@@ -569,23 +568,23 @@ bool JtData_Model::readLSGData(JtData_Reader &theReader,
 //=======================================================================
 bool JtData_Model::readElements(JtData_Reader &theReader,
                                             JtData_Object::MapOfObjects &theMap,
-                                            Handle(JtData_Object) & theFirstObject) const
+                                            std::shared_ptr<JtData_Object> & theFirstObject) const
 {
-  Handle(JtData_Object) anObject;
+  std::shared_ptr<JtData_Object> anObject;
   Jt_I32 anObjectID;
 
   // Read elements while possible until End-Of-Elements marker is reached
   while (readElement(theReader, anObject, &anObjectID))
   {
     // if End-Of-Elements marker is reached, finish the reading
-    if (anObject.IsNull())
+    if (!anObject)
       return true;
 
     // if an object of a known type is read, store it
-    if (!anObject->IsInstance(STANDARD_TYPE(JtData_Object)))
+    if (typeid(*anObject) != typeid(JtData_Object))
     {
       theMap.Bind(anObjectID, anObject);
-      if (theFirstObject.IsNull())
+      if (!theFirstObject)
         theFirstObject = anObject;
     }
   }
@@ -599,7 +598,7 @@ bool JtData_Model::readElements(JtData_Reader &theReader,
 //purpose  : Read an element from a JT file segment
 //=======================================================================
 bool JtData_Model::readElement(JtData_Reader &theReader,
-                                           Handle(JtData_Object) & theObject,
+                                           std::shared_ptr<JtData_Object> & theObject,
                                            Jt_I32 *theObjectIDPtr) const
 {
   // Read Element Length
@@ -638,7 +637,7 @@ bool JtData_Model::readElement(JtData_Reader &theReader,
   else if (anObjectTypeID == EOEMarkerGUID)
   {
     // End-Of-Elements marker
-    theObject = Handle(JtData_Object)();
+    theObject = std::shared_ptr<JtData_Object>();
     return true;
   }
   else
@@ -647,7 +646,7 @@ bool JtData_Model::readElement(JtData_Reader &theReader,
     char aGuidString[128];
     anObjectTypeID.ToString(aGuidString);
     //cerr << std::string("Unknown Element with GUID ") + aGuidString << '\n';
-    theObject = new JtData_Object();
+    theObject = std::make_shared<JtData_Object>();
     return theReader.Skip(anElemStart + anElemLength - theReader.GetPosition());
   }
 
@@ -699,19 +698,19 @@ bool JtData_Model::readElement(JtData_Reader &theReader,
 //function : FindSegment
 //purpose  : Lookup offset of a segment in TOCs of this model and its ancestor models
 //=======================================================================
-Handle(JtData_Model) JtData_Model::FindSegment(const Jt_GUID &theGUID,
+std::shared_ptr<JtData_Model> JtData_Model::FindSegment(const Jt_GUID &theGUID,
                                                Jt_U64 &theOffset) const
 {
   if (myTOC.Find(theGUID, theOffset))
-    return this;
-  else if (!myParent.IsNull())
+    return self();
+  else if (myParent)
     return myParent->FindSegment(theGUID, theOffset);
   else
   {
     char aGuidString[128];
     theGUID.ToString(aGuidString);
     ALARM(std::string("Error: Failed to find segment with GUID: ") + aGuidString);
-    return Handle(JtData_Model)();
+    return std::shared_ptr<JtData_Model>();
   }
 }
 
@@ -719,13 +718,13 @@ Handle(JtData_Model) JtData_Model::FindSegment(const Jt_GUID &theGUID,
 //function : ReadSegment
 //purpose  : Read object from a late loaded segment
 //=======================================================================
-Handle(JtData_Object) JtData_Model::ReadSegment(const Jt_U64 theOffset) const
+std::shared_ptr<JtData_Object> JtData_Model::ReadSegment(const Jt_U64 theOffset) const
 {
     ifstream aFile;
     if (!open(aFile))
     {
         ALARM("Error: Failed to open Jt file of late-loaded segment");
-        return Handle(JtNode_Partition)();
+        return std::shared_ptr<JtNode_Partition>();
     }
 
     return readSegment(aFile, theOffset, false);
@@ -735,13 +734,13 @@ Handle(JtData_Object) JtData_Model::ReadSegment(const Jt_U64 theOffset) const
 //function : ReadSegment
 //purpose  : Read object from a late loaded segment
 //=======================================================================
-Handle(JtData_Object) JtData_Model::ReadSegmentDump(const Jt_U64 theOffset) const
+std::shared_ptr<JtData_Object> JtData_Model::ReadSegmentDump(const Jt_U64 theOffset) const
 {
     ifstream aFile;
     if (!open(aFile))
     {
         ALARM("Error: Failed to open Jt file of late-loaded segment");
-        return Handle(JtNode_Partition)();
+        return std::shared_ptr<JtNode_Partition>();
     }
 
     return readSegmentDump(aFile, theOffset, false);

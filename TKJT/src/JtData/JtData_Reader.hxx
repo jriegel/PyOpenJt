@@ -43,7 +43,7 @@ public:
 
 public:
   //! Constructor.
-  TKJT_EXPORT JtData_Reader (const Handle(JtData_Model)& theModel);
+  TKJT_EXPORT JtData_Reader (const std::shared_ptr<JtData_Model>& theModel);
 
   //! Destructor.
   TKJT_EXPORT virtual ~JtData_Reader();
@@ -58,7 +58,7 @@ public:
   TKJT_EXPORT virtual size_t GetPosition() const = 0;
 
   //! Get the associated model.
-  const Handle(JtData_Model)& Model() const { return myModel; }
+  const std::shared_ptr<JtData_Model>& Model() const { return myModel; }
 
   //! Read a primitive value from the stream.
   template <class Type>
@@ -132,7 +132,7 @@ public:
   }
 
 protected:
-  Handle(JtData_Model) myModel;
+  std::shared_ptr<JtData_Model> myModel;
   bool     myNeedSwap;
 };
 

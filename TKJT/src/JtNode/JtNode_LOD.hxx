@@ -30,13 +30,11 @@ public:
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_LOD,JtNode_Group)
   DEFINE_OBJECT_CLASS (JtNode_LOD)
 
 protected:
   Jt_I16 myVersion;
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_LOD, JtNode_Group)
 
 #endif // _JtNode_LOD_HeaderFile

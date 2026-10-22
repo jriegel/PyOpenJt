@@ -33,7 +33,7 @@ class JtData_ReaderInterface
 {
 public:
   //! Get the associated model.
-  const Handle(JtData_Model) & Model() const
+  const std::shared_ptr<JtData_Model> & Model() const
   {
     return reader().Model();
   }

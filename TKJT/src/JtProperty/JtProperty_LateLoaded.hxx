@@ -54,25 +54,23 @@ public:
   //! Load object from the referenced JT file segment.
   void LoadDump() { myDefferedObject = mySegModel->ReadSegmentDump(mySegOffset); }
 
-  Handle(JtData_Object) DefferedObject() { return myDefferedObject; }
+  std::shared_ptr<JtData_Object> DefferedObject() { return myDefferedObject; }
 
-  void Unload() { myDefferedObject.Nullify(); }
+  void Unload() { myDefferedObject.reset(); }
 
   //! returns the type of the late load segment as specified in Segment Type Table in the standard
   Jt_I32 getSegmentType() const { return mySegmentType; }
 
 
-  DEFINE_STANDARD_RTTIEXT(JtProperty_LateLoaded,JtProperty_Base)
   DEFINE_OBJECT_CLASS (JtProperty_LateLoaded)
 
 protected:
-  Handle(JtData_Model) mySegModel;
+  std::shared_ptr<JtData_Model> mySegModel;
   Jt_U64               mySegOffset;
   Jt_I32			   mySegmentType;
 
-  Handle(JtData_Object) myDefferedObject;
+  std::shared_ptr<JtData_Object> myDefferedObject;
 };
 
-DEFINE_STANDARD_HANDLE(JtProperty_LateLoaded, JtProperty_Base)
 
 #endif // _JtProperty_LateLoaded_HeaderFile

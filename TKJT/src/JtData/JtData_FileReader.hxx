@@ -25,7 +25,7 @@ class JtData_FileReader : public JtData_Reader
 public:
   //! Constructor.
   TKJT_EXPORT JtData_FileReader (std::ifstream&                theFile,
-                                     const Handle(JtData_Model)&   theModel,
+                                     const std::shared_ptr<JtData_Model>&   theModel,
                                      const std::ifstream::pos_type theOffset = -1);
 
   //! Read raw bytes from the stream.

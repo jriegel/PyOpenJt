@@ -17,7 +17,6 @@
 #include <JtData_Object.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtData_Object, Standard_Transient)
 
 //=======================================================================
 //function : Read

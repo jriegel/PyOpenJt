@@ -24,10 +24,10 @@ class JtData_DeferredObject : public JtData_Object
 public:
   //! Read a deferred object from a JT file.
   static bool Read (JtData_Reader&         theReader,
-                                Handle(JtData_Object)& theResult);
+                                std::shared_ptr<JtData_Object>& theResult);
 
   //! Replace the deferred object by the corresponding object from the given map.
-  static void Resolve (Handle(JtData_Object)& theObject,
+  static void Resolve (std::shared_ptr<JtData_Object>& theObject,
                        const MapOfObjects&    theObjectsMap);
 
   //! Read an array of deferred objects from a JT file.
@@ -41,12 +41,10 @@ public:
 public:
   JtData_DeferredObject (Jt_I32 theObjectID) : myObjectID (theObjectID) {}
 
-  DEFINE_STANDARD_RTTIEXT(JtData_DeferredObject,JtData_Object)
 
 protected:
   Jt_I32 myObjectID;
 };
 
-DEFINE_STANDARD_HANDLE(JtData_DeferredObject, JtData_Object)
 
 #endif // _JtData_DeferredObject_HeaderFile

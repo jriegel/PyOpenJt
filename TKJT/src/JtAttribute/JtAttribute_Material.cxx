@@ -17,7 +17,6 @@
 #include <JtAttribute_Material.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtAttribute_Material, JtAttribute_Base)
 
 IMPLEMENT_OBJECT_CLASS(JtAttribute_Material, "Material Object",
                        "10dd1030-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")

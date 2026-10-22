@@ -90,9 +90,9 @@ void addUIntToBuffer(uint32_t value, std::vector<unsigned char>& data)
     data.push_back((value >> 24) & 0xFF);
 }
 
-void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNodeRecord);
-void HandleAllChildrenGlTf(gltfConfig& config, const Handle(JtNode_Group)& theGroupRecord);
-void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNodeRecord);
+void RecurseDownTheTreeGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Base>& theNodeRecord);
+void HandleAllChildrenGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Group>& theGroupRecord);
+void HandleAttributesGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Base>& theNodeRecord);
 
 
 void writeTestGltfMesh( std::string name)
@@ -198,23 +198,10 @@ void writeTestGltfMesh( std::string name)
 
 }
 
-static Handle(Standard_Type) TypeOf_JtNode_Partition = STANDARD_TYPE(JtNode_Partition);
-static Handle(Standard_Type) TypeOf_JtNode_Part = STANDARD_TYPE(JtNode_Part);
-static Handle(Standard_Type) TypeOf_JtNode_RangeLOD = STANDARD_TYPE(JtNode_RangeLOD);
-static Handle(Standard_Type) TypeOf_JtNode_LOD = STANDARD_TYPE(JtNode_LOD);
-static Handle(Standard_Type) TypeOf_JtNode_Group = STANDARD_TYPE(JtNode_Group);
-static Handle(Standard_Type) TypeOf_JtNode_Instance = STANDARD_TYPE(JtNode_Instance);
-static Handle(Standard_Type) TypeOf_JtNode_Shape_Vertex = STANDARD_TYPE(JtNode_Shape_Vertex);
-static Handle(Standard_Type) TypeOf_JtNode_MetaData = STANDARD_TYPE(JtNode_MetaData);
-static Handle(Standard_Type) TypeOf_JtNode_Shape_TriStripSet = STANDARD_TYPE(JtNode_Shape_TriStripSet);
-static Handle(Standard_Type) TypeOf_JtAttribute_Material = STANDARD_TYPE(JtAttribute_Material);
-static Handle(Standard_Type) TypeOf_JtAttribute_GeometricTransform = STANDARD_TYPE(JtAttribute_GeometricTransform);
-static Handle(Standard_Type) TypeOf_JtElement_ProxyMetaData = STANDARD_TYPE(JtElement_ProxyMetaData);
-static Handle(Standard_Type) TypeOf_JtElement_ShapeLOD_Vertex = STANDARD_TYPE(JtElement_ShapeLOD_Vertex);
 
 
 
-void writeGltfMesh(const Handle(JtNode_Base)& theNodeRecord, const std::string& name)
+void writeGltfMesh(const std::shared_ptr<JtNode_Base>& theNodeRecord, const std::string& name)
 {
     gltfConfig config;
 
@@ -262,23 +249,23 @@ void writeGltfMesh(const Handle(JtNode_Base)& theNodeRecord, const std::string& 
 }
 
 
-void RecurseDownTheTreeGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNodeRecord)
+void RecurseDownTheTreeGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Base>& theNodeRecord)
 {
 
     // Handle all different types of LSG Nodes
-    if (theNodeRecord->IsKind(TypeOf_JtNode_Partition))
+    if ((dynamic_cast<const JtNode_Partition*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_Partition) aPartitionRecord = Handle(JtNode_Partition)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Partition> aPartitionRecord = std::dynamic_pointer_cast<JtNode_Partition>(theNodeRecord);
 
 
         HandleAttributesGlTf(config,  theNodeRecord);
         HandleAllChildrenGlTf(config, aPartitionRecord);
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Part))
+    else if ((dynamic_cast<const JtNode_Part*>(theNodeRecord.get()) != nullptr))
     {
         // cast to actuall type
-        Handle(JtNode_Part) aPartRecord = Handle(JtNode_Part)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Part> aPartRecord = std::dynamic_pointer_cast<JtNode_Part>(theNodeRecord);
         const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
         auto name = theNodeRecord->Name();
         bool useThisPart = true;
@@ -303,12 +290,12 @@ end:
 
         if (useThisPart) {
             HandleAttributesGlTf(config, theNodeRecord);
-            HandleAllChildrenGlTf(config, Handle(JtNode_Group)::DownCast(theNodeRecord));
+            HandleAllChildrenGlTf(config, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord));
         }
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_MetaData))
+    else if ((dynamic_cast<const JtNode_MetaData*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_MetaData) aPartRecord = Handle(JtNode_MetaData)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_MetaData> aPartRecord = std::dynamic_pointer_cast<JtNode_MetaData>(theNodeRecord);
         const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
 
         
@@ -325,14 +312,14 @@ end:
         }
 
         HandleAttributesGlTf(config, theNodeRecord);
-        HandleAllChildrenGlTf(config, Handle(JtNode_Group)::DownCast(theNodeRecord));
+        HandleAllChildrenGlTf(config, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord));
 
         
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_RangeLOD))
+    else if ((dynamic_cast<const JtNode_RangeLOD*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_RangeLOD) aRangeLODRecord =
-            Handle(JtNode_RangeLOD)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_RangeLOD> aRangeLODRecord =
+            std::dynamic_pointer_cast<JtNode_RangeLOD>(theNodeRecord);
 
         config.isInRangeLOD = true;
         config.LOD = 0;
@@ -341,31 +328,31 @@ end:
         config.isInRangeLOD = false;
        
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_LOD))
+    else if ((dynamic_cast<const JtNode_LOD*>(theNodeRecord.get()) != nullptr))
     {
    
         HandleAttributesGlTf(config, theNodeRecord);
-        HandleAllChildrenGlTf(config, Handle(JtNode_Group)::DownCast(theNodeRecord));
+        HandleAllChildrenGlTf(config, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord));
 
         
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Group))
+    else if ((dynamic_cast<const JtNode_Group*>(theNodeRecord.get()) != nullptr))
     {
         
         HandleAttributesGlTf(config, theNodeRecord);
-        HandleAllChildrenGlTf(config, Handle(JtNode_Group)::DownCast(theNodeRecord));
+        HandleAllChildrenGlTf(config, std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord));
 
         if (config.isInRangeLOD)
             config.LOD++;
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Instance))
+    else if ((dynamic_cast<const JtNode_Instance*>(theNodeRecord.get()) != nullptr))
     {
-        Handle(JtNode_Instance) anInstance = Handle(JtNode_Instance)::DownCast(theNodeRecord);        
+        std::shared_ptr<JtNode_Instance> anInstance = std::dynamic_pointer_cast<JtNode_Instance>(theNodeRecord);        
 
         HandleAttributesGlTf(config, theNodeRecord);
 
-        Handle(JtNode_Base) aNode = Handle(JtNode_Base)::DownCast(anInstance->Object());
+        std::shared_ptr<JtNode_Base> aNode = std::dynamic_pointer_cast<JtNode_Base>(anInstance->Object());
         
         RecurseDownTheTreeGlTf(config, aNode);
 
@@ -373,16 +360,16 @@ end:
         config.TrsfSet = false;
 
     }
-    else if (theNodeRecord->IsKind(TypeOf_JtNode_Shape_Vertex))
+    else if ((dynamic_cast<const JtNode_Shape_Vertex*>(theNodeRecord.get()) != nullptr))
     {
         if (config.isInRangeLOD && config.LOD !=0)
             return;
 
-        Handle(JtNode_Shape_Vertex) aShapeRecord = Handle(JtNode_Shape_Vertex)::DownCast(theNodeRecord);
+        std::shared_ptr<JtNode_Shape_Vertex> aShapeRecord = std::dynamic_pointer_cast<JtNode_Shape_Vertex>(theNodeRecord);
 
-        if (aShapeRecord->IsKind(TypeOf_JtNode_Shape_TriStripSet))
+        if ((dynamic_cast<const JtNode_Shape_TriStripSet*>(aShapeRecord.get()) != nullptr))
         {
-            Handle(JtNode_Shape_TriStripSet) aMeshRecord = Handle(JtNode_Shape_TriStripSet)::DownCast(aShapeRecord);
+            std::shared_ptr<JtNode_Shape_TriStripSet> aMeshRecord = std::dynamic_pointer_cast<JtNode_Shape_TriStripSet>(aShapeRecord);
 
             theNodeRecord->Name();
 
@@ -395,12 +382,12 @@ end:
 
             for (int i = 0; i < aLateLoaded.Count(); i++) {
                 //cerr << "TriStripSet Late load SegType: " << aLateLoaded[i]->getSegmentType() << '\n';
-                if (aLateLoaded[i]->DefferedObject().IsNull())
+                if (!aLateLoaded[i]->DefferedObject())
                     aLateLoaded[i]->Load();
 
-                Handle(JtData_Object) prop = aLateLoaded[i]->DefferedObject();
-                if (!prop.IsNull() && prop->IsKind(TypeOf_JtElement_ShapeLOD_Vertex)) {
-                    Handle(JtElement_ShapeLOD_Vertex) aProxyMetaDataElement = Handle(JtElement_ShapeLOD_Vertex)::DownCast(prop);
+                std::shared_ptr<JtData_Object> prop = aLateLoaded[i]->DefferedObject();
+                if (prop && (dynamic_cast<const JtElement_ShapeLOD_Vertex*>(prop.get()) != nullptr)) {
+                    std::shared_ptr<JtElement_ShapeLOD_Vertex> aProxyMetaDataElement = std::dynamic_pointer_cast<JtElement_ShapeLOD_Vertex>(prop);
 
                     auto startIndex = config.buffer.data.size();
 
@@ -588,7 +575,7 @@ end:
 }
 
 
-void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNodeRecord)
+void HandleAttributesGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Base>& theNodeRecord)
 {
     // Extract attributes
 
@@ -597,21 +584,21 @@ void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNode
 
     for (Standard_Integer anIdx = 0; anIdx < (Standard_Integer)theNodeRecord->Attributes().Count(); ++anIdx)
     {
-        const Handle(JtData_Object)& anObject = theNodeRecord->Attributes()[anIdx];
+        const std::shared_ptr<JtData_Object>& anObject = theNodeRecord->Attributes()[anIdx];
 
-        if (anObject.IsNull())
+        if (!anObject)
             continue;
 
-        Handle(JtAttribute_Base) anAttrib = Handle(JtAttribute_Base)::DownCast(anObject);
+        std::shared_ptr<JtAttribute_Base> anAttrib = std::dynamic_pointer_cast<JtAttribute_Base>(anObject);
 
-        if (anAttrib.IsNull())
+        if (!anAttrib)
             cerr << "Error! Invalid node attribute\n";
 
 
-        if (anAttrib->IsKind(TypeOf_JtAttribute_GeometricTransform))
+        if ((dynamic_cast<const JtAttribute_GeometricTransform*>(anAttrib.get()) != nullptr))
         {
-            Handle(JtAttribute_GeometricTransform) aTransform =
-                Handle(JtAttribute_GeometricTransform)::DownCast(anAttrib);
+            std::shared_ptr<JtAttribute_GeometricTransform> aTransform =
+                std::dynamic_pointer_cast<JtAttribute_GeometricTransform>(anAttrib);
 
             config.actTrsf(0, 0) = aTransform->GetTrsf()[0];
             config.actTrsf(1, 0) = aTransform->GetTrsf()[1];
@@ -633,10 +620,10 @@ void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNode
             config.TrsfSet = true;
 
         }
-        else if (anAttrib->IsKind(TypeOf_JtAttribute_Material))
+        else if ((dynamic_cast<const JtAttribute_Material*>(anAttrib.get()) != nullptr))
         {
-            Handle(JtAttribute_Material) aMaterial =
-                Handle(JtAttribute_Material)::DownCast(anAttrib);
+            std::shared_ptr<JtAttribute_Material> aMaterial =
+                std::dynamic_pointer_cast<JtAttribute_Material>(anAttrib);
             
             memcpy(config.actDiffuseColor, aMaterial->DiffuseColor(), 16);
             memcpy(config.actAmbientColor, aMaterial->AmbientColor(), 16);
@@ -653,7 +640,7 @@ void HandleAttributesGlTf(gltfConfig& config, const Handle(JtNode_Base)& theNode
 
 }
 
-void HandleAllChildrenGlTf(gltfConfig& config, const Handle(JtNode_Group)& theGroupRecord)
+void HandleAllChildrenGlTf(gltfConfig& config, const std::shared_ptr<JtNode_Group>& theGroupRecord)
 {
     if (theGroupRecord->Children().IsEmpty())
         return;
@@ -661,9 +648,9 @@ void HandleAllChildrenGlTf(gltfConfig& config, const Handle(JtNode_Group)& theGr
     for (Standard_Integer aChildIdx = 0; aChildIdx < (Standard_Integer)theGroupRecord->Children().Count(); ++aChildIdx)
     {
 
-        Handle(JtNode_Base) aChildRecord = Handle(JtNode_Base)::DownCast(theGroupRecord->Children()[aChildIdx]);
+        std::shared_ptr<JtNode_Base> aChildRecord = std::dynamic_pointer_cast<JtNode_Base>(theGroupRecord->Children()[aChildIdx]);
 
-        if (aChildRecord.IsNull())
+        if (!aChildRecord)
         {
             
             continue;

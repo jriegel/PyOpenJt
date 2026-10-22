@@ -19,6 +19,7 @@
 
 #include <JtData_Types.hxx>
 
+#include <memory>
 #include <Standard.hxx>
 #include <NCollection_Map.hxx>
 
@@ -35,7 +36,7 @@ public:
       return NULL;
   }
 
-  virtual RootClass*       Create() const = 0;
+  virtual std::shared_ptr<RootClass> Create() const = 0;
   virtual const char* Name()   const = 0;
 
   // D-tor to prevent gcc warnings
@@ -64,7 +65,7 @@ public:
       this->DerivedClasses().Bind (theGUID, this);
   }
 
-  virtual RootClass*       Create() const { return new Class(); }
+  virtual std::shared_ptr<RootClass> Create() const { return std::make_shared<Class>(); }
   virtual const char* Name()   const { return myName; }
 };
 

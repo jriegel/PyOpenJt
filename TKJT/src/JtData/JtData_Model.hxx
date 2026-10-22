@@ -22,7 +22,6 @@
 
 #include <TCollection_ExtendedString.hxx>
 
-#include <Standard_DefineHandle.hxx>
 #include <ostream>
 #include <NCollection_DataMap.hxx>
 
@@ -31,11 +30,10 @@
 
 class JtNode_Partition;
 
-DEFINE_STANDARD_HANDLE(JtData_Model, Standard_Transient)
 
 //! Model class dealing with Jt file and providing base services
 //! on file open, read header, fetching Jt segments.
-class JtData_Model : public Standard_Transient
+class JtData_Model : public std::enable_shared_from_this<JtData_Model>
 {
 public:
   static const bool IsLittleEndianHost;
@@ -45,19 +43,19 @@ public:
   //! @param theFileName - name of Jt file
   //! @param theParent - the parent model in case of non monolythic assembly.
   TKJT_EXPORT JtData_Model (const TCollection_ExtendedString& theFileName,
-                                const Handle(JtData_Model)& theParent = Handle(JtData_Model)());
+                                const std::shared_ptr<JtData_Model>& theParent = std::shared_ptr<JtData_Model>());
 
   //! Read JT file header, TOC and LSG and return a handle to the root LSG node.
-  TKJT_EXPORT Handle(JtNode_Partition) Init();
+  TKJT_EXPORT std::shared_ptr<JtNode_Partition> Init();
 
   //! Lookup offset of a segment in TOCs of this model and its ancestor models.
-  TKJT_EXPORT Handle(JtData_Model) FindSegment (const Jt_GUID& theGUID,
+  TKJT_EXPORT std::shared_ptr<JtData_Model> FindSegment (const Jt_GUID& theGUID,
                                                           Jt_U64&  theOffset) const;
 
   //! Read object from a late loaded segment.
-  TKJT_EXPORT Handle(JtData_Object) ReadSegment(const Jt_U64 theOffset) const;
+  TKJT_EXPORT std::shared_ptr<JtData_Object> ReadSegment(const Jt_U64 theOffset) const;
   //! Read object from a late loaded segment.
-  TKJT_EXPORT Handle(JtData_Object) ReadSegmentDump(const Jt_U64 theOffset) const;
+  TKJT_EXPORT std::shared_ptr<JtData_Object> ReadSegmentDump(const Jt_U64 theOffset) const;
 
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& theStream) const;
@@ -85,9 +83,11 @@ public:
   //! Get access to the read TOC table
   const std::vector < JtData_Model::TocEntry>& getTOC() { return stdToc; }
 
-  DEFINE_STANDARD_RTTIEXT(JtData_Model,Standard_Transient)
 
 protected:
+  //! Shared pointer to this model; the model must be owned by a shared_ptr.
+  std::shared_ptr<JtData_Model> self() const { return std::const_pointer_cast<JtData_Model>(shared_from_this()); }
+
   //! Open the file.
   bool open (std::ifstream& aFile) const;
 
@@ -95,29 +95,29 @@ protected:
   bool readTOC (std::ifstream& theFile, const Jt_U64 theOffset);
 
   //! Read object(s) from a JT file segment.
-  Handle(JtData_Object) readSegment(std::ifstream& theFile,
+  std::shared_ptr<JtData_Object> readSegment(std::ifstream& theFile,
       const Jt_U64             theOffset,
       const bool   theIsLSG) const;
   //! Read object(s) from a JT file segment.
-  Handle(JtData_Object) readSegmentDump(std::ifstream& theFile,
+  std::shared_ptr<JtData_Object> readSegmentDump(std::ifstream& theFile,
       const Jt_U64             theOffset,
       const bool   theIsLSG) const;
   //! Read LSG segment data.
   bool readLSGData  (JtData_Reader&               theReader,
-                                 Handle(JtData_Object)&       theFirstObject) const;
+                                 std::shared_ptr<JtData_Object>&       theFirstObject) const;
 
   //! Read a sequence of elements from a JT file segment.
   bool readElements (JtData_Reader&               theReader,
                                  JtData_Object::MapOfObjects& theMap,
-                                 Handle(JtData_Object)&       theFirstObject) const;
+                                 std::shared_ptr<JtData_Object>&       theFirstObject) const;
 
   //! Read an element from a JT file segment.
   bool readElement  (JtData_Reader&               theReader,
-                                 Handle(JtData_Object)&       theObject,
+                                 std::shared_ptr<JtData_Object>&       theObject,
                                  Jt_I32*                      theObjectIDPtr = 0L) const;
 
 protected:
-  Handle(JtData_Model)       myParent;
+  std::shared_ptr<JtData_Model>       myParent;
 
   TCollection_ExtendedString myFileName;
   bool           myIsFileLE;

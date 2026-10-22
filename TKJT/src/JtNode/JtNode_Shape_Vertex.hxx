@@ -29,10 +29,8 @@ public:
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& S) const override;
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Shape_Vertex,JtNode_Shape_Base)
   DEFINE_OBJECT_CLASS (JtNode_Shape_Vertex)
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Shape_Vertex, JtNode_Shape_Base)
 
 #endif // _JtNode_Shape_Vertex_HeaderFile

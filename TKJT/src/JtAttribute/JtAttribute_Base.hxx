@@ -32,7 +32,6 @@ public:
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
-  DEFINE_STANDARD_RTTIEXT(JtAttribute_Base,JtData_Object)
 
 protected:
   Jt_I16 myVersion;
@@ -40,6 +39,5 @@ protected:
   Jt_U32 myFieldInhibitFlags;
 };
 
-DEFINE_STANDARD_HANDLE(JtAttribute_Base, JtData_Object)
 
 #endif // _JtAttribute_Base_HeaderFile

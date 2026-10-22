@@ -37,7 +37,6 @@ public:
   const VectorOfLateLoads& LateLoads() const { return myLateLoads; }
 
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_MetaData,JtNode_Group)
   DEFINE_OBJECT_CLASS (JtNode_MetaData)
 
 protected:
@@ -45,6 +44,5 @@ protected:
 
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_MetaData, JtNode_Group)
 
 #endif // _JtNode_MetaData_HeaderFile

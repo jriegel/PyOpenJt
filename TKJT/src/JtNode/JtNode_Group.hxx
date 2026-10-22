@@ -35,13 +35,11 @@ public:
   //! Return list of children.
   const VectorOfObjects& Children() const { return myChildren; }
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Group,JtNode_Base)
   DEFINE_OBJECT_CLASS (JtNode_Group)
 
 protected:
   VectorOfObjects myChildren;
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Group, JtNode_Base)
 
 #endif // _JtNode_Group_HeaderFile

@@ -17,6 +17,6 @@
 
 
 void writeTestGltfMesh(std::string name);
-void writeGltfMesh(const Handle(JtNode_Base)& theNodeRecord, const std::string& name);
+void writeGltfMesh(const std::shared_ptr<JtNode_Base>& theNodeRecord, const std::string& name);
 
 

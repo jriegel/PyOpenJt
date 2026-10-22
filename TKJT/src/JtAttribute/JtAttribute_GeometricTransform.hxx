@@ -37,13 +37,11 @@ public:
   //! Return transformationy.
   const double* GetTrsf() const { return myTransform; }
 
-  DEFINE_STANDARD_RTTIEXT(JtAttribute_GeometricTransform,JtAttribute_Base)
   DEFINE_OBJECT_CLASS (JtAttribute_GeometricTransform)
 
 protected:
   double myTransform[16];
 };
 
-DEFINE_STANDARD_HANDLE(JtAttribute_GeometricTransform, JtAttribute_Base)
 
 #endif // _JtAttribute_GeometricTransform_HeaderFile

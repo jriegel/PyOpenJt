@@ -35,7 +35,6 @@ public:
 
   void ClearData() { myData.Free(); }
 
-  DEFINE_STANDARD_RTTIEXT(JtElement_XTBRep,JtData_Object)
   DEFINE_OBJECT_CLASS (JtElement_XTBRep)
 
 protected:
@@ -46,6 +45,5 @@ protected:
   Jt_String myData;        //!< Parasolid Binary Data
 };
 
-DEFINE_STANDARD_HANDLE(JtElement_XTBRep, JtData_Object)
 
 #endif // _JtElement_XTBRep_HeaderFile

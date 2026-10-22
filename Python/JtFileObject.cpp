@@ -19,8 +19,8 @@ PyObject *JtFile_new(PyTypeObject *type, PyObject *args, PyObject *kwds);
 typedef struct {
     PyObject_HEAD;
     std::string FileName;
-    Handle(JtNode_Partition) PartitionNode;
-    Handle(JtData_Model) rootModel;
+    std::shared_ptr<JtNode_Partition> PartitionNode;
+    std::shared_ptr<JtData_Model> rootModel;
 } JtFileObject;
 
 
@@ -72,14 +72,14 @@ JtFile_open(JtFileObject* self, PyObject* , PyObject*)
 
     TCollection_ExtendedString aFileName(self->FileName.c_str(), Standard_True);
 
-    self->rootModel = new JtData_Model(aFileName);
+    self->rootModel = std::make_shared<JtData_Model>(aFileName);
 
-    if (!self->rootModel.IsNull())
+    if (self->rootModel)
         self->PartitionNode = self->rootModel->Init();
 
     Py_END_ALLOW_THREADS;
 
-    if (self->rootModel.IsNull() || self->PartitionNode.IsNull()) {
+    if (!self->rootModel || !self->PartitionNode) {
         Py_INCREF(Py_False);
         return Py_False;
     }
@@ -91,7 +91,7 @@ JtFile_open(JtFileObject* self, PyObject* , PyObject*)
 static PyObject*
 JtFile_json(JtFileObject* self, PyObject* , PyObject*)
 {
-    if (self->rootModel.IsNull() || self->PartitionNode.IsNull())
+    if (!self->rootModel || !self->PartitionNode)
         return PyUnicode_FromStringAndSize("", 1);
 
     std::stringstream outStream;
@@ -119,7 +119,7 @@ JtFile_json(JtFileObject* self, PyObject* , PyObject*)
 static PyObject*
 JtFile_writeGlTf(JtFileObject* self, PyObject* args , PyObject*)
 {
-    if (self->rootModel.IsNull() || self->PartitionNode.IsNull())
+    if (!self->rootModel || !self->PartitionNode)
         return PyUnicode_FromStringAndSize("", 1);
 
     char* value;

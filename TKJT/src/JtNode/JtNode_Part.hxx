@@ -30,12 +30,10 @@ public:
   //! Dump this entity.
   TKJT_EXPORT int Dump (std::ostream& theStream) const override;
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Part,JtNode_MetaData)
   DEFINE_OBJECT_CLASS (JtNode_Part)
 
 
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Part, JtNode_MetaData)
 
 #endif // _JtNode_Part_HeaderFile

@@ -42,7 +42,6 @@ public:
   //! Return node's name.
   const TCollection_ExtendedString& Name() const { return myName; }
 
-  DEFINE_STANDARD_RTTIEXT(JtNode_Base,JtData_Object)
   DEFINE_OBJECT_CLASS (JtNode_Base)
 
 protected:
@@ -50,6 +49,5 @@ protected:
   TCollection_ExtendedString myName;
 };
 
-DEFINE_STANDARD_HANDLE(JtNode_Base, JtData_Object)
 
 #endif // _JtNode_Base_HeaderFile

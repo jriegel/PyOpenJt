@@ -127,16 +127,16 @@ int main(int argc, char* argv[])
 
         TCollection_ExtendedString aFileName(fileName.c_str());
 
-        Handle(JtData_Model) rootModel = new JtData_Model(aFileName);
+        std::shared_ptr<JtData_Model> rootModel = std::make_shared<JtData_Model>(aFileName);
 
-        if (rootModel.IsNull())
+        if (!rootModel)
             return 2;
 
-        Handle(JtNode_Partition) PartitionNode = rootModel->Init();
+        std::shared_ptr<JtNode_Partition> PartitionNode = rootModel->Init();
 
         writeModel(rootModel, *outStream, indention, outFilter);
 
-        if (PartitionNode.IsNull()) {
+        if (!PartitionNode) {
             WriteMeshesWithoutLSG(dumpConfig::dump_all, *outStream, rootModel, fileName);
         }
         else {

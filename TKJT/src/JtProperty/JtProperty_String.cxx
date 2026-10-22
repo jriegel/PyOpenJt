@@ -17,7 +17,6 @@
 #include <JtProperty_String.hxx>
 #include <JtData_Reader.hxx>
 
-IMPLEMENT_STANDARD_RTTIEXT(JtProperty_String, JtProperty_Base)
 
 IMPLEMENT_OBJECT_CLASS(JtProperty_String, "String Object",
                        "10dd106e-2ac8-11d1-9b-6b-00-80-c7-bb-59-97")
