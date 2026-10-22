@@ -106,7 +106,7 @@ bool JTVis_Frustum::Intersect (const Vector4f& theMinPoint,
   }
 
   int aPlaneStep = isOrthographic ? 2 : 1;
-  for (Standard_Integer anIdx = 0; anIdx < 5; anIdx += aPlaneStep) // Frustum normals
+  for (int anIdx = 0; anIdx < 5; anIdx += aPlaneStep) // Frustum normals
   {
     Vector4f anAxis = Planes[anIdx].Normal;
 
@@ -117,7 +117,7 @@ bool JTVis_Frustum::Intersect (const Vector4f& theMinPoint,
 
     aFrustumProj = FrustumProjections[anIdx];
 
-    const Standard_ShortReal aPnt0 = aPVertex.dot (anAxis);
+    const float aPnt0 = aPVertex.dot (anAxis);
 
     if (aPnt0 >= aFrustumProj.Min && aPnt0 <= aFrustumProj.Max)
       continue;
@@ -127,10 +127,10 @@ bool JTVis_Frustum::Intersect (const Vector4f& theMinPoint,
                              anAxis.z() > 0.f ? theMinPoint.z() : theMaxPoint.z(),
                              0.f);
 
-    const Standard_ShortReal aPnt1 = aNVertex.dot (anAxis);
+    const float aPnt1 = aNVertex.dot (anAxis);
 
-    const Standard_ShortReal aMin = aPnt0 < aPnt1 ? aPnt0 : aPnt1;
-    const Standard_ShortReal aMax = aPnt0 > aPnt1 ? aPnt0 : aPnt1;
+    const float aMin = aPnt0 < aPnt1 ? aPnt0 : aPnt1;
+    const float aMax = aPnt0 > aPnt1 ? aPnt0 : aPnt1;
 
     if (aFrustumProj.Max < aMin || aFrustumProj.Min > aMax)
     {
@@ -156,11 +156,11 @@ void JTVis_Frustum::UpdatePlanes()
   // -X, +X, -Y, +Y, -Z, +Z
   // (in local frustum space)
 
-  for (Standard_Integer anAxis = 0; anAxis < 3; ++anAxis)
+  for (int anAxis = 0; anAxis < 3; ++anAxis)
   {
-    for (Standard_Integer i = 0; i < 2; ++i)
+    for (int i = 0; i < 2; ++i)
     {
-      for (Standard_Integer j = 0; j < 3; ++j)
+      for (int j = 0; j < 3; ++j)
       {
         aShifts[anAxis] = i;
         aShifts[(anAxis + 1) % 3] = aLookup1[j];

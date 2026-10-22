@@ -118,9 +118,9 @@ void JTVis_PrepareNodeTask::Perform (QStack<JTVis_ScenegraphTaskPtr>& theStack)
 
     ScenePartNodes().push_back (aNewPartNode);
 
-    NCollection_Handle<BVH_Object<float, 4> > anObject (new JTVis_PartBvhObject (aNewPartNode.data(), aNewPartNode->Bounds));
+    std::shared_ptr<BVH_Object<float, 4> > anObject (new JTVis_PartBvhObject (aNewPartNode.data(), aNewPartNode->Bounds));
 
-    SceneBvhGeometry().Objects().Append (anObject);
+    SceneBvhGeometry().Objects().push_back (anObject);
   }
 }
 

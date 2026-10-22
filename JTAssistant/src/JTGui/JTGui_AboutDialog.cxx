@@ -27,7 +27,7 @@
 // function : checkUpdateState
 // purpose  :
 // =======================================================================
-JTGui_AboutDialog::JTGui_AboutDialog (const QString& theOcctVersion, QWidget* theParent)
+JTGui_AboutDialog::JTGui_AboutDialog (QWidget* theParent)
   : QDialog (theParent)
 {
   this->setWindowTitle (tr ("Open CASCADE JT Assistant"));
@@ -38,9 +38,6 @@ JTGui_AboutDialog::JTGui_AboutDialog (const QString& theOcctVersion, QWidget* th
   QString anAboutText = tr (
     "Open CASCADE JT Assistant\n"
     "\n"
-    "\n"
-    "powered by\n"
-    "Open CASCADE Technology %1.dev\n"
     "\n"
     "This software is provided 'as-is', without any express or\n"
     "implied warranty of any kind. Use it on your own risk. In\n"
@@ -55,7 +52,7 @@ JTGui_AboutDialog::JTGui_AboutDialog (const QString& theOcctVersion, QWidget* th
     "See licensing information in README.txt\n"
     "file in application folder\n"
 
-  ).arg (theOcctVersion);
+  );
   QLabel* aLabel = new QLabel (anAboutText, this);
   aLabel->setAlignment (Qt::AlignHCenter | Qt::AlignVCenter);
   aLayout->addWidget (aLabel);

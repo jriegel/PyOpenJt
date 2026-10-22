@@ -94,7 +94,7 @@ void JTVis_CameraTransition::Apply (const float theTime, JTVis_TargetedCamera& t
   }
 
   float t = (theTime - myStartTime) / myTimeLength;
-  t = sin (t * static_cast<float> (M_PI_2));
+  t = sin (t * static_cast<float> (1.57079632679489661923f));
   theCamera.SetRotation (Eigen::AngleAxisf (myStartRotation.slerp (t, myEndRotation)));
   theCamera.SetTarget (myStartTarget * (1.f - t) + myEndTarget * t);
   theCamera.SetScale (myStartScale * (1.f - t) + myEndScale * t);

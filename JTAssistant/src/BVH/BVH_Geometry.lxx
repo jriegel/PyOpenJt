@@ -22,11 +22,11 @@
 // =======================================================================
 template<class T, int N>
 BVH_Geometry<T, N>::BVH_Geometry()
-: myIsDirty (Standard_False),
+: myIsDirty (false),
   myBVH (new BVH_Tree<T, N>())
 {
   // Set default builder - binned SAH split
-  myBuilder = new BVH_BinnedBuilder<T, N, 32> (1 /* primitive per leaf */);
+  myBuilder = std::make_shared<BVH_BinnedBuilder<T, N, 32> > (1 /* primitive per leaf */);
 }
 
 // =======================================================================
@@ -36,8 +36,8 @@ BVH_Geometry<T, N>::BVH_Geometry()
 template<class T, int N>
 BVH_Geometry<T, N>::~BVH_Geometry()
 {
-  myBVH.Nullify();
-  myBuilder.Nullify();
+  myBVH.reset();
+  myBuilder.reset();
 }
 
 // =======================================================================
@@ -47,7 +47,7 @@ BVH_Geometry<T, N>::~BVH_Geometry()
 template<class T, int N>
 void BVH_Geometry<T, N>::MarkDirty()
 {
-  myIsDirty = Standard_True;
+  myIsDirty = true;
 }
 
 // =======================================================================
@@ -71,7 +71,7 @@ BVH_Box<T, N> BVH_Geometry<T, N>::Box() const
 // purpose  :
 // =======================================================================
 template<class T, int N>
-const NCollection_Handle<BVH_Tree<T, N> >& BVH_Geometry<T, N>::BVH()
+const std::shared_ptr<BVH_Tree<T, N> >& BVH_Geometry<T, N>::BVH()
 {
   if (myIsDirty)
   {
@@ -95,7 +95,7 @@ void BVH_Geometry<T, N>::Update()
 
   myBuilder->Build (this, myBVH.operator->(), Box());
 
-  myIsDirty = Standard_False;
+  myIsDirty = false;
 }
 
 // =======================================================================
@@ -103,7 +103,7 @@ void BVH_Geometry<T, N>::Update()
 // purpose  :
 // =======================================================================
 template<class T, int N>
-const NCollection_Handle<BVH_Builder<T, N> >& BVH_Geometry<T, N>::Builder() const
+const std::shared_ptr<BVH_Builder<T, N> >& BVH_Geometry<T, N>::Builder() const
 {
   return myBuilder;
 }
@@ -113,7 +113,7 @@ const NCollection_Handle<BVH_Builder<T, N> >& BVH_Geometry<T, N>::Builder() cons
 // purpose  :
 // =======================================================================
 template<class T, int N>
-void BVH_Geometry<T, N>::SetBuilder (NCollection_Handle<BVH_Builder<T, N> >& theBuilder)
+void BVH_Geometry<T, N>::SetBuilder (std::shared_ptr<BVH_Builder<T, N> >& theBuilder)
 {
   myBuilder = theBuilder;
 }

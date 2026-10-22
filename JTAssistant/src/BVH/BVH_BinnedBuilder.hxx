@@ -28,7 +28,7 @@ struct BVH_Bin
   //! Creates new node bin.
   BVH_Bin() : Count (0) {}
 
-  Standard_Integer Count; //!< Number of primitives in the bin
+  int Count; //!< Number of primitives in the bin
   BVH_Box<T, N>    Box;   //!< AABB of primitives in the bin
 };
 
@@ -45,8 +45,8 @@ public:
 public:
 
   //! Creates binned SAH BVH builder.
-  BVH_BinnedBuilder (const Standard_Integer theLeafNodeSize = 5,
-                     const Standard_Integer theMaxTreeDepth = 32);
+  BVH_BinnedBuilder (const int theLeafNodeSize = 5,
+                     const int theMaxTreeDepth = 32);
 
   //! Releases resources of binned SAH BVH builder.
   virtual ~BVH_BinnedBuilder();
@@ -56,14 +56,14 @@ protected:
   //! Builds BVH node for specified task info.
   virtual void BuildNode (BVH_Set<T, N>*         theSet,
                           BVH_Tree<T, N>*        theBVH,
-                          const Standard_Integer theNode);
+                          const int theNode);
 
   //! Arranges node primitives into bins.
   virtual void GetSubVolumes (BVH_Set<T, N>*         theSet,
                               BVH_Tree<T, N>*        theBVH,
-                              const Standard_Integer theNode,
+                              const int theNode,
                               BVH_BinVector&         theBins,
-                              const Standard_Integer theAxis);
+                              const int theAxis);
 
 public:
 

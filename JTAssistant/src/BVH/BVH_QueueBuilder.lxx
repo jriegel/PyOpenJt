@@ -15,8 +15,8 @@
 // on <http://www.gnu.org/licenses/>.
 
 template<class T, int N>
-BVH_QueueBuilder<T, N>::BVH_QueueBuilder (const Standard_Integer theLeafNodeSize,
-                                          const Standard_Integer theMaxTreeDepth)
+BVH_QueueBuilder<T, N>::BVH_QueueBuilder (const int theLeafNodeSize,
+                                          const int theMaxTreeDepth)
 : BVH_Builder<T, N> (theLeafNodeSize,
                      theMaxTreeDepth)
 {
@@ -53,19 +53,19 @@ void BVH_QueueBuilder<T, N>::Build (BVH_Set<T, N>*       theSet,
     return;
   }
 
-  const Standard_Integer aRoot = theBVH->AddLeafNode (theBox, 0, theSet->Size() - 1);
+  const int aRoot = theBVH->AddLeafNode (theBox, 0, theSet->Size() - 1);
   if (theSet->Size() == 1)
   {
     return;
   }
 
-  myTasksQueue.Append (aRoot);
-  for (Standard_Integer aTask = 0; aTask < myTasksQueue.Size(); ++aTask)
+  myTasksQueue.push_back (aRoot);
+  for (int aTask = 0; aTask < static_cast<int> (myTasksQueue.size()); ++aTask)
   {
-    BuildNode (theSet, theBVH, myTasksQueue.Value (aTask));
+    BuildNode (theSet, theBVH, myTasksQueue[aTask]);
   }
 
-  myTasksQueue.Clear();
+  myTasksQueue.clear();
 }
 
 // =======================================================================
@@ -75,7 +75,7 @@ void BVH_QueueBuilder<T, N>::Build (BVH_Set<T, N>*       theSet,
 template<class T, int N>
 void BVH_QueueBuilder<T, N>::BuildNode (BVH_Set<T, N>*         /* theSet */,
                                         BVH_Tree<T, N>*        /* theBVH */,
-                                        const Standard_Integer /* theTask */)
+                                        const int /* theTask */)
 {
   // needed to disable compile warnings
 }

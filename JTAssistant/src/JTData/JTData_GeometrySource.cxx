@@ -44,36 +44,36 @@ JTData_GeometrySource::~JTData_GeometrySource()
 // function : LoadPartition
 // purpose  :
 //=======================================================================
-Standard_Boolean JTData_GeometrySource::LoadPartition (JTData_PartitionNode* thePartition)
+bool JTData_GeometrySource::LoadPartition (JTData_PartitionNode* thePartition)
 {
   if (thePartition == NULL)
   {
-    return Standard_False;
+    return false;
   }
 
-  QMap<QString, Handle(JtNode_Partition)>::iterator anIter = myMap.find (thePartition->FileName());
+  QMap<QString, std::shared_ptr<JtNode_Partition>>::iterator anIter = myMap.find (thePartition->FileName());
 
   if (anIter == myMap.end())
   {
-    TCollection_ExtendedString aFileName (thePartition->FileName().toUtf8().data(), Standard_True);
+    std::wstring aFileName = thePartition->FileName().toStdWString();
 
-    Handle(JtData_Model) aModel = new JtData_Model (aFileName);
+    std::shared_ptr<JtData_Model> aModel = std::make_shared<JtData_Model> (aFileName);
 
-    Handle(JtNode_Partition) aPartitionRecord = aModel->Init();
+    std::shared_ptr<JtNode_Partition> aPartitionRecord = aModel->Init();
 
-    if (aPartitionRecord.IsNull())
+    if (!aPartitionRecord)
     {
-      return Standard_False;
+      return false;
     }
 
     myMap.insert (thePartition->FileName(), aPartitionRecord);
   }
 
-  const Handle(JtNode_Partition)& aPartitionRecord = myMap.find (thePartition->FileName()).value();
+  const std::shared_ptr<JtNode_Partition>& aPartitionRecord = myMap.find (thePartition->FileName()).value();
 
-  if (aPartitionRecord.IsNull())
+  if (!aPartitionRecord)
   {
-    return Standard_False;
+    return false;
   }
 
   return mySceneGraph->Init (aPartitionRecord, thePartition);
@@ -83,11 +83,11 @@ Standard_Boolean JTData_GeometrySource::LoadPartition (JTData_PartitionNode* the
 // function : LoadExternalPartitions
 // purpose  :
 //=======================================================================
-Standard_Boolean JTData_GeometrySource::LoadExternalPartitions()
+bool JTData_GeometrySource::LoadExternalPartitions()
 {
   if (mySceneGraph == NULL)
   {
-    return Standard_True;
+    return true;
   }
 
   JTData_PartitionNode* aRoot =
@@ -95,7 +95,7 @@ Standard_Boolean JTData_GeometrySource::LoadExternalPartitions()
 
   if (aRoot == NULL)
   {
-    return Standard_False;
+    return false;
   }
 
   QStack<JTData_Node*> aStack;
@@ -120,7 +120,7 @@ Standard_Boolean JTData_GeometrySource::LoadExternalPartitions()
       {
         if (!LoadPartition (aPartition))
         {
-          return Standard_False;
+          return false;
         }
       }
       else
@@ -133,14 +133,14 @@ Standard_Boolean JTData_GeometrySource::LoadExternalPartitions()
     }
   }
 
-  return Standard_True;
+  return true;
 }
 
 //=======================================================================
 // function : Init
 // purpose  :
 //=======================================================================
-Standard_Boolean JTData_GeometrySource::Init (const QString& theFileName)
+bool JTData_GeometrySource::Init (const QString& theFileName)
 {
   myMap.clear();
 
@@ -157,27 +157,27 @@ Standard_Boolean JTData_GeometrySource::Init (const QString& theFileName)
 
   if (!aFile.is_open())
   {
-    return Standard_False;
+    return false;
   }
 
 #ifdef _WIN32
-  TCollection_ExtendedString aFileName (theFileName.toUtf8().data(), Standard_True);
+  std::wstring aFileName = theFileName.toStdWString();
 #else
-  TCollection_ExtendedString aFileName (theFileName.toUtf8().data());
+  std::wstring aFileName = theFileName.toStdWString();
 #endif
 
-  Handle(JtData_Model) aModel = new JtData_Model (aFileName);
+  std::shared_ptr<JtData_Model> aModel = std::make_shared<JtData_Model> (aFileName);
 
-  if (aModel.IsNull())
+  if (!aModel)
   {
-    return Standard_False;
+    return false;
   }
 
   mySceneGraph = new JTData_SceneGraph;
 
   if (!mySceneGraph->Init (aModel, theFileName))
   {
-    return Standard_False;
+    return false;
   }
 
   return LoadExternalPartitions();

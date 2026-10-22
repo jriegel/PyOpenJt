@@ -37,11 +37,11 @@ BVH_ObjectSet<T, N>::~BVH_ObjectSet()
 template<class T, int N>
 void BVH_ObjectSet<T, N>::Clear()
 {
-  for (Standard_Integer anObjectIdx = 0; anObjectIdx < myObjects.Size(); ++anObjectIdx)
+  for (int anObjectIdx = 0; anObjectIdx < static_cast<int> (myObjects.size()); ++anObjectIdx)
   {
-    myObjects.ChangeValue (anObjectIdx).Nullify();
+    myObjects.at (anObjectIdx).reset();
   }
-  myObjects.Clear();
+  myObjects.clear();
 }
 
 // =======================================================================
@@ -69,9 +69,9 @@ const typename BVH_ObjectSet<T, N>::BVH_ObjectList& BVH_ObjectSet<T, N>::Objects
 // purpose  :
 // =======================================================================
 template<class T, int N>
-Standard_Integer BVH_ObjectSet<T, N>::Size() const
+int BVH_ObjectSet<T, N>::Size() const
 {
-  return myObjects.Size();
+  return static_cast<int> (myObjects.size());
 }
 
 // =======================================================================
@@ -79,9 +79,9 @@ Standard_Integer BVH_ObjectSet<T, N>::Size() const
 // purpose  :
 // =======================================================================
 template<class T, int N>
-BVH_Box<T, N> BVH_ObjectSet<T, N>::Box (const Standard_Integer theIndex) const
+BVH_Box<T, N> BVH_ObjectSet<T, N>::Box (const int theIndex) const
 {
-  return myObjects.Value (theIndex)->Box();
+  return myObjects.at (theIndex)->Box();
 }
 
 // =======================================================================
@@ -89,11 +89,11 @@ BVH_Box<T, N> BVH_ObjectSet<T, N>::Box (const Standard_Integer theIndex) const
 // purpose  :
 // =======================================================================
 template<class T, int N>
-T BVH_ObjectSet<T, N>::Center (const Standard_Integer theIndex,
-                               const Standard_Integer theAxis) const
+T BVH_ObjectSet<T, N>::Center (const int theIndex,
+                               const int theAxis) const
 {
   // Note: general implementation, not optimal
-  return BVH::CenterAxis<T, N>::Center (myObjects.Value (theIndex)->Box(), theAxis);
+  return BVH::CenterAxis<T, N>::Center (myObjects.at (theIndex)->Box(), theAxis);
 }
 
 // =======================================================================
@@ -101,9 +101,9 @@ T BVH_ObjectSet<T, N>::Center (const Standard_Integer theIndex,
 // purpose  :
 // =======================================================================
 template<class T, int N>
-void BVH_ObjectSet<T, N>::Swap (const Standard_Integer theIndex1,
-                                const Standard_Integer theIndex2)
+void BVH_ObjectSet<T, N>::Swap (const int theIndex1,
+                                const int theIndex2)
 {
-  std::swap (myObjects.ChangeValue (theIndex1),
-             myObjects.ChangeValue (theIndex2));
+  std::swap (myObjects.at (theIndex1),
+             myObjects.at (theIndex2));
 }

@@ -49,13 +49,13 @@ public:
   virtual BVH_Box<T, N> Box() const;
 
   //! Returns BVH tree (and builds it if necessary).
-  virtual const NCollection_Handle<BVH_Tree<T, N> >& BVH();
+  virtual const std::shared_ptr<BVH_Tree<T, N> >& BVH();
 
   //! Returns the method (builder) used to construct BVH.
-  virtual const NCollection_Handle<BVH_Builder<T, N> >& Builder() const;
+  virtual const std::shared_ptr<BVH_Builder<T, N> >& Builder() const;
 
   //! Sets the method (builder) used to construct BVH.
-  virtual void SetBuilder (NCollection_Handle<BVH_Builder<T, N> >& theBuilder);
+  virtual void SetBuilder (std::shared_ptr<BVH_Builder<T, N> >& theBuilder);
 
 protected:
 
@@ -64,8 +64,8 @@ protected:
 
 protected:
 
-  NCollection_Handle<BVH_Tree<T, N> >    myBVH;     //!< Constructed bottom-level BVH
-  NCollection_Handle<BVH_Builder<T, N> > myBuilder; //!< Builder for bottom-level BVH
+  std::shared_ptr<BVH_Tree<T, N> >    myBVH;     //!< Constructed bottom-level BVH
+  std::shared_ptr<BVH_Builder<T, N> > myBuilder; //!< Builder for bottom-level BVH
 
   mutable BVH_Box<T, N> myBox; //!< Cached bounding box of geometric primitives
 

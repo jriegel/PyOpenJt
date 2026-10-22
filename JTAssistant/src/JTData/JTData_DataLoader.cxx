@@ -27,14 +27,14 @@
 // function : Perform
 // purpose  :
 // =======================================================================
-Standard_Boolean JTData_WorkItem::Perform()
+bool JTData_WorkItem::Perform()
 {
-  if (myLateLoaded->DefferedObject().IsNull())
+  if (!myLateLoaded->DefferedObject())
   {
     myLateLoaded->Load();
   }
 
-  bool isLoaded = !myLateLoaded->DefferedObject().IsNull();
+  bool isLoaded = myLateLoaded->DefferedObject() != nullptr;
 
   if (isLoaded)
   {
@@ -91,9 +91,9 @@ JTData_WorkItem JTData_LoadingQueue::Fetch()
 // function : Size
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_LoadingQueue::Size()
+int JTData_LoadingQueue::Size()
 {
-  Standard_Integer aSize;
+  int aSize;
 
   myMutex.lock();
   {
@@ -108,15 +108,15 @@ Standard_Integer JTData_LoadingQueue::Size()
 // function : Enqueued
 // purpose  :
 // =======================================================================
-Standard_Boolean JTData_LoadingQueue::Enqueued (const JTData_WorkItem& theQuery)
+bool JTData_LoadingQueue::Enqueued (const JTData_WorkItem& theQuery)
 {
-  Standard_Boolean anIsEnqueued = Standard_False;
+  bool anIsEnqueued = false;
 
   myMutex.lock();
   {
     if (mySet.find (&*theQuery.LateLoaded()) != mySet.end())
     {
-      anIsEnqueued = Standard_True;
+      anIsEnqueued = true;
     }
   }
   myMutex.unlock();

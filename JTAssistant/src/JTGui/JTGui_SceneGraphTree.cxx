@@ -154,10 +154,10 @@ void JTGui_SceneGraphItem::updateParents (JTGui_SceneGraphItem* theItem)
 
   aParent->myCheckUpdatesOn = false;
 
-  Standard_Integer aNbUncheck = 0;
-  Standard_Integer aNbChecked = 0;
+  int aNbUncheck = 0;
+  int aNbChecked = 0;
 
-  for (Standard_Integer anIdx = 0; anIdx < aParent->childCount(); ++anIdx)
+  for (int anIdx = 0; anIdx < aParent->childCount(); ++anIdx)
   {
     if (aParent->child (anIdx)->checkState() == Qt::Unchecked)
     {

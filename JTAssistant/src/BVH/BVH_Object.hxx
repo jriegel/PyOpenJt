@@ -20,7 +20,7 @@
 #include <BVH_Box.hxx>
 #include <BVH_Properties.hxx>
 
-#include <NCollection_Handle.hxx>
+#include <memory>
 
 //! Abstract geometric object bounded by BVH box.
 //! \tparam T Numeric data type
@@ -42,18 +42,18 @@ public:
   virtual BVH_Box<T, N> Box() const = 0;
 
   //! Returns properties of the geometric object.
-  virtual const NCollection_Handle<BVH_Properties>& Properties() const;
+  virtual const std::shared_ptr<BVH_Properties>& Properties() const;
 
   //! Sets properties of the geometric object.
-  virtual void SetProperties (const NCollection_Handle<BVH_Properties>& theProperties);
+  virtual void SetProperties (const std::shared_ptr<BVH_Properties>& theProperties);
 
   //! Marks object state as outdated (needs BVH rebuilding).
   virtual void MarkDirty();
 
 protected:
 
-  Standard_Boolean                   myIsDirty;    //!< Marks internal object state as outdated
-  NCollection_Handle<BVH_Properties> myProperties; //!< Generic properties assigned to the object
+  bool                   myIsDirty;    //!< Marks internal object state as outdated
+  std::shared_ptr<BVH_Properties> myProperties; //!< Generic properties assigned to the object
 
 public:
 

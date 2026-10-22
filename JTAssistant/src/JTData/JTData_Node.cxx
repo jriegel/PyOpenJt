@@ -29,9 +29,9 @@ JTData_Node::~JTData_Node()
 // function : EstimateMemoryUsed
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_GroupNode::EstimateMemoryUsed (JTData_InstanceMap& theMap) const
+int JTData_GroupNode::EstimateMemoryUsed (JTData_InstanceMap& theMap) const
 {
-  Standard_Integer aSize = sizeof (JTData_GroupNode);
+  int aSize = sizeof (JTData_GroupNode);
 
   for (size_t anIdx = 0; anIdx < Children.size(); ++anIdx)
   {
@@ -51,7 +51,7 @@ void JTData_GroupNode::applayLayerFilter(const std::vector<uint32_t>& LayerInfo)
 // function : EstimateMemoryUsed
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_InstanceNode::EstimateMemoryUsed (JTData_InstanceMap& /*theMap*/) const
+int JTData_InstanceNode::EstimateMemoryUsed (JTData_InstanceMap& /*theMap*/) const
 {
   return sizeof (JTData_InstanceNode) + sizeof (JTData_NodePtr);
 }
@@ -78,7 +78,7 @@ JTData_PartitionNode::JTData_PartitionNode (const QString& theFileName)
 // function : EstimateMemoryUsed
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_PartitionNode::EstimateMemoryUsed (JTData_InstanceMap& theMap) const
+int JTData_PartitionNode::EstimateMemoryUsed (JTData_InstanceMap& theMap) const
 {
   return JTData_GroupNode::EstimateMemoryUsed (theMap) + myFileName.toUtf8().length();
 }
@@ -112,7 +112,7 @@ JTData_ShapeNode::~JTData_ShapeNode()
 // function : EstimateMemoryUsed
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_ShapeNode::EstimateMemoryUsed (JTData_InstanceMap& /*theMap*/) const
+int JTData_ShapeNode::EstimateMemoryUsed (JTData_InstanceMap& /*theMap*/) const
 {
   return sizeof (JTData_ShapeNode) + sizeof (JTCommon_AABB);
 }
@@ -141,9 +141,9 @@ JTData_MeshNode::~JTData_MeshNode()
 // function : EstimateMemoryUsed
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_MeshNode::EstimateMemoryUsed (JTData_InstanceMap& theMap) const
+int JTData_MeshNode::EstimateMemoryUsed (JTData_InstanceMap& theMap) const
 {
-  Standard_Integer aSize = JTData_ShapeNode::EstimateMemoryUsed (theMap);
+  int aSize = JTData_ShapeNode::EstimateMemoryUsed (theMap);
 
   if (mySource.isNull() || theMap.contains (mySource.data()))
     return aSize;
@@ -164,7 +164,7 @@ Standard_Integer JTData_MeshNode::EstimateMemoryUsed (JTData_InstanceMap& theMap
 // function : JTData_MeshNodeSource
 // purpose  :
 // =======================================================================
-JTData_MeshNodeSource::JTData_MeshNodeSource (JTData_LoadingQueue& theQueue, const Handle(JtNode_Shape_TriStripSet)& theShape)
+JTData_MeshNodeSource::JTData_MeshNodeSource (JTData_LoadingQueue& theQueue, const std::shared_ptr<JtNode_Shape_TriStripSet>& theShape)
   : myQueue (theQueue),
     myShape (theShape)
 {
@@ -175,7 +175,7 @@ JTData_MeshNodeSource::JTData_MeshNodeSource (JTData_LoadingQueue& theQueue, con
 // function : RequestTriangulation
 // purpose  :
 // =======================================================================
-JTCommon_TriangleDataPtr JTData_MeshNodeSource::RequestTriangulation (const Standard_Integer theIndex, QObject* theFeedback)
+JTCommon_TriangleDataPtr JTData_MeshNodeSource::RequestTriangulation (const int theIndex, QObject* theFeedback)
 {
   if (myData.isNull())
   {
@@ -186,14 +186,14 @@ JTCommon_TriangleDataPtr JTData_MeshNodeSource::RequestTriangulation (const Stan
       return myData;
     }
 
-    Handle(JtData_Object) anObject = aLateLoaded[theIndex]->DefferedObject();
+    std::shared_ptr<JtData_Object> anObject = aLateLoaded[theIndex]->DefferedObject();
 
-    if (!anObject.IsNull())
+    if (anObject)
     {
-      Handle(JtElement_ShapeLOD_TriStripSet) aLOD =
-        Handle(JtElement_ShapeLOD_TriStripSet)::DownCast (anObject);
+      std::shared_ptr<JtElement_ShapeLOD_TriStripSet> aLOD =
+        std::dynamic_pointer_cast<JtElement_ShapeLOD_TriStripSet>(anObject);
 
-      if (!aLOD.IsNull())
+      if (aLOD)
       {
         BuildTriangulation (aLOD);
       }
@@ -221,9 +221,9 @@ JTCommon_TriangleDataPtr JTData_MeshNodeSource::RequestTriangulation (const Stan
 // function : BuildTriangulation
 // purpose  :
 // =======================================================================
-void JTData_MeshNodeSource::BuildTriangulation (const Handle(JtElement_ShapeLOD_TriStripSet)& theShapeLOD)
+void JTData_MeshNodeSource::BuildTriangulation (const std::shared_ptr<JtElement_ShapeLOD_TriStripSet>& theShapeLOD)
 {
-  if (theShapeLOD.IsNull())
+  if (!theShapeLOD)
   {
     return;
   }

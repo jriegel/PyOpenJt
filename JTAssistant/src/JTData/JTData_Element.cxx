@@ -21,7 +21,7 @@
 // purpose  :
 // =======================================================================
 JTData_Element::JTData_Element()
-  : myIsIgnored (Standard_False),
+  : myIsIgnored (false),
     myState(0)
 {
   //

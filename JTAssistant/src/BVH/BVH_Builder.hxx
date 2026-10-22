@@ -23,7 +23,7 @@
 namespace BVH
 {
   //! Minimum node size to split.
-  const Standard_Real THE_NODE_MIN_SIZE = 1e-5;
+  const double THE_NODE_MIN_SIZE = 1e-5;
 }
 
 //! Performs construction of BVH tree using bounding
@@ -36,8 +36,8 @@ class BVH_Builder
 public:
 
   //! Creates new abstract BVH builder.
-  BVH_Builder (const Standard_Integer theLeafNodeSize,
-               const Standard_Integer theMaxTreeDepth);
+  BVH_Builder (const int theLeafNodeSize,
+               const int theMaxTreeDepth);
 
   //! Releases resources of BVH builder.
   virtual ~BVH_Builder();
@@ -51,7 +51,7 @@ protected:
 
   //! Updates depth of constructed BVH tree.
   void UpdateDepth (BVH_Tree<T, N>*        theBVH,
-                    const Standard_Integer theLevel)
+                    const int theLevel)
   {
     if (theLevel > theBVH->myDepth)
     {
@@ -61,8 +61,8 @@ protected:
 
 protected:
 
-  Standard_Integer myMaxTreeDepth; //!< Maximum depth of constructed BVH
-  Standard_Integer myLeafNodeSize; //!< Maximum number of objects per leaf
+  int myMaxTreeDepth; //!< Maximum depth of constructed BVH
+  int myLeafNodeSize; //!< Maximum number of objects per leaf
 
 public:
 

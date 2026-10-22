@@ -14,7 +14,6 @@ set(CMAKE_AUTORCC ON)
 
 # Find the QtWidgets library
 find_package(Qt5			COMPONENTS Core Widgets REQUIRED)
-find_package(OpenCASCADE 	CONFIG 					REQUIRED)
 find_package(TBB 			CONFIG 					REQUIRED)
 find_package(ZLIB 									REQUIRED)
 find_package(OpenGL 								REQUIRED)
@@ -41,12 +40,6 @@ file (GLOB_RECURSE ProjectHeaders src/*.hxx)
 file (GLOB_RECURSE ProjectQRC *.qrc)
 file (GLOB_RECURSE ProjectUI src/*.ui)
 
-
-if(WIN32)
-  add_definitions (-DWNT -DWINVER=0x0500)
-else()
-  add_definitions (-fexceptions -fPIC -DOCC_CONVERT_SIGNALS)
-endif()
 
 # Suppression of 3rdparty warnings in MSVC with #pragma warnings (disable)
 if(MSVC)
@@ -78,9 +71,7 @@ add_executable (JTAssistant WIN32 ${ProjectSources} ${ProjectHeaders} ${ProjectU
 add_dependencies (JTAssistant TKJT)
 add_dependencies (JTAssistant ToolsLib)
 
-target_include_directories (JTAssistant PUBLIC ${OpenCASCADE_INCLUDE_DIR} )
 
-target_link_libraries(JTAssistant PRIVATE TKernel TKMath TKXSBase)
 target_link_libraries(JTAssistant PRIVATE ZLIB::ZLIB)
 target_link_libraries(JTAssistant PRIVATE TBB::tbb)
 target_link_libraries(JTAssistant PRIVATE Eigen3::Eigen)

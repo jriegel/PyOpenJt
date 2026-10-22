@@ -20,9 +20,6 @@
   #include <Windows.h>
 #endif
 
-#include <Message.hxx>
-#include <Message_Messenger.hxx>
-#include <Message_PrinterOStream.hxx>
 
 #pragma warning (push, 0)
 #include <QApplication>
@@ -66,17 +63,6 @@ int main (int argc, char **argv)
   aParser.process (app);
 
   const QStringList anArgs = aParser.positionalArguments();
-
-  Handle(Message_PrinterOStream) aCoutPrinter
-    = Handle(Message_PrinterOStream)::DownCast (::Message::DefaultMessenger()->ChangePrinters().First());
-  if (!aCoutPrinter.IsNull())
-  {
-#ifdef _DEBUG
-    aCoutPrinter->SetTraceLevel (Message_Trace);
-#else
-    aCoutPrinter->SetTraceLevel (aParser.isSet (aLogOption) ? Message_Trace : Message_Alarm);
-#endif
-  }
 
   // window
 

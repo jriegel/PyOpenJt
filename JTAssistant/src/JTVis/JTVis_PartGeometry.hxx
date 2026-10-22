@@ -54,7 +54,7 @@ public:
 
   //! Allocates OpenGL vertex buffer objects with size of "theMaxSize" vertices.
   //! Stores attribute bindings for given shader program in its VAO.
-  void Initialize (QOpenGLShaderProgram* theProgram, Standard_Integer theMaxSize);
+  void Initialize (QOpenGLShaderProgram* theProgram, int theMaxSize);
 
   //! Adds to its OpenGL vertex buffers data from the triangulation object.
   //! Initializes given index buffer applying correct offset to triangulation indices.

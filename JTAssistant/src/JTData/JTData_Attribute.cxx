@@ -21,8 +21,8 @@
 // purpose  :
 // =======================================================================
 JTData_Attribute::JTData_Attribute()
-  : myIsFinal (Standard_False),
-    myIsForce (Standard_False)
+  : myIsFinal (false),
+    myIsForce (false)
 {
   //
 }
@@ -44,7 +44,7 @@ JTData_MaterialAttribute ::JTData_MaterialAttribute (const Eigen::Vector4f& theA
                                                      const Eigen::Vector4f& theDiffuseColor,
                                                      const Eigen::Vector4f& theSpecularColor,
                                                      const Eigen::Vector4f& theEmissionColor,
-                                                     const Standard_ShortReal theShininess)
+                                                     const float theShininess)
   : myAmbientColor (theAmbientColor),
     myDiffuseColor (theDiffuseColor),
     mySpecularColor (theSpecularColor),

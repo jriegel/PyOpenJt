@@ -16,7 +16,7 @@
 
 template<class T, int N>
 BVH_Object<T, N>::BVH_Object()
-: myIsDirty (Standard_False)
+: myIsDirty (false)
 {
   //
 }
@@ -36,7 +36,7 @@ BVH_Object<T, N>::~BVH_Object()
 // purpose  :
 // =======================================================================
 template<class T, int N>
-const NCollection_Handle<BVH_Properties>& BVH_Object<T, N>::Properties() const
+const std::shared_ptr<BVH_Properties>& BVH_Object<T, N>::Properties() const
 {
   return myProperties;
 }
@@ -46,7 +46,7 @@ const NCollection_Handle<BVH_Properties>& BVH_Object<T, N>::Properties() const
 // purpose  :
 // =======================================================================
 template<class T, int N>
-void BVH_Object<T, N>::SetProperties (const NCollection_Handle<BVH_Properties>& theProperties)
+void BVH_Object<T, N>::SetProperties (const std::shared_ptr<BVH_Properties>& theProperties)
 {
   myProperties = theProperties;
 }
@@ -58,5 +58,5 @@ void BVH_Object<T, N>::SetProperties (const NCollection_Handle<BVH_Properties>& 
 template<class T, int N>
 void BVH_Object<T, N>::MarkDirty()
 {
-  myIsDirty = Standard_True;
+  myIsDirty = true;
 }

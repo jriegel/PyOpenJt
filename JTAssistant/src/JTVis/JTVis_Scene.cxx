@@ -285,7 +285,7 @@ void JTVis_Scene::Render()
 
   unsigned int aLastVaoUsed = 0xffffff;
 
-  NCollection_Handle<BvhTree> aBVH = myBvhGeometry.BVH();
+  std::shared_ptr<BvhTree> aBVH = myBvhGeometry.BVH();
   JTVis_FrustumIntersection anElementList;
 
   if (mySettings.IsViewCullingEnabled)
@@ -296,11 +296,11 @@ void JTVis_Scene::Render()
 
     JTVis_BvhTraverser::Traverse (aCameraFrustum, anElementList, myBvhGeometry);
 
-    Standard_Integer theBeg = 0;
-    Standard_Integer theEnd = static_cast<Standard_Integer>(anElementList.Elements.size()) - 1;
+    int theBeg = 0;
+    int theEnd = static_cast<int>(anElementList.Elements.size()) - 1;
 
-    Standard_Integer aLftIdx = 0;
-    Standard_Integer aRghIdx = static_cast<Standard_Integer>(anElementList.Elements.size()) - 1;
+    int aLftIdx = 0;
+    int aRghIdx = static_cast<int>(anElementList.Elements.size()) - 1;
 
     // divide node list into 2 groups
     do
@@ -308,7 +308,7 @@ void JTVis_Scene::Render()
       while (aLftIdx < theEnd)
       {
         JTVis_PartBvhObject* anObject = static_cast<JTVis_PartBvhObject*> (
-          myBvhGeometry.Objects().ChangeValue (aBVH->BegPrimitive (anElementList.Elements[aLftIdx])).operator->());
+          myBvhGeometry.Objects().at (aBVH->BegPrimitive (anElementList.Elements[aLftIdx])).operator->());
 
         if (anObject->PartNode()->TriangleCount > mySmallPartTreshold)
         {
@@ -321,7 +321,7 @@ void JTVis_Scene::Render()
       while (aRghIdx > theBeg)
       {
         JTVis_PartBvhObject* anObject = static_cast<JTVis_PartBvhObject*> (
-          myBvhGeometry.Objects().ChangeValue (aBVH->BegPrimitive (anElementList.Elements[aRghIdx])).operator->());
+          myBvhGeometry.Objects().at (aBVH->BegPrimitive (anElementList.Elements[aRghIdx])).operator->());
 
         if (anObject->PartNode()->TriangleCount <= mySmallPartTreshold)
         {
@@ -335,8 +335,8 @@ void JTVis_Scene::Render()
       {
         if (aLftIdx != aRghIdx)
         {
-          const Standard_Integer aLftElem = anElementList.Elements[aLftIdx];
-          const Standard_Integer aRghElem = anElementList.Elements[aRghIdx];
+          const int aLftElem = anElementList.Elements[aLftIdx];
+          const int aRghElem = anElementList.Elements[aRghIdx];
 
           anElementList.Elements[aLftIdx] = aRghElem;
           anElementList.Elements[aRghIdx] = aLftElem;
@@ -393,10 +393,10 @@ void JTVis_Scene::Render()
     int aNode = anElementList.Elements.at (aNodeIdx);
     JTCommon_AABB aCurrentBox (aBVH->MinPoint (aNode), aBVH->MaxPoint (aNode));
 
-    const Standard_Integer anObjectIdx = static_cast<Standard_Integer>(aBVH->BegPrimitive (aNode));
+    const int anObjectIdx = static_cast<int>(aBVH->BegPrimitive (aNode));
 
     JTVis_PartBvhObject* anObject = static_cast<JTVis_PartBvhObject*> (
-      myBvhGeometry.Objects().ChangeValue (anObjectIdx).operator->());
+      myBvhGeometry.Objects().at (anObjectIdx).operator->());
 
     JTVis_PartNode* aPartNode = anObject->PartNode();
 
@@ -1030,11 +1030,11 @@ void JTVis_Scene::UpdateLods()
       float aSize = aProjectedSize * mySettings.LodQuality;
 
       int aSelectedLod = 0;
-      Standard_Size aLodCount = aRangeLOD->Ranges().size();
+      size_t aLodCount = aRangeLOD->Ranges().size();
 
       if (aLodCount != 0 && aSize >= aBaseSize * powf (2.f, 1e-2f))
       {
-        for (Standard_Size anIdx = 1; anIdx <= aLodCount; ++anIdx)
+        for (size_t anIdx = 1; anIdx <= aLodCount; ++anIdx)
         {
           if ((size_t )aSelectedLod + 1 >= aRangeLOD->Children.size())
           {
@@ -1131,8 +1131,8 @@ void JTVis_Scene::PreparePartNodes()
     JTCommon_Profiler::GetProfiler().Start();
   }
 
-  NCollection_Handle<BvhTree> aBVH = myBvhGeometry.BVH(); // just a reference
-  if (aBVH.IsNull()
+  std::shared_ptr<BvhTree> aBVH = myBvhGeometry.BVH(); // just a reference
+  if (!aBVH
    || aBVH->Length() == 0)
   {
     myGlobalBounds = JTCommon_AABB (BVH_Vec4f (-10.0f, -10.0f, -10.0f, 0.0f),

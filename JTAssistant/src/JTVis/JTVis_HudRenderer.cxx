@@ -132,9 +132,9 @@ void JTVis_HudRenderer::Update (const JTVis_Stats& theStats, OpenGLFunctions* th
                              "%5% Size culling\n")
       .arg (theStats.VisibleTriangleCount)
       .arg (theStats.VisiblePartCount)
-      .arg ((int ) Round (aRatioOverall))
-      .arg ((int ) Round (aRatioViewCulling))
-      .arg ((int ) Round (aRatioSizeCulling));
+      .arg (static_cast<int> (std::floor (aRatioOverall + 0.5)))
+      .arg (static_cast<int> (std::floor (aRatioViewCulling + 0.5)))
+      .arg (static_cast<int> (std::floor (aRatioSizeCulling + 0.5)));
 
     aPainter.setPen (QPen (QColor (70, 70, 70, 200), 0));
     QFont aFont;

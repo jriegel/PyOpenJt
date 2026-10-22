@@ -15,8 +15,8 @@
 // on <http://www.gnu.org/licenses/>.
 
 template<class T, int N>
-BVH_Builder<T, N>::BVH_Builder (const Standard_Integer theLeafNodeSize,
-                                const Standard_Integer theMaxTreeDepth)
+BVH_Builder<T, N>::BVH_Builder (const int theLeafNodeSize,
+                                const int theMaxTreeDepth)
 : myMaxTreeDepth (theMaxTreeDepth),
   myLeafNodeSize (theLeafNodeSize)
 {

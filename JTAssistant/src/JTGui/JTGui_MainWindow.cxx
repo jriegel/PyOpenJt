@@ -504,14 +504,14 @@ void JTGui_MainWindow::loadFile (const QString& theFileName)
     {
       ui->myTreeWidget->topLevelItem (0)->setExpanded (true);
 
-      Standard_Integer aRows = 0;
+      int aRows = 0;
 
-      for (Standard_Integer anIdx = 0; anIdx < ui->myTreeWidget->topLevelItem (0)->childCount(); ++anIdx)
+      for (int anIdx = 0; anIdx < ui->myTreeWidget->topLevelItem (0)->childCount(); ++anIdx)
         aRows += ui->myTreeWidget->topLevelItem (0)->child (anIdx)->childCount();
 
       if (aRows < 35)
       {
-        for (Standard_Integer anIdx = 0; anIdx < ui->myTreeWidget->topLevelItem (0)->childCount(); ++anIdx)
+        for (int anIdx = 0; anIdx < ui->myTreeWidget->topLevelItem (0)->childCount(); ++anIdx)
           ui->myTreeWidget->topLevelItem (0)->child (anIdx)->setExpanded (true);
       }
     }
@@ -783,7 +783,7 @@ void JTGui_MainWindow::updateStatusBar()
     ui->statusbar->showMessage (tr ("Visible triangles: %1    Culled triangles: %2    %3% Culled    %4 Vis parts    %5% Small-part usage")
       .arg (aStats.VisibleTriangleCount)
       .arg (aStats.FullTriangleCount - aStats.VisibleTriangleCount)
-      .arg ((int ) Round (aRatio))
+      .arg (static_cast<int> (std::floor (aRatio + 0.5)))
       .arg (aStats.VisiblePartCount)
       .arg (aStats.SmallPartBufferUsage));
   }
@@ -1207,7 +1207,7 @@ void JTGui_MainWindow::fileLoaded()
 //=======================================================================
 void JTGui_MainWindow::showAbout()
 {
-  JTGui_AboutDialog aDialog (JTData_GeometrySource::OcctVersion(), this);
+  JTGui_AboutDialog aDialog (this);
   aDialog.exec();
 }
 

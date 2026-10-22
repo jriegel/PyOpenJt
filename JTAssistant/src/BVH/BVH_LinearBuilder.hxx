@@ -19,7 +19,7 @@
 
 #include <BVH_Builder.hxx>
 
-typedef std::pair<Standard_Integer, Standard_Integer> BVH_EncodedLink;
+typedef std::pair<int, int> BVH_EncodedLink;
 
 //! Performs fast BVH construction using LBVH building approach.
 //! Algorithm uses spatial Morton codes to reduce the BVH construction
@@ -41,8 +41,8 @@ public:
 public:
 
   //! Creates binned LBVH builder.
-  BVH_LinearBuilder (const Standard_Integer theLeafNodeSize = 5,
-                     const Standard_Integer theMaxTreeDepth = 32);
+  BVH_LinearBuilder (const int theLeafNodeSize = 5,
+                     const int theMaxTreeDepth = 32);
 
   //! Releases resources of LBVH builder.
   virtual ~BVH_LinearBuilder();
@@ -55,9 +55,9 @@ public:
 protected:
 
   //! Emits hierarchy from sorted Morton codes.
-  Standard_Integer EmitHierachy (BVH_Tree<T, N>*                        theBVH,
-                                 const Standard_Integer                 theBit,
-                                 const Standard_Integer                 theShift,
+  int EmitHierachy (BVH_Tree<T, N>*                        theBVH,
+                                 const int                 theBit,
+                                 const int                 theShift,
                                  std::vector<BVH_EncodedLink>::iterator theStart,
                                  std::vector<BVH_EncodedLink>::iterator theFinal);
 

@@ -28,7 +28,7 @@ class JTGui_AboutDialog : public QDialog
 
 public:
 
-  JTGui_AboutDialog (const QString& theOcctVersion, QWidget* theParent);
+  JTGui_AboutDialog (QWidget* theParent);
 
 private:
 

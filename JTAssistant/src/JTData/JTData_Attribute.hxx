@@ -41,25 +41,25 @@ public:
 public:
 
   //! Returns accumulated final flag.
-  inline Standard_Boolean IsFinal() const
+  inline bool IsFinal() const
   {
     return myIsFinal;
   }
 
   //! Returns accumulated force flag.
-  inline Standard_Boolean IsForce() const
+  inline bool IsForce() const
   {
     return myIsForce;
   }
 
   //! Sets accumulated final flag.
-  inline void SetFinal (const Standard_Boolean theIsFinal)
+  inline void SetFinal (const bool theIsFinal)
   {
     myIsFinal = theIsFinal;
   }
 
   //! Returns accumulated force flag.
-  inline void SetForce (const Standard_Boolean theIsForce)
+  inline void SetForce (const bool theIsForce)
   {
     myIsForce = theIsForce;
   }
@@ -67,10 +67,10 @@ public:
 protected:
 
   //! Accumulated final flag.
-  Standard_Boolean myIsFinal;
+  bool myIsFinal;
 
   //! Accumulated force flag.
-  Standard_Boolean myIsForce;
+  bool myIsForce;
 
 public:
 
@@ -96,7 +96,7 @@ public:
                             const Eigen::Vector4f& theDiffuseColor = Eigen::Vector4f::Ones(),
                             const Eigen::Vector4f& theSpecularColor = Eigen::Vector4f::Zero(),
                             const Eigen::Vector4f& theEmissionColor = Eigen::Vector4f::Zero(),
-                            const Standard_ShortReal theShininess = 32.f);
+                            const float theShininess = 32.f);
 
   //! Returns ambient color.
   inline const Eigen::Vector4f& AmbientColor() const
@@ -123,7 +123,7 @@ public:
   }
 
   //! Returns shininess exponent.
-  inline Standard_ShortReal Shininess() const
+  inline float Shininess() const
   {
     return myShininess;
   }
@@ -153,7 +153,7 @@ public:
   }
 
   //! Sets shininess exponent.
-  inline void SetShininess (Standard_ShortReal theShininess)
+  inline void SetShininess (float theShininess)
   {
     myShininess = theShininess;
   }
@@ -179,7 +179,7 @@ protected:
   Eigen::Vector4f myEmissionColor;
 
   //! Shininess value.
-  Standard_ShortReal myShininess;
+  float myShininess;
 
 public:
 

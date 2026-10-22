@@ -16,7 +16,7 @@
 
 template<class T, int N>
 void BVH_Sorter<T, N>::Perform (BVH_Set<T, N>*         theSet,
-                                const Standard_Integer theAxis)
+                                const int theAxis)
 {
   Perform (theSet, theAxis, 0, theSet->Size() - 1);
 }
@@ -27,12 +27,12 @@ void BVH_Sorter<T, N>::Perform (BVH_Set<T, N>*         theSet,
 // =======================================================================
 template<class T, int N>
 void BVH_Sorter<T, N>::Perform (BVH_Set<T, N>*         theSet,
-                                const Standard_Integer theAxis,
-                                const Standard_Integer theBegElement,
-                                const Standard_Integer theEndElement)
+                                const int theAxis,
+                                const int theBegElement,
+                                const int theEndElement)
 {
-  Standard_Integer aLft = theBegElement;
-  Standard_Integer aRgh = theEndElement;
+  int aLft = theBegElement;
+  int aRgh = theEndElement;
 
   T aPivot = theSet->Center ((aRgh + aLft) / 2, theAxis);
 

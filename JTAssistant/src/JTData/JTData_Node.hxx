@@ -43,7 +43,7 @@ class JTData_Node : public JTData_Element
 public:
 
   //! Creates new abstract scene graph node.
-  JTData_Node() : myIsVisible (Standard_True)
+  JTData_Node() : myIsVisible (true)
   {
     //
   }
@@ -64,13 +64,13 @@ public:
   }
 
   //! Returns node visibility flag.
-  inline Standard_Boolean IsVisible() const
+  inline bool IsVisible() const
   {
     return myIsVisible;
   }
 
   //! Sets node visibility flag.
-  inline void SetVisible (const Standard_Boolean theIsVisisble)
+  inline void SetVisible (const bool theIsVisisble)
   {
     myIsVisible = theIsVisisble;
   }
@@ -80,7 +80,7 @@ public:
 
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed (JTData_InstanceMap& theMap) const = 0;
+  virtual int EstimateMemoryUsed (JTData_InstanceMap& theMap) const = 0;
 
   //! Properties to display as JSON
   QString Properties;
@@ -93,7 +93,7 @@ protected:
 
 
   //! Node visibility flag.
-  Standard_Boolean myIsVisible;
+  bool myIsVisible;
 
 public:
 
@@ -126,7 +126,7 @@ public:
   }
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
+  virtual int EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
 
   //! Apply layer filter recursive down to the Part Nodes which hold the layer number information 
   virtual void applayLayerFilter(const std::vector<uint32_t>& LayerInfo);
@@ -162,7 +162,7 @@ public:
   }
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
+  virtual int EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
 
 protected:
 
@@ -224,7 +224,7 @@ public:
   virtual void applayLayerFilter(const std::vector<uint32_t>& LayerInfo);
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
+  virtual int EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
 
 public:
 
@@ -286,13 +286,13 @@ public:
   }
 
   //! Returns WCS distances from the eye to select representation.
-  std::vector<Standard_ShortReal>& Ranges()
+  std::vector<float>& Ranges()
   {
     return myRanges;
   }
 
   //! Returns WCS distances from the eye to select representation.
-  const std::vector<Standard_ShortReal>& Ranges() const
+  const std::vector<float>& Ranges() const
   {
     return myRanges;
   }
@@ -305,7 +305,7 @@ protected:
   Eigen::Vector4f myCenter;
 
   //! Indicates the WCS distance from the eye to select specific representation.
-  std::vector<Standard_ShortReal> myRanges;
+  std::vector<float> myRanges;
 
 public:
 
@@ -333,7 +333,7 @@ public:
   ~JTData_ShapeNode() = 0;
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
+  virtual int EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
 
 public:
 
@@ -362,12 +362,12 @@ class JTData_MeshNodeSource
 public:
 
   //! Creates new triangle mesh source.
-  Standard_EXPORT JTData_MeshNodeSource (JTData_LoadingQueue& theQueue, const Handle(JtNode_Shape_TriStripSet)& theShape);
+   JTData_MeshNodeSource (JTData_LoadingQueue& theQueue, const std::shared_ptr<JtNode_Shape_TriStripSet>& theShape);
 
 public:
 
   //! Requests triangulation data for the mesh.
-  JTCommon_TriangleDataPtr RequestTriangulation (const Standard_Integer theIndex = 0, QObject* theFeedback = NULL);
+  JTCommon_TriangleDataPtr RequestTriangulation (const int theIndex = 0, QObject* theFeedback = NULL);
 
   //! Returns triangulation data for the mesh.
   JTCommon_TriangleDataPtr Triangulation()
@@ -376,7 +376,7 @@ public:
   }
 
   //! Returns triangles number in the mesh.
-  Standard_Integer TriangleCount() const
+  int TriangleCount() const
   {
     return myTriangleCount;
   }
@@ -390,15 +390,15 @@ private:
   JTCommon_TriangleDataPtr myData;
 
   //! Vertex shape element to read from JT file.
-  Handle(JtNode_Shape_TriStripSet) myShape;
+  std::shared_ptr<JtNode_Shape_TriStripSet> myShape;
 
   //! Total number of triangles in the loaded mesh.
-  Standard_Integer myTriangleCount;
+  int myTriangleCount;
 
 private:
 
   //! Creates triangulation from JT reader arrays.
-  void BuildTriangulation (const Handle(JtElement_ShapeLOD_TriStripSet)& theLOD);
+  void BuildTriangulation (const std::shared_ptr<JtElement_ShapeLOD_TriStripSet>& theLOD);
 
 private:
   JTData_MeshNodeSource(JTData_MeshNodeSource&);
@@ -428,10 +428,10 @@ public:
   virtual ~JTData_MeshNode();
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
+  virtual int EstimateMemoryUsed (JTData_InstanceMap& theMap) const;
 
   //! Checks to see if the mesh node must be visualized.
-  inline Standard_Boolean RequiresDrawing (JtData_State theState) const
+  inline bool RequiresDrawing (JtData_State theState) const
   {
     return (myState == theState) && myIsVisible;
   }

@@ -15,6 +15,7 @@
 // on <http://www.gnu.org/licenses/>.
 
 #pragma warning (push, 0)
+#include <iostream>
 #include <QDir>
 #include <QStack>
 #include <QFileInfo>
@@ -66,16 +67,16 @@ JTData_SceneGraph::~JTData_SceneGraph()
 // purpose  :
 // =======================================================================
 void JTData_SceneGraph::FillGroup (const JTData_GroupNodePtr& theGroupNode,
-  const Handle(JtNode_Group)& theGroupRecord, const QString& thePrefix)
+  const std::shared_ptr<JtNode_Group>& theGroupRecord, const QString& thePrefix)
 {
   if (theGroupRecord->Children().IsEmpty())
     return;
 
-  for (Standard_Integer aChildIdx = 0; aChildIdx < (Standard_Integer)theGroupRecord->Children().Count(); ++aChildIdx)
+  for (int aChildIdx = 0; aChildIdx < (int)theGroupRecord->Children().Count(); ++aChildIdx)
   {
-    Handle(JtNode_Base) aChildRecord = Handle(JtNode_Base)::DownCast (theGroupRecord->Children()[aChildIdx]);
+    std::shared_ptr<JtNode_Base> aChildRecord = std::dynamic_pointer_cast<JtNode_Base>(theGroupRecord->Children()[aChildIdx]);
 
-    if (aChildRecord.IsNull())
+    if (!aChildRecord)
     {
       continue;
     }
@@ -92,28 +93,16 @@ void JTData_SceneGraph::FillGroup (const JTData_GroupNodePtr& theGroupNode,
   }
 }
 
-static Handle(Standard_Type) TypeOf_JtNode_Partition        = STANDARD_TYPE(JtNode_Partition);
-static Handle(Standard_Type) TypeOf_JtNode_Part             = STANDARD_TYPE(JtNode_Part);
-static Handle(Standard_Type) TypeOf_JtNode_RangeLOD         = STANDARD_TYPE(JtNode_RangeLOD);
-static Handle(Standard_Type) TypeOf_JtNode_LOD              = STANDARD_TYPE(JtNode_LOD);
-static Handle(Standard_Type) TypeOf_JtNode_Group            = STANDARD_TYPE(JtNode_Group);
-static Handle(Standard_Type) TypeOf_JtNode_Instance         = STANDARD_TYPE(JtNode_Instance);
-static Handle(Standard_Type) TypeOf_JtNode_Shape_Vertex      = STANDARD_TYPE(JtNode_Shape_Vertex);
-static Handle(Standard_Type) TypeOf_JtNode_Shape_TriStripSet = STANDARD_TYPE(JtNode_Shape_TriStripSet);
-static Handle(Standard_Type) TypeOf_JtNode_MetaData         = STANDARD_TYPE(JtNode_MetaData);
-static Handle(Standard_Type) TypeOf_JtAttribute_Material    = STANDARD_TYPE(JtAttribute_Material);
-static Handle(Standard_Type) TypeOf_JtAttribute_GeometricTransform = STANDARD_TYPE(JtAttribute_GeometricTransform);
-static Handle(Standard_Type) TypeOf_JtElement_ProxyMetaData = STANDARD_TYPE(JtElement_ProxyMetaData);
 
 
 // =======================================================================
 // function : setNodeName
 // purpose  : Auxiliary function to set the correct Node name
 // =======================================================================
-static void setNodeName (const Handle(JtNode_Base)& theNodeRecord, 
+static void setNodeName (const std::shared_ptr<JtNode_Base>& theNodeRecord, 
                          const JTData_NodePtr&      theNode)
 {
-  QString aName (QString::fromUtf16 (reinterpret_cast<const ushort*> (theNodeRecord->Name().ToExtString())));
+  QString aName (QString::fromStdWString (theNodeRecord->Name()));
 
   // Remove unnecessary suffixes from name
   if (aName.contains (".asm"))
@@ -135,13 +124,13 @@ const std::vector<char> HandleLateLoadsMeta(const JtData_Object::VectorOfLateLoa
     int numOfMeta = 0;
     for (int i = 0; i < aLateLoaded.Count(); i++) {
         if (aLateLoaded[i]->getSegmentType() == SegmentType::Meta_Data) {
-            if (aLateLoaded[i]->DefferedObject().IsNull())
+            if (aLateLoaded[i]->DefferedObject() == nullptr)
                 aLateLoaded[i]->Load();
 
-            Handle(JtData_Object)  prop = aLateLoaded[i]->DefferedObject();
-            if (!prop.IsNull() && prop->IsKind(TypeOf_JtElement_ProxyMetaData)) {
-                Handle(JtElement_ProxyMetaData) aProxyMetaDataElement =
-                    Handle(JtElement_ProxyMetaData)::DownCast(prop);
+            std::shared_ptr<JtData_Object>  prop = aLateLoaded[i]->DefferedObject();
+            if (prop && (dynamic_cast<const JtElement_ProxyMetaData*>(prop.get()) != nullptr)) {
+                std::shared_ptr<JtElement_ProxyMetaData> aProxyMetaDataElement =
+                    std::dynamic_pointer_cast<JtElement_ProxyMetaData>(prop);
 
                 auto newProps = aProxyMetaDataElement->getKeyValueStream();
 
@@ -161,21 +150,20 @@ const std::vector<char> HandleLateLoadsMeta(const JtData_Object::VectorOfLateLoa
 // function : PushNode
 // purpose  :
 // =======================================================================
-JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRecord, const QString& thePrefix)
+JTData_NodePtr JTData_SceneGraph::PushNode (const std::shared_ptr<JtNode_Base>& theNodeRecord, const QString& thePrefix)
 {
   JTData_NodePtr aResult;
 
   // Extract LSG node
 
-  if (theNodeRecord->IsKind (TypeOf_JtNode_Partition))
+  if ((dynamic_cast<const JtNode_Partition*>(theNodeRecord.get()) != nullptr))
   {
-    Handle(JtNode_Partition) aPartitionRecord =
-      Handle(JtNode_Partition)::DownCast (theNodeRecord);
+    std::shared_ptr<JtNode_Partition> aPartitionRecord =
+      std::dynamic_pointer_cast<JtNode_Partition>(theNodeRecord);
 
-    QFileInfo anInfo (QString::fromUtf16 (reinterpret_cast<const ushort*> (
-      aPartitionRecord->FileName().ToExtString()), aPartitionRecord->FileName().Length()));
+    QFileInfo anInfo (QString::fromStdWString (aPartitionRecord->FileName()));
 
-    if (aPartitionRecord->FileName().Length() > 0)
+    if (!aPartitionRecord->FileName().empty())
     {
       aResult = JTData_PartitionNodePtr (new JTData_PartitionNode (
         QDir::cleanPath (QDir (thePrefix).absoluteFilePath (anInfo.filePath()))));
@@ -186,9 +174,9 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
 
     FillGroup (aResult.dynamicCast<JTData_GroupNode>(), aPartitionRecord, thePrefix);
   }
-  else if (theNodeRecord->IsKind (TypeOf_JtNode_Part))
+  else if ((dynamic_cast<const JtNode_Part*>(theNodeRecord.get()) != nullptr))
   {
-    Handle(JtNode_Part) aPartRecord = Handle(JtNode_Part)::DownCast(theNodeRecord);
+    std::shared_ptr<JtNode_Part> aPartRecord = std::dynamic_pointer_cast<JtNode_Part>(theNodeRecord);
     JTData_PartNodePtr aPartNode = JTData_PartNodePtr(new JTData_PartNode);
     aResult = JTData_PartNodePtr (aPartNode);
     const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
@@ -204,11 +192,11 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
     aPartNode->setLayerNumbers(ScanForLayer(metaData));
 
     FillGroup (aResult.dynamicCast<JTData_GroupNode>(),
-      Handle(JtNode_Group)::DownCast (theNodeRecord), thePrefix);
+      std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
   }
-  else if (theNodeRecord->IsKind(TypeOf_JtNode_MetaData))
+  else if ((dynamic_cast<const JtNode_MetaData*>(theNodeRecord.get()) != nullptr))
   {
-      Handle(JtNode_MetaData) aPartRecord = Handle(JtNode_MetaData)::DownCast(theNodeRecord);
+      std::shared_ptr<JtNode_MetaData> aPartRecord = std::dynamic_pointer_cast<JtNode_MetaData>(theNodeRecord);
       const JtData_Object::VectorOfLateLoads& aLateLoaded = aPartRecord->LateLoads();
       aResult = JTData_GroupNodePtr(new JTData_GroupNode);
 
@@ -225,35 +213,35 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
           layerInfo = layerInfoTemp;
 
       FillGroup(aResult.dynamicCast<JTData_GroupNode>(),
-      Handle(JtNode_Group)::DownCast(theNodeRecord), thePrefix);
+      std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
   }
-  else if (theNodeRecord->IsKind (TypeOf_JtNode_RangeLOD))
+  else if ((dynamic_cast<const JtNode_RangeLOD*>(theNodeRecord.get()) != nullptr))
   {
     JTData_RangeLODNodePtr aRangeLOD = JTData_RangeLODNodePtr (new JTData_RangeLODNode);
 
-    Handle(JtNode_RangeLOD) aRangeLODRecord =
-      Handle(JtNode_RangeLOD)::DownCast (theNodeRecord);
+    std::shared_ptr<JtNode_RangeLOD> aRangeLODRecord =
+      std::dynamic_pointer_cast<JtNode_RangeLOD>(theNodeRecord);
 
     FillGroup (aRangeLOD, aRangeLODRecord, thePrefix);
 
     aRangeLOD->Center() = Eigen::Vector4f (
-      static_cast<Standard_ShortReal> (aRangeLODRecord->Center().X),
-      static_cast<Standard_ShortReal> (aRangeLODRecord->Center().Y),
-      static_cast<Standard_ShortReal> (aRangeLODRecord->Center().Z),
+      static_cast<float> (aRangeLODRecord->Center().X),
+      static_cast<float> (aRangeLODRecord->Center().Y),
+      static_cast<float> (aRangeLODRecord->Center().Z),
       1.0);
 
     if (!aRangeLODRecord->RangeLimits().IsEmpty())
     {
-      for (Standard_Integer anIdx = 1; anIdx <= aRangeLODRecord->RangeLimits().Count(); ++anIdx)
+      for (int anIdx = 1; anIdx <= aRangeLODRecord->RangeLimits().Count(); ++anIdx)
       {
         aRangeLOD->Ranges().push_back (aRangeLODRecord->RangeLimits()[anIdx]);
       }
     }
     else
     {
-      aRangeLOD->Ranges().push_back (std::numeric_limits<Standard_ShortReal>::max());
+      aRangeLOD->Ranges().push_back (std::numeric_limits<float>::max());
 
-      for (Standard_Integer anIdx = 1; anIdx < (Standard_Integer)aRangeLODRecord->Children().Count(); ++anIdx)
+      for (int anIdx = 1; anIdx < (int)aRangeLODRecord->Children().Count(); ++anIdx)
       {
         aRangeLOD->Ranges().push_back (0.0);
       }
@@ -261,43 +249,43 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
 
     aResult = aRangeLOD;
   }
-  else if (theNodeRecord->IsKind (TypeOf_JtNode_LOD))
+  else if ((dynamic_cast<const JtNode_LOD*>(theNodeRecord.get()) != nullptr))
   {
     aResult = JTData_LODNodePtr (new JTData_LODNode);
 
     FillGroup (aResult.dynamicCast<JTData_GroupNode>(),
-      Handle(JtNode_Group)::DownCast (theNodeRecord), thePrefix);
+      std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
   }
-  else if (theNodeRecord->IsKind (TypeOf_JtNode_Group))
+  else if ((dynamic_cast<const JtNode_Group*>(theNodeRecord.get()) != nullptr))
   {
     aResult = JTData_GroupNodePtr (new JTData_GroupNode);
 
     FillGroup (aResult.dynamicCast<JTData_GroupNode>(),
-      Handle(JtNode_Group)::DownCast (theNodeRecord), thePrefix);
+      std::dynamic_pointer_cast<JtNode_Group>(theNodeRecord), thePrefix);
   }
-  else if (theNodeRecord->IsKind (TypeOf_JtNode_Instance))
+  else if ((dynamic_cast<const JtNode_Instance*>(theNodeRecord.get()) != nullptr))
   {
-    Handle(JtNode_Instance) anInstance = Handle(JtNode_Instance)::DownCast (theNodeRecord);
+    std::shared_ptr<JtNode_Instance> anInstance = std::dynamic_pointer_cast<JtNode_Instance>(theNodeRecord);
 
     // Note: To support JT Viewer operations (such as object hiding) it is convenient
     // to eliminate instance nodes from the scene graph. In result, using of sub-tree
     // references becomes impossible. But the actual geometric data is not duplicated
     // by decomposing the node on the description part and data source part.
 
-    Handle(JtNode_Base) aNode = Handle(JtNode_Base)::DownCast (anInstance->Object());
+    std::shared_ptr<JtNode_Base> aNode = std::dynamic_pointer_cast<JtNode_Base>(anInstance->Object());
 
-    Q_ASSERT_X (!aNode.IsNull(),
+    Q_ASSERT_X (aNode,
       "PushNode", "Error! Invalid object in LSG segment");
 
     aResult = PushNode (aNode, thePrefix);
   }
-  else if (theNodeRecord->IsKind (TypeOf_JtNode_Shape_Vertex))
+  else if ((dynamic_cast<const JtNode_Shape_Vertex*>(theNodeRecord.get()) != nullptr))
   {
-    Handle(JtNode_Shape_Vertex) aShapeRecord = Handle(JtNode_Shape_Vertex)::DownCast (theNodeRecord);
+    std::shared_ptr<JtNode_Shape_Vertex> aShapeRecord = std::dynamic_pointer_cast<JtNode_Shape_Vertex>(theNodeRecord);
 
-    if (aShapeRecord->IsKind (TypeOf_JtNode_Shape_TriStripSet))
+    if ((dynamic_cast<const JtNode_Shape_TriStripSet*>(aShapeRecord.get()) != nullptr))
     {
-      Handle(JtNode_Shape_TriStripSet) aMeshRecord = Handle(JtNode_Shape_TriStripSet)::DownCast (aShapeRecord);
+      std::shared_ptr<JtNode_Shape_TriStripSet> aMeshRecord = std::dynamic_pointer_cast<JtNode_Shape_TriStripSet>(aShapeRecord);
 
       JTCommon_AABB aBox (
         Eigen::Vector4f (aMeshRecord->Bounds().MinCorner.X,
@@ -309,17 +297,17 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
                          aMeshRecord->Bounds().MaxCorner.Z,
                          1.f));
 
-      if (!mySources.Contains (aMeshRecord))
+      if (mySources.find (aMeshRecord) == mySources.end())
       {
         JTData_MeshNodeSourcePtr aMeshSource (
           new JTData_MeshNodeSource (myLoadingQueue, aMeshRecord));
 
         // Add to new mesh source to the map (can be reused)
-        mySources.Add (aMeshRecord, aMeshSource);
+        mySources.emplace (aMeshRecord, aMeshSource);
       }
 
       aResult = JTData_MeshNodePtr (new JTData_MeshNode (
-        aBox, mySources.FindFromKey (aMeshRecord)));
+        aBox, mySources.at (aMeshRecord)));
     }
   }
 
@@ -333,30 +321,30 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
   if (theNodeRecord->Attributes().IsEmpty())
     return aResult;
 
-  for (Standard_Integer anIdx = 0; anIdx < (Standard_Integer)theNodeRecord->Attributes().Count(); ++anIdx)
+  for (int anIdx = 0; anIdx < (int)theNodeRecord->Attributes().Count(); ++anIdx)
   {
-    const Handle(JtData_Object)& anObject = theNodeRecord->Attributes()[anIdx];
+    const std::shared_ptr<JtData_Object>& anObject = theNodeRecord->Attributes()[anIdx];
 
-    if (anObject.IsNull())
+    if (!anObject)
       continue;
 
-    Handle(JtAttribute_Base) anAttrib = Handle(JtAttribute_Base)::DownCast (anObject);
+    std::shared_ptr<JtAttribute_Base> anAttrib = std::dynamic_pointer_cast<JtAttribute_Base>(anObject);
 
-    Q_ASSERT_X (!anAttrib.IsNull(),
+    Q_ASSERT_X (anAttrib,
       "PushNode", "Error! Invalid node attribute");
 
-    if (anAttrib->IsKind (TypeOf_JtAttribute_GeometricTransform))
+    if ((dynamic_cast<const JtAttribute_GeometricTransform*>(anAttrib.get()) != nullptr))
     {
-      Handle(JtAttribute_GeometricTransform) aTransform =
-        Handle(JtAttribute_GeometricTransform)::DownCast (anAttrib);
+      std::shared_ptr<JtAttribute_GeometricTransform> aTransform =
+        std::dynamic_pointer_cast<JtAttribute_GeometricTransform>(anAttrib);
 
       Eigen::Matrix4f aMatrix;
 
-      for (Standard_Integer aX = 0; aX < 4; ++aX)
+      for (int aX = 0; aX < 4; ++aX)
       {
-        for (Standard_Integer aY = 0; aY < 4; ++aY)
+        for (int aY = 0; aY < 4; ++aY)
         {
-          aMatrix (aX, aY) = static_cast<Standard_ShortReal> (aTransform->GetTrsf()[aY * 4 + aX]);
+          aMatrix (aX, aY) = static_cast<float> (aTransform->GetTrsf()[aY * 4 + aX]);
         }
       }
 
@@ -367,37 +355,37 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
 
       aResult->Attributes.push_back (JTData_TransformAttributePtr (new JTData_TransformAttribute (aMatrix)));
     }
-    else if (anAttrib->IsKind (TypeOf_JtAttribute_Material))
+    else if ((dynamic_cast<const JtAttribute_Material*>(anAttrib.get()) != nullptr))
     {
-      Handle(JtAttribute_Material) aMaterial =
-        Handle(JtAttribute_Material)::DownCast (anAttrib);
+      std::shared_ptr<JtAttribute_Material> aMaterial =
+        std::dynamic_pointer_cast<JtAttribute_Material>(anAttrib);
 
       Eigen::Vector4f aAmbientColor (
-        static_cast<Standard_ShortReal> (aMaterial->AmbientColor()[0]),
-        static_cast<Standard_ShortReal> (aMaterial->AmbientColor()[1]),
-        static_cast<Standard_ShortReal> (aMaterial->AmbientColor()[2]),
-        static_cast<Standard_ShortReal> (aMaterial->AmbientColor()[3]));
+        static_cast<float> (aMaterial->AmbientColor()[0]),
+        static_cast<float> (aMaterial->AmbientColor()[1]),
+        static_cast<float> (aMaterial->AmbientColor()[2]),
+        static_cast<float> (aMaterial->AmbientColor()[3]));
 
       Eigen::Vector4f aDiffuseColor (
-        static_cast<Standard_ShortReal> (aMaterial->DiffuseColor()[0]),
-        static_cast<Standard_ShortReal> (aMaterial->DiffuseColor()[1]),
-        static_cast<Standard_ShortReal> (aMaterial->DiffuseColor()[2]),
-        static_cast<Standard_ShortReal> (aMaterial->DiffuseColor()[3]));
+        static_cast<float> (aMaterial->DiffuseColor()[0]),
+        static_cast<float> (aMaterial->DiffuseColor()[1]),
+        static_cast<float> (aMaterial->DiffuseColor()[2]),
+        static_cast<float> (aMaterial->DiffuseColor()[3]));
 
       Eigen::Vector4f aSpecularColor (
-        static_cast<Standard_ShortReal> (aMaterial->SpecularColor()[0]),
-        static_cast<Standard_ShortReal> (aMaterial->SpecularColor()[1]),
-        static_cast<Standard_ShortReal> (aMaterial->SpecularColor()[2]),
-        static_cast<Standard_ShortReal> (aMaterial->SpecularColor()[3]));
+        static_cast<float> (aMaterial->SpecularColor()[0]),
+        static_cast<float> (aMaterial->SpecularColor()[1]),
+        static_cast<float> (aMaterial->SpecularColor()[2]),
+        static_cast<float> (aMaterial->SpecularColor()[3]));
 
       Eigen::Vector4f aEmissionColor (
-        static_cast<Standard_ShortReal> (aMaterial->EmissionColor()[0]),
-        static_cast<Standard_ShortReal> (aMaterial->EmissionColor()[1]),
-        static_cast<Standard_ShortReal> (aMaterial->EmissionColor()[2]),
-        static_cast<Standard_ShortReal> (aMaterial->EmissionColor()[3]));
+        static_cast<float> (aMaterial->EmissionColor()[0]),
+        static_cast<float> (aMaterial->EmissionColor()[1]),
+        static_cast<float> (aMaterial->EmissionColor()[2]),
+        static_cast<float> (aMaterial->EmissionColor()[3]));
 
-      Standard_ShortReal aShininess =
-        static_cast<Standard_ShortReal> (aMaterial->Shininess());
+      float aShininess =
+        static_cast<float> (aMaterial->Shininess());
 
       JTData_MaterialAttributePtr aMaterialAttrib (new JTData_MaterialAttribute (
         aAmbientColor, aDiffuseColor, aSpecularColor, aEmissionColor, aShininess));
@@ -413,11 +401,11 @@ JTData_NodePtr JTData_SceneGraph::PushNode (const Handle(JtNode_Base)& theNodeRe
 // function : Init
 // purpose  :
 // =======================================================================
-Standard_Boolean JTData_SceneGraph::Init (const Handle(JtNode_Partition)& thePartitionRecord, JTData_PartitionNode* thePartition)
+bool JTData_SceneGraph::Init (const std::shared_ptr<JtNode_Partition>& thePartitionRecord, JTData_PartitionNode* thePartition)
 {
-  if (thePartitionRecord.IsNull())
+  if (!thePartitionRecord)
   {
-    return Standard_False;
+    return false;
   }
 
   JTData_PartitionNodePtr aRoot = PushNode (thePartitionRecord,
@@ -425,7 +413,7 @@ Standard_Boolean JTData_SceneGraph::Init (const Handle(JtNode_Partition)& thePar
 
   if (aRoot.isNull())
   {
-    return Standard_False;
+    return false;
   }
 
   for (size_t anIdx = 0; anIdx < aRoot->Children.size(); ++anIdx)
@@ -433,21 +421,21 @@ Standard_Boolean JTData_SceneGraph::Init (const Handle(JtNode_Partition)& thePar
     thePartition->Children.push_back (aRoot->Children.at (anIdx));
   }
 
-  return Standard_True;
+  return true;
 }
 
 // =======================================================================
 // function : Init
 // purpose  :
 // =======================================================================
-Standard_Boolean JTData_SceneGraph::Init (const Handle(JtData_Model)& theModel, const QString& theFileName)
+bool JTData_SceneGraph::Init (const std::shared_ptr<JtData_Model>& theModel, const QString& theFileName)
 {
   if (!myRoot.isNull())
     myRoot.reset();
 
-  Handle(JtNode_Partition) aNode = theModel->Init();
+  std::shared_ptr<JtNode_Partition> aNode = theModel->Init();
 
-  if (!aNode.IsNull())
+  if (aNode)
   {
     
     myRoot = PushNode (aNode, QFileInfo (theFileName).path());
@@ -456,7 +444,7 @@ Standard_Boolean JTData_SceneGraph::Init (const Handle(JtData_Model)& theModel, 
   Q_ASSERT_X (!myRoot.isNull(),
     "Init", "Error! failed to create root node for LSG segment");
 
-  return Standard_True;
+  return true;
 }
 
 // =======================================================================
@@ -464,9 +452,9 @@ Standard_Boolean JTData_SceneGraph::Init (const Handle(JtData_Model)& theModel, 
 // purpose  :
 // =======================================================================
 void GenerateRanges (const JTData_RangeLODNodePtr& theRangeLOD,
-  const JTCommon_AABB& theGlobalBox, const Standard_ShortReal theScale)
+  const JTCommon_AABB& theGlobalBox, const float theScale)
 {
-  const Standard_ShortReal aLength = theGlobalBox.Size().norm();
+  const float aLength = theGlobalBox.Size().norm();
 
   theRangeLOD->Ranges().clear();
 
@@ -481,7 +469,7 @@ void GenerateRanges (const JTData_RangeLODNodePtr& theRangeLOD,
 // purpose  :
 // =======================================================================
 void JTData_SceneGraph::GenerateRanges (
-  const JTCommon_AABB& theGlobalBox, const Standard_ShortReal theScale)
+  const JTCommon_AABB& theGlobalBox, const float theScale)
 {
   QStack<JTData_NodePtr> aStack;
 
@@ -539,7 +527,7 @@ void JTData_SceneGraph::Clear()
 // function : EstimateMemoryUsed
 // purpose  :
 // =======================================================================
-Standard_Integer JTData_SceneGraph::EstimateMemoryUsed() const
+int JTData_SceneGraph::EstimateMemoryUsed() const
 {
   JTData_InstanceMap aMap;
 

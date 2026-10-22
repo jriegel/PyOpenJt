@@ -48,21 +48,21 @@ public:
 public:
 
   //! Returns total number of triangles.
-  virtual Standard_Integer Size() const;
+  virtual int Size() const;
 
   //! Returns AABB of entire set of objects.
   using BVH_PrimitiveSet<T, N>::Box;
 
   //! Returns AABB of the given triangle.
-  virtual BVH_Box<T, N> Box (const Standard_Integer theIndex) const;
+  virtual BVH_Box<T, N> Box (const int theIndex) const;
 
   //! Returns centroid position along the given axis.
-  virtual T Center (const Standard_Integer theIndex,
-                    const Standard_Integer theAxis) const;
+  virtual T Center (const int theIndex,
+                    const int theAxis) const;
 
   //! Performs transposing the two given triangles in the set.
-  virtual void Swap (const Standard_Integer theIndex1,
-                     const Standard_Integer theIndex2);
+  virtual void Swap (const int theIndex1,
+                     const int theIndex2);
 
 public:
 

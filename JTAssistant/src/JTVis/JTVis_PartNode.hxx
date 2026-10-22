@@ -80,40 +80,40 @@ public:
   //! Sets material of the mesh node.
   void SetMaterial (const JTData_MaterialAttribute& theMaterial)
   {
-    Standard_Integer anOffset = 0;
+    int anOffset = 0;
 
-    for (Standard_Integer anIdx = 0; anIdx < 4; ++anIdx)
+    for (int anIdx = 0; anIdx < 4; ++anIdx)
       myMaterial[anOffset++] = theMaterial.AmbientColor()[anIdx];
 
-    for (Standard_Integer anIdx = 0; anIdx < 4; ++anIdx)
+    for (int anIdx = 0; anIdx < 4; ++anIdx)
       myMaterial[anOffset++] = theMaterial.DiffuseColor()[anIdx];
 
-    for (Standard_Integer anIdx = 0; anIdx < 3; ++anIdx)
+    for (int anIdx = 0; anIdx < 3; ++anIdx)
       myMaterial[anOffset++] = theMaterial.SpecularColor()[anIdx];
 
     myMaterial[anOffset] = theMaterial.Shininess();
   }
 
   //! Returns serialized material parameters.
-  inline const Standard_ShortReal* Material() const
+  inline const float* Material() const
   {
     return myMaterial + 0;
   }
 
   //! Returns ambient color.
-  inline const Standard_ShortReal* AmbientColor() const
+  inline const float* AmbientColor() const
   {
     return myMaterial + 0;
   }
 
   //! Returns diffuse color.
-  inline const Standard_ShortReal* DiffuseColor() const
+  inline const float* DiffuseColor() const
   {
     return myMaterial + 4;
   }
 
   //! Returns specular color.
-  inline const Standard_ShortReal* SpecularColor() const
+  inline const float* SpecularColor() const
   {
     return myMaterial + 8;
   }
@@ -140,7 +140,7 @@ private:
   Eigen::Matrix4f myTransform;         //!< Transformation matrix of part.
   Eigen::Matrix4f myTransformInversed; //!< Inversed transformation matrix of part.
 
-  Standard_ShortReal myMaterial[12];   //!< Serialized material of the mesh node.
+  float myMaterial[12];   //!< Serialized material of the mesh node.
 
 public:
 

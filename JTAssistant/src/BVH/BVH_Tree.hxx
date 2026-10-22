@@ -17,7 +17,6 @@
 #ifndef _BVH_Tree_Header
 #define _BVH_Tree_Header
 
-#include <Standard_Type.hxx>
 
 #include <BVH_Box.hxx>
 
@@ -49,121 +48,121 @@ public:
   }
 
   //! Returns minimum point of the given node.
-  BVH_VecNt& MinPoint (const Standard_Integer theNodeIndex)
+  BVH_VecNt& MinPoint (const int theNodeIndex)
   {
     return BVH::Array<T, N>::ChangeValue (myMinPointBuffer, theNodeIndex);
   }
 
   //! Returns maximum point of the given node.
-  BVH_VecNt& MaxPoint (const Standard_Integer theNodeIndex)
+  BVH_VecNt& MaxPoint (const int theNodeIndex)
   {
     return BVH::Array<T, N>::ChangeValue (myMaxPointBuffer, theNodeIndex);
   }
 
   //! Returns minimum point of the given node.
-  const BVH_VecNt& MinPoint (const Standard_Integer theNodeIndex) const
+  const BVH_VecNt& MinPoint (const int theNodeIndex) const
   {
     return BVH::Array<T, N>::Value (myMinPointBuffer, theNodeIndex);
   }
 
   //! Returns maximum point of the given node.
-  const BVH_VecNt& MaxPoint (const Standard_Integer theNodeIndex) const
+  const BVH_VecNt& MaxPoint (const int theNodeIndex) const
   {
     return BVH::Array<T, N>::Value (myMaxPointBuffer, theNodeIndex);
   }
 
   //! Returns index of left child of the given inner node.
-  Standard_Integer& LeftChild (const Standard_Integer theNodeIndex)
+  int& LeftChild (const int theNodeIndex)
   {
-    return BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).y();
+    return BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).y();
   }
 
   //! Returns index of left child of the given inner node.
-  Standard_Integer LeftChild (const Standard_Integer theNodeIndex) const
+  int LeftChild (const int theNodeIndex) const
   {
-    return BVH::Array<Standard_Integer, 4>::Value (myNodeInfoBuffer, theNodeIndex).y();
+    return BVH::Array<int, 4>::Value (myNodeInfoBuffer, theNodeIndex).y();
   }
 
   //! Returns index of right child of the given inner node.
-  Standard_Integer& RightChild (const Standard_Integer theNodeIndex)
+  int& RightChild (const int theNodeIndex)
   {
-    return BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).z();
+    return BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).z();
   }
 
   //! Returns index of right child of the given inner node.
-  Standard_Integer RightChild (const Standard_Integer theNodeIndex) const
+  int RightChild (const int theNodeIndex) const
   {
-    return BVH::Array<Standard_Integer, 4>::Value (myNodeInfoBuffer, theNodeIndex).z();
+    return BVH::Array<int, 4>::Value (myNodeInfoBuffer, theNodeIndex).z();
   }
 
   //! Returns index of first primitive of the given leaf node.
-  Standard_Integer& BegPrimitive (const Standard_Integer theNodeIndex)
+  int& BegPrimitive (const int theNodeIndex)
   {
-    return BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).y();
+    return BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).y();
   }
 
   //! Returns index of first primitive of the given leaf node.
-  Standard_Integer BegPrimitive (const Standard_Integer theNodeIndex) const
+  int BegPrimitive (const int theNodeIndex) const
   {
-    return BVH::Array<Standard_Integer, 4>::Value (myNodeInfoBuffer, theNodeIndex).y();
+    return BVH::Array<int, 4>::Value (myNodeInfoBuffer, theNodeIndex).y();
   }
 
   //! Returns index of last primitive of the given leaf node.
-  Standard_Integer& EndPrimitive (const Standard_Integer theNodeIndex)
+  int& EndPrimitive (const int theNodeIndex)
   {
-    return BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).z();
+    return BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).z();
   }
 
   //! Returns index of last primitive of the given leaf node.
-  Standard_Integer EndPrimitive (const Standard_Integer theNodeIndex) const
+  int EndPrimitive (const int theNodeIndex) const
   {
-    return BVH::Array<Standard_Integer, 4>::Value (myNodeInfoBuffer, theNodeIndex).z();
+    return BVH::Array<int, 4>::Value (myNodeInfoBuffer, theNodeIndex).z();
   }
 
   //! Returns number of primitives for the given tree node.
-  Standard_Integer NbPrimitives (const Standard_Integer theNodeIndex) const
+  int NbPrimitives (const int theNodeIndex) const
   {
     return EndPrimitive (theNodeIndex) - BegPrimitive (theNodeIndex) + 1;
   }
 
   //! Returns level (depth) of the given node.
-  Standard_Integer& Level (const Standard_Integer theNodeIndex)
+  int& Level (const int theNodeIndex)
   {
-    return BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).w();
+    return BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).w();
   }
 
   //! Returns level (depth) of the given node.
-  Standard_Integer Level (const Standard_Integer theNodeIndex) const
+  int Level (const int theNodeIndex) const
   {
-    return BVH::Array<Standard_Integer, 4>::Value (myNodeInfoBuffer, theNodeIndex).w();
+    return BVH::Array<int, 4>::Value (myNodeInfoBuffer, theNodeIndex).w();
   }
 
   //! Is node a leaf (outer)?
-  Standard_Boolean IsOuter (const Standard_Integer theNodeIndex) const
+  bool IsOuter (const int theNodeIndex) const
   {
-    return BVH::Array<Standard_Integer, 4>::Value (myNodeInfoBuffer, theNodeIndex).x() > 0;
+    return BVH::Array<int, 4>::Value (myNodeInfoBuffer, theNodeIndex).x() > 0;
   }
 
   //! Sets node type to 'outer'.
-  void SetOuter (const Standard_Integer theNodeIndex)
+  void SetOuter (const int theNodeIndex)
   {
-    BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).x() = 1;
+    BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).x() = 1;
   }
 
   //! Sets node type to 'inner'.
-  void SetInner (const Standard_Integer theNodeIndex)
+  void SetInner (const int theNodeIndex)
   {
-    BVH::Array<Standard_Integer, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).x() = 0;
+    BVH::Array<int, 4>::ChangeValue (myNodeInfoBuffer, theNodeIndex).x() = 0;
   }
 
   //! Returns total number of BVH nodes.
-  Standard_Integer Length() const
+  int Length() const
   {
-    return BVH::Array<Standard_Integer, 4>::Size (myNodeInfoBuffer);
+    return BVH::Array<int, 4>::Size (myNodeInfoBuffer);
   }
 
   //! Returns depth of BVH tree from last build.
-  Standard_Integer Depth() const
+  int Depth() const
   {
     return myDepth;
   }
@@ -174,34 +173,34 @@ public:
   void Clear();
 
   //! Adds new leaf node to the BVH.
-  Standard_Integer AddLeafNode (const BVH_VecNt&       theMinPoint,
+  int AddLeafNode (const BVH_VecNt&       theMinPoint,
                                 const BVH_VecNt&       theMaxPoint,
-                                const Standard_Integer theBegElem,
-                                const Standard_Integer theEndElem);
+                                const int theBegElem,
+                                const int theEndElem);
 
   //! Adds new inner node to the BVH.
-  Standard_Integer AddInnerNode (const BVH_VecNt&       theMinPoint,
+  int AddInnerNode (const BVH_VecNt&       theMinPoint,
                                  const BVH_VecNt&       theMaxPoint,
-                                 const Standard_Integer theLftChild,
-                                 const Standard_Integer theRghChild);
+                                 const int theLftChild,
+                                 const int theRghChild);
 
   //! Adds new leaf node to the BVH.
-  Standard_Integer AddLeafNode (const BVH_Box<T, N>&   theAABB,
-                                const Standard_Integer theBegElem,
-                                const Standard_Integer theEndElem);
+  int AddLeafNode (const BVH_Box<T, N>&   theAABB,
+                                const int theBegElem,
+                                const int theEndElem);
 
   //! Adds new inner node to the BVH.
-  Standard_Integer AddInnerNode (const BVH_Box<T, N>&   theAABB,
-                                 const Standard_Integer theLftChild,
-                                 const Standard_Integer theRghChild);
+  int AddInnerNode (const BVH_Box<T, N>&   theAABB,
+                                 const int theLftChild,
+                                 const int theRghChild);
 
   //! Adds new leaf node to the BVH with UNINITIALIZED bounds.
-  Standard_Integer AddLeafNode (const Standard_Integer theBegElem,
-                                const Standard_Integer theEndElem);
+  int AddLeafNode (const int theBegElem,
+                                const int theEndElem);
 
   //! Adds new inner node to the BVH with UNINITIALIZED bounds.
-  Standard_Integer AddInnerNode (const Standard_Integer theLftChild,
-                                 const Standard_Integer theRghChild);
+  int AddInnerNode (const int theLftChild,
+                                 const int theRghChild);
 
   //! Returns value of SAH (surface area heuristic).
   //! Allows to compare the quality of BVH trees constructed for
@@ -258,7 +257,7 @@ protected:
   BVH_Array4i myNodeInfoBuffer;
 
   //! Depth of constructed tree.
-  Standard_Integer myDepth;
+  int myDepth;
 
 public:
 

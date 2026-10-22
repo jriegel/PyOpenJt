@@ -423,7 +423,7 @@ private:
 
   JTVis_PartGeometryAggregator myPartAggregator; //!< Part geometry aggregator object.
 
-  Standard_Integer mySmallPartTreshold; //!< Threshold to consider part as "small".
+  int mySmallPartTreshold; //!< Threshold to consider part as "small".
                                         //!< Used to determine possibility of myPartAggregator utilizing 
                                         //!< for given PartGeometry.
 

@@ -25,7 +25,7 @@ BVH_PrimitiveSet<T, N>::BVH_PrimitiveSet()
 : myBVH (new BVH_Tree<T, N>())
 {
   // Set default builder - binned SAH split
-  myBuilder = new BVH_BinnedBuilder<T, N, 48> (5, 32);
+  myBuilder = std::make_shared<BVH_BinnedBuilder<T, N, 48> > (5, 32);
 }
 
 // =======================================================================
@@ -35,8 +35,8 @@ BVH_PrimitiveSet<T, N>::BVH_PrimitiveSet()
 template<class T, int N>
 BVH_PrimitiveSet<T, N>::~BVH_PrimitiveSet()
 {
-  myBVH.Nullify();
-  myBuilder.Nullify();
+  myBVH.reset();
+  myBuilder.reset();
 }
 
 // =======================================================================
@@ -44,7 +44,7 @@ BVH_PrimitiveSet<T, N>::~BVH_PrimitiveSet()
 // purpose  :
 // =======================================================================
 template<class T, int N>
-const NCollection_Handle<BVH_Tree<T, N> >& BVH_PrimitiveSet<T, N>::BVH()
+const std::shared_ptr<BVH_Tree<T, N> >& BVH_PrimitiveSet<T, N>::BVH()
 {
   if (BVH_Object<T, N>::myIsDirty)
   {
@@ -83,7 +83,7 @@ void BVH_PrimitiveSet<T, N>::Update()
   }
 
   myBuilder->Build (this, myBVH.operator->(), Box());
-  BVH_Object<T, N>::myIsDirty = Standard_False;
+  BVH_Object<T, N>::myIsDirty = false;
 }
 
 // =======================================================================
@@ -91,7 +91,7 @@ void BVH_PrimitiveSet<T, N>::Update()
 // purpose  :
 // =======================================================================
 template<class T, int N>
-const NCollection_Handle<BVH_Builder<T, N> >& BVH_PrimitiveSet<T, N>::Builder() const
+const std::shared_ptr<BVH_Builder<T, N> >& BVH_PrimitiveSet<T, N>::Builder() const
 {
   return myBuilder;
 }
@@ -101,7 +101,7 @@ const NCollection_Handle<BVH_Builder<T, N> >& BVH_PrimitiveSet<T, N>::Builder() 
 // purpose  :
 // =======================================================================
 template<class T, int N>
-void BVH_PrimitiveSet<T, N>::SetBuilder (NCollection_Handle<BVH_Builder<T, N> >& theBuilder)
+void BVH_PrimitiveSet<T, N>::SetBuilder (std::shared_ptr<BVH_Builder<T, N> >& theBuilder)
 {
   myBuilder = theBuilder;
 }

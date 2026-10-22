@@ -32,13 +32,13 @@
 #include <JtNode_Group.hxx>
 #include <JtNode_Partition.hxx>
 
-#include <NCollection_IndexedDataMap.hxx>
+#include <unordered_map>
 
 #include "../../ToolsLib/src/JtLayer.h"
 
 
 //! Data map to store instanced mesh triangulation sources.
-typedef NCollection_IndexedDataMap<Handle(JtData_Object), JTData_MeshNodeSourcePtr> JTData_MeshSources;
+typedef std::unordered_map<std::shared_ptr<JtData_Object>, JTData_MeshNodeSourcePtr> JTData_MeshSources;
 
 Q_DECLARE_METATYPE (JTData_NodePtr)
 
@@ -65,19 +65,19 @@ public:
   }
 
   //! Extracts scene graph from JT data model.
-  Standard_Boolean Init (const Handle(JtData_Model)& theModel, const QString& theFileName);
+  bool Init (const std::shared_ptr<JtData_Model>& theModel, const QString& theFileName);
 
   //! Extracts scene graph from JT data model.
-  Standard_Boolean Init (const Handle(JtNode_Partition)& thePartitionRecord, JTData_PartitionNode* thePartition);
+  bool Init (const std::shared_ptr<JtNode_Partition>& thePartitionRecord, JTData_PartitionNode* thePartition);
 
   //! Generates ranges for LODs based on scene bounding box.
-  void GenerateRanges (const JTCommon_AABB& theGlobalBox, const Standard_ShortReal theScale = 1.f);
+  void GenerateRanges (const JTCommon_AABB& theGlobalBox, const float theScale = 1.f);
 
   //! Clears data of scene graph.
   void Clear();
 
   //! Returns estimated memory consumption in bytes.
-  virtual Standard_Integer EstimateMemoryUsed() const;
+  virtual int EstimateMemoryUsed() const;
 
   //! Returns reference to object mapping nodes to TreeWidget items.
   const QMap<JTData_Node*, QTreeWidgetItem*>& NodeToItemMap() { return myNodeToItemMap; }
@@ -88,11 +88,11 @@ public:
 protected:
 
   //! Creates new scene graph node from JT reader node.
-  JTData_NodePtr PushNode (const Handle(JtNode_Base)& theNodeRecord, const QString& thePrefix);
+  JTData_NodePtr PushNode (const std::shared_ptr<JtNode_Base>& theNodeRecord, const QString& thePrefix);
 
   //! Fills children for specified group node of the scene graph.
   void FillGroup (const JTData_GroupNodePtr& theGroupNode,
-    const Handle(JtNode_Group)& theGroupRecord, const QString& thePrefix);
+    const std::shared_ptr<JtNode_Group>& theGroupRecord, const QString& thePrefix);
 
 protected:
 

@@ -22,7 +22,6 @@
 #include <QString>
 #pragma warning (pop)
 
-#include <Standard_Version.hxx>
 
 #include "JTData_Node.hxx"
 #include "JTData_SceneGraph.hxx"
@@ -43,7 +42,7 @@ public:
 public:
 
   //! Initialized geometry source from specified file.
-  Standard_Boolean Init (const QString& theFileName);
+  bool Init (const QString& theFileName);
 
   //! Returns logical scene graph.
   JTData_SceneGraph* SceneGraph()
@@ -51,15 +50,13 @@ public:
     return mySceneGraph;
   }
 
-  static const char* OcctVersion() { return OCC_VERSION_COMPLETE; }
-
 protected:
 
   //! Loads specified partition.
-  Standard_Boolean LoadPartition (JTData_PartitionNode* thePartition);
+  bool LoadPartition (JTData_PartitionNode* thePartition);
 
   //! Loads external partitions and connect it to LSG.
-  Standard_Boolean LoadExternalPartitions();
+  bool LoadExternalPartitions();
 
 protected:
 
@@ -67,7 +64,7 @@ protected:
   JTData_SceneGraph* mySceneGraph;
 
   //! Loaded JT data models for given file names.
-  QMap<QString, Handle(JtNode_Partition)> myMap;
+  QMap<QString, std::shared_ptr<JtNode_Partition>> myMap;
 
 public:
 

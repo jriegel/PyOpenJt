@@ -42,13 +42,13 @@ public:
 public:
 
   //! Returns element ignore flag.
-  inline Standard_Boolean IsIgnored() const
+  inline bool IsIgnored() const
   {
     return myIsIgnored;
   }
 
   //! Sets element ignore flag.
-  inline void SetIgnored (const Standard_Boolean theIsIgnored)
+  inline void SetIgnored (const bool theIsIgnored)
   {
     myIsIgnored = theIsIgnored;
   }
@@ -68,7 +68,7 @@ public:
 protected:
 
   //! Marks that element should be ignored by traversing algorithms.
-  Standard_Boolean myIsIgnored;
+  bool myIsIgnored;
 
   //! Indicates state of the JT object (used by service sub-routines).
   JtData_State myState;

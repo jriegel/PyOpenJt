@@ -35,13 +35,13 @@ public:
   BVH_Box() : 
       myMinPoint (BVH_VecNt::Zero()),
       myMaxPoint (BVH_VecNt::Zero()),
-      myIsInited (Standard_False)  {}
+      myIsInited (false)  {}
 
   //! Creates bounding box of given point.
   BVH_Box (const BVH_VecNt& thePoint)
   : myMinPoint (thePoint),
     myMaxPoint (thePoint),
-    myIsInited (Standard_True) {}
+    myIsInited (true) {}
 
   //! Creates copy of another bounding box.
   BVH_Box (const BVH_Box& theBox)
@@ -54,7 +54,7 @@ public:
            const BVH_VecNt& theMaxPoint)
   : myMinPoint (theMinPoint),
     myMaxPoint (theMaxPoint),
-    myIsInited (Standard_True) {}
+    myIsInited (true) {}
 
 public:
 
@@ -62,7 +62,7 @@ public:
   void Clear();
 
   //! Is bounding box valid?
-  Standard_Boolean IsValid() const;
+  bool IsValid() const;
 
   //! Appends new point to the bounding box.
   void Add (const BVH_VecNt& thePoint);
@@ -92,13 +92,13 @@ public:
   BVH_VecNt Center() const;
 
   //! Returns center of bounding box along the given axis.
-  T Center (const Standard_Integer theAxis) const;
+  T Center (const int theAxis) const;
 
 protected:
 
   BVH_VecNt        myMinPoint; //!< Minimum point of bounding box
   BVH_VecNt        myMaxPoint; //!< Maximum point of bounding box
-  Standard_Boolean myIsInited; //!< Is bounding box initialized?
+  bool myIsInited; //!< Is bounding box initialized?
 
 public:
 
@@ -120,7 +120,7 @@ namespace BVH
   template<class T>
   struct CenterAxis<T, 2>
   {
-    static T Center (const BVH_Box<T, 2>& theBox, const Standard_Integer theAxis)
+    static T Center (const BVH_Box<T, 2>& theBox, const int theAxis)
     {
       if (theAxis == 0)
       {
@@ -137,7 +137,7 @@ namespace BVH
   template<class T>
   struct CenterAxis<T, 3>
   {
-    static T Center (const BVH_Box<T, 3>& theBox, const Standard_Integer theAxis)
+    static T Center (const BVH_Box<T, 3>& theBox, const int theAxis)
     {
       if (theAxis == 0)
       {
@@ -158,7 +158,7 @@ namespace BVH
   template<class T>
   struct CenterAxis<T, 4>
   {
-    static T Center (const BVH_Box<T, 4>& theBox, const Standard_Integer theAxis)
+    static T Center (const BVH_Box<T, 4>& theBox, const int theAxis)
     {
       if (theAxis == 0)
       {
@@ -227,16 +227,16 @@ namespace BVH
 
     static void CwiseMin (BVH_VecNt& theVec1, const BVH_VecNt& theVec2)
     {
-      theVec1.x() = Min (theVec1.x(), theVec2.x());
-      theVec1.y() = Min (theVec1.y(), theVec2.y());
-      theVec1.z() = Min (theVec1.z(), theVec2.z());
+      theVec1.x() = std::min (theVec1.x(), theVec2.x());
+      theVec1.y() = std::min (theVec1.y(), theVec2.y());
+      theVec1.z() = std::min (theVec1.z(), theVec2.z());
     }
 
     static void CwiseMax (BVH_VecNt& theVec1, const BVH_VecNt& theVec2)
     {
-      theVec1.x() = Max (theVec1.x(), theVec2.x());
-      theVec1.y() = Max (theVec1.y(), theVec2.y());
-      theVec1.z() = Max (theVec1.z(), theVec2.z());
+      theVec1.x() = std::max (theVec1.x(), theVec2.x());
+      theVec1.y() = std::max (theVec1.y(), theVec2.y());
+      theVec1.z() = std::max (theVec1.z(), theVec2.z());
     }
   };
 
@@ -247,14 +247,14 @@ namespace BVH
 
     static void CwiseMin (BVH_VecNt& theVec1, const BVH_VecNt& theVec2)
     {
-      theVec1.x() = Min (theVec1.x(), theVec2.x());
-      theVec1.y() = Min (theVec1.y(), theVec2.y());
+      theVec1.x() = std::min (theVec1.x(), theVec2.x());
+      theVec1.y() = std::min (theVec1.y(), theVec2.y());
     }
 
     static void CwiseMax (BVH_VecNt& theVec1, const BVH_VecNt& theVec2)
     {
-      theVec1.x() = Max (theVec1.x(), theVec2.x());
-      theVec1.y() = Max (theVec1.y(), theVec2.y());
+      theVec1.x() = std::max (theVec1.x(), theVec2.x());
+      theVec1.y() = std::max (theVec1.y(), theVec2.y());
     }
   };
 }

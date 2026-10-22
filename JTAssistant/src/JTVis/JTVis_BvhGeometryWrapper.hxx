@@ -34,7 +34,7 @@ struct JTVis_Intersection
 //! Helper structure to handle intersections of frustum with BVH-tree.
 struct JTVis_FrustumIntersection
 {
-  std::vector<Standard_Integer> Elements; //!< Intersected objects.
+  std::vector<int> Elements; //!< Intersected objects.
 };
 
 typedef BVH_Box<float, 4> BVH_Box4f;

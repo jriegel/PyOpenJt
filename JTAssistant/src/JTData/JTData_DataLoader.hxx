@@ -56,7 +56,7 @@ public:
   }
 
   //! Creates new work-item for loading triangulation data.
-  JTData_WorkItem (const Handle(JtProperty_LateLoaded)& theLateLoaded, QObject* theFeedback)
+  JTData_WorkItem (const std::shared_ptr<JtProperty_LateLoaded>& theLateLoaded, QObject* theFeedback)
     : QObject (NULL),
       myLateLoaded (theLateLoaded),
       myFeedback   (theFeedback)
@@ -82,16 +82,16 @@ public:
   }
 
   //! Returns late-loaded object.
-  const Handle(JtProperty_LateLoaded)& LateLoaded() const
+  const std::shared_ptr<JtProperty_LateLoaded>& LateLoaded() const
   {
     return myLateLoaded;
   }
 
   //! Perform loading shape triangulation data from JT file.
-  Standard_Boolean Perform();
+  bool Perform();
 
   //! Checks to see if two work-items are identical.
-  Standard_Boolean IsEqual (const JTData_WorkItem& theItem) const
+  bool IsEqual (const JTData_WorkItem& theItem) const
   {
     return myLateLoaded == theItem.myLateLoaded;
   }
@@ -103,7 +103,7 @@ signals:
 
 protected:
 
-  Handle(JtProperty_LateLoaded) myLateLoaded; //!< Shape node to load.
+  std::shared_ptr<JtProperty_LateLoaded> myLateLoaded; //!< Shape node to load.
   QObject* myFeedback;                        //!< Pointer to scene for update feedback.
 
 };
@@ -125,7 +125,7 @@ public:
 public:
 
   //! Returns size of the loading queue.
-  Standard_Integer Size();
+  int Size();
 
   //! Fetches work-item from the loading queue.
   JTData_WorkItem Fetch();
@@ -134,7 +134,7 @@ public:
   void Enqueue (const JTData_WorkItem& theQuery);
 
   //! Checks if specific work-item is in loading queue.
-  Standard_Boolean Enqueued (const JTData_WorkItem& theQuery);
+  bool Enqueued (const JTData_WorkItem& theQuery);
 
 signals:
 
@@ -143,7 +143,7 @@ signals:
 protected:
 
   //! Set of loading tasks.
-  QSet<const Standard_Transient*> mySet;
+  QSet<const JtData_Object*> mySet;
 
   //! Queue of loading tasks.
   QList<JTData_WorkItem> myQueue;

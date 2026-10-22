@@ -208,7 +208,7 @@ JTVis_PartGeometryAggregator::JTVis_PartGeometryAggregator()
 // purpose  :
 //=======================================================================
 void JTVis_PartGeometryAggregator::Initialize (QOpenGLShaderProgram* theProgram,
-                                               Standard_Integer theMaxSize)
+                                               int theMaxSize)
 {
   myVertexCount  = 0;
 

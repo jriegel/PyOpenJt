@@ -27,13 +27,13 @@ public:
 
   //! Sorts the set by centroids coordinates in specified axis.
   static void Perform (BVH_Set<T, N>*         theSet,
-                       const Standard_Integer theAxis);
+                       const int theAxis);
 
   //! Sorts the set by centroids coordinates in specified axis.
   static void Perform (BVH_Set<T, N>*         theSet,
-                       const Standard_Integer theAxis,
-                       const Standard_Integer theBegElement,
-                       const Standard_Integer theEndElement);
+                       const int theAxis,
+                       const int theBegElement,
+                       const int theEndElement);
 
 };
 

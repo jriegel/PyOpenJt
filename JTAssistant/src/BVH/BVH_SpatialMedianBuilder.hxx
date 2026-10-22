@@ -26,8 +26,8 @@ class BVH_SpatialMedianBuilder : public BVH_BinnedBuilder<T, N, 2>
 public:
 
   //! Creates spatial median split builder.
-  BVH_SpatialMedianBuilder (const Standard_Integer theLeafNodeSize = 5,
-                            const Standard_Integer theMaxTreeDepth = 32);
+  BVH_SpatialMedianBuilder (const int theLeafNodeSize = 5,
+                            const int theMaxTreeDepth = 32);
 
   //! Releases resources of spatial median split builder.
   virtual ~BVH_SpatialMedianBuilder();

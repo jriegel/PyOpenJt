@@ -23,7 +23,7 @@ namespace
 {
 
   //! The maximum positive float value.
-  const Standard_Real THE_MAX_VAL = std::numeric_limits<float>::max();
+  const double THE_MAX_VAL = std::numeric_limits<float>::max();
 
   //! The 'small' (safe for inversion) 4F vector of floats.
   const BVH_Vec4f THE_MIN_VEC (1e-10f, 1e-10f, 1e-10f, 1e-10f);
@@ -56,11 +56,11 @@ JTVis_PartBvhObject::~JTVis_PartBvhObject()
 // =======================================================================
 BVH_Box4f JTVis_PartBvhObject::Box() const
 {
-  if (Properties().IsNull())
+  if (!Properties())
     return myBox;
 
-  const BVH_Transform<Standard_ShortReal, 4>* aTransform =
-    dynamic_cast<const BVH_Transform<Standard_ShortReal, 4>* > (Properties().operator->());
+  const BVH_Transform<float, 4>* aTransform =
+    dynamic_cast<const BVH_Transform<float, 4>* > (Properties().operator->());
 
   if (aTransform)
   {
@@ -115,7 +115,7 @@ void JTVis_BvhTraverser::Traverse (const JTVis_Frustum&       theFrustum,
                                    BVH_Geometry<float, 4>&    theBvhGeometry,
                                    const bool                 isOrthographic)
 {
-  const NCollection_Handle<BVH_Tree<float, 4> >& aBVH = theBvhGeometry.BVH();
+  const std::shared_ptr<BVH_Tree<float, 4> >& aBVH = theBvhGeometry.BVH();
 
   int aStack[32];
   signed short aHead = -1;
@@ -123,7 +123,7 @@ void JTVis_BvhTraverser::Traverse (const JTVis_Frustum&       theFrustum,
   int aNode = 0; // root node
 
   theElements.Elements.clear();
-  if (aBVH.IsNull()
+  if (!aBVH
    || aBVH->Length() == 0)
   {
     return;

@@ -19,7 +19,6 @@
 
 #include <BVH_Box.hxx>
 
-#include <Standard_Macro.hxx>
 
 //! Abstract properties of geometric object.
 class BVH_Properties
@@ -27,7 +26,7 @@ class BVH_Properties
 public:
 
   //! Releases resources of object properties.
-  Standard_EXPORT virtual ~BVH_Properties() = 0;
+   virtual ~BVH_Properties() = 0;
 
 };
 

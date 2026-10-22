@@ -14,7 +14,7 @@
 // Copy of the GNU General Public License is in LICENSE.txt and  
 // on <http://www.gnu.org/licenses/>.
 
-#include <Standard_ShortReal.hxx>
+#include <cfloat>
 
 // =======================================================================
 // function : Clear
@@ -23,7 +23,7 @@
 template<class T, int N>
 void BVH_Box<T, N>::Clear()
 {
-  myIsInited = Standard_False;
+  myIsInited = false;
 }
 
 // =======================================================================
@@ -31,7 +31,7 @@ void BVH_Box<T, N>::Clear()
 // purpose  :
 // =======================================================================
 template<class T, int N>
-Standard_Boolean BVH_Box<T, N>::IsValid() const
+bool BVH_Box<T, N>::IsValid() const
 {
   return myIsInited;
 }
@@ -48,7 +48,7 @@ void BVH_Box<T, N>::Add (const BVH_VecNt& thePoint)
     myMinPoint = thePoint;
     myMaxPoint = thePoint;
 
-    myIsInited = Standard_True;
+    myIsInited = true;
   }
   else
   {
@@ -71,7 +71,7 @@ void BVH_Box<T, N>::Combine (const BVH_Box& theBox)
       myMinPoint = theBox.myMinPoint;
       myMaxPoint = theBox.myMaxPoint;
 
-      myIsInited = Standard_True;
+      myIsInited = true;
     }
     else
     {
@@ -157,7 +157,7 @@ typename BVH_Box<T, N>::BVH_VecNt BVH_Box<T, N>::Center() const
 // purpose  :
 // =======================================================================
 template<class T, int N>
-T BVH_Box<T, N>::Center (const Standard_Integer theAxis) const
+T BVH_Box<T, N>::Center (const int theAxis) const
 {
   return BVH::CenterAxis<T, N>::Center (*this, theAxis);
 }
