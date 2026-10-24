@@ -241,7 +241,7 @@ bool JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
     if (theReader.Model()->MajorVersion() > 7)
     {
       Jt_I16 aVersion;
-      if (!theReader.ReadI16 (aVersion))
+      if (!theReader.ReadVersion (aVersion))
         return false;
     }
 
@@ -257,14 +257,37 @@ bool JtElement_ShapeLOD_Vertex::readVertexShapeLODData (
     Jt_I16 aMeshVersion;
     Jt_I32 aTriID;
     Jt_I16 aVersion4;
-    if (!JtElement_ShapeLOD_Base::Read (theReader)
-     || !theReader.ReadI16 (aVersion)
+    if (theReader.Model()->MajorVersion() >= 10)
+    {
+      // JT 10.x layout: topologically compressed LOD version, then the topo mesh LOD data
+      if (!JtElement_ShapeLOD_Base::Read (theReader)
+       || !theReader.ReadVersion (aVersion)
+       || !aVertexBinding.Read (theReader)
+       || !theReader.ReadVersion (aVersion4)
+       || !theReader.ReadVersion (aMeshVersion)
+       || !theReader.ReadI32 (aTriID))
+        return false;
+    }
+    else if (!JtElement_ShapeLOD_Base::Read (theReader)
+     || !theReader.ReadVersion (aVersion)
      || !aVertexBinding.Read (theReader)
-     || !theReader.ReadI16 (aMeshVersion)
+     || !theReader.ReadVersion (aMeshVersion)
      || !theReader.ReadI32 (aTriID)
-     || !theReader.ReadI16 (aVersion4))
+     || !theReader.ReadVersion (aVersion4))
     {
       return false;
+    }
+
+    if (theReader.Model()->MajorVersion() >= 10 && theIsTriStripSet)
+    {
+      // 10.x embeds a 25-byte logical element header (GUID, flag, id) before the rep data
+      static const uint8_t THE_GUID[16] = {0x30, 0xf8, 0x4c, 0xbe, 0xbc, 0x4f, 0x9b, 0x5f,
+                                         0xb9, 0x26, 0x92, 0x78, 0xd2, 0xe1, 0x09, 0x01};
+      uint8_t aBuf[16];
+      if (!theReader.ReadBytes (aBuf, 16)
+       || memcmp (aBuf, THE_GUID, 16) != 0
+       || !theReader.Skip (9))
+        return false;
     }
 
     if (theIsTriStripSet)
@@ -296,7 +319,7 @@ bool JtElement_ShapeLOD_Vertex::readVertexBasedShapeCompressedRepData (JtData_Re
   Jt_I16 aVersionNumber;
   Jt_U8 aNormalBinding, aTextCoordBinding, aColorBinding;
   QuantizationParams aQuantParam;
-  if (!theReader.ReadI16 (aVersionNumber)
+  if (!theReader.ReadVersion (aVersionNumber)
    || !theReader.ReadU8  (aNormalBinding)
    || !theReader.ReadU8  (aTextCoordBinding)
    || !theReader.ReadU8  (aColorBinding)
@@ -492,9 +515,7 @@ bool JtElement_ShapeLOD_Vertex::readTopologicallyCompressedData (JtData_Reader& 
   if (!aVertexBindings.Read (theReader)
    || !aQuantParam.Read     (theReader)
    || !theReader.ReadI32 (aNumberOfVert))
-  {
     return false;
-  }
 
   if (aNumberOfVert == 0)
     return true;

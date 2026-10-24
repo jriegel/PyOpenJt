@@ -66,9 +66,10 @@ namespace
 }
 
 JtDecode_VertexData_Deering::JtDecode_VertexData_Deering (const Jt_U8      theNbBits,
-                                                          JtDecode_Unpack& theUnpacker)
-  : JtDecode_VertexData (4, theUnpacker)
-  , myNbBits (theNbBits) {}
+                                                          JtDecode_Unpack& theUnpacker,
+                                                          const size_t theNbPackages)
+  : JtDecode_VertexData (theNbPackages, theUnpacker)
+  , myNbBits (theNbBits), myNbPkg (theNbPackages) {}
 
 int JtDecode_VertexData_Deering::getOutCompCount (size_t)
 {
@@ -78,21 +79,46 @@ int JtDecode_VertexData_Deering::getOutCompCount (size_t)
 void JtDecode_VertexData_Deering::decode (Decoded::Ref theResults)
 {
   Jt_VecU32 aSextantCodes, anOctantCodes, aThetaCodes, aPsiCodes;
+  Jt_VecI32 aPacked;
 
-  JtData_Parallel::TaskGroup aDecodeTasks;
-  aDecodeTasks.Run (getDecodingFunctor (0, aSextantCodes));
-  aDecodeTasks.Run (getDecodingFunctor (1, anOctantCodes));
-  aDecodeTasks.Run (getDecodingFunctor (2, aThetaCodes));
-  aDecodeTasks.Run (getDecodingFunctor (3, aPsiCodes));
-  aDecodeTasks.Wait();
+  if (myNbPkg == 1)
+  {
+    // JT 10.x: one package with sextant, octant, theta and psi packed into a single code
+    aPacked = Jt_VecI32 (decodePackage (0));
+  }
+  else
+  {
+    JtData_Parallel::TaskGroup aDecodeTasks;
+    aDecodeTasks.Run (getDecodingFunctor (0, aSextantCodes));
+    aDecodeTasks.Run (getDecodingFunctor (1, anOctantCodes));
+    aDecodeTasks.Run (getDecodingFunctor (2, aThetaCodes));
+    aDecodeTasks.Run (getDecodingFunctor (3, aPsiCodes));
+    aDecodeTasks.Wait();
+  }
 
+  const Jt_U32 aMask = (1u << myNbBits) - 1;
   int anOffset = TABLE_BITS - myNbBits;
   for (Decoded::SizeType i = 0; i < theResults.Count(); ++i)
   {
-    Jt_U32 aSextant = aSextantCodes[i];
+    Jt_U32 aSextant, anOctantCode, aThetaCode, aPsiCode;
+    if (myNbPkg == 1)
+    {
+      const Jt_U32 aCode = static_cast<Jt_U32>(aPacked[i]);
+      aPsiCode     = aCode & aMask;
+      aThetaCode   = (aCode >> myNbBits) & aMask;
+      anOctantCode = (aCode >> (2 * myNbBits)) & 7;
+      aSextant     = (aCode >> (2 * myNbBits + 3)) & 7;
+    }
+    else
+    {
+      aSextant     = aSextantCodes[i];
+      anOctantCode = anOctantCodes[i];
+      aThetaCode   = aThetaCodes[i];
+      aPsiCode     = aPsiCodes[i];
+    }
 
-    const SinCos& aThetaPar = LOOKUP_TABLE.Theta[(aThetaCodes[i] + (aSextant & 1)) << anOffset];
-    const SinCos& aPsiPar   = LOOKUP_TABLE.Psi  [ aPsiCodes  [i]                   << anOffset];
+    const SinCos& aThetaPar = LOOKUP_TABLE.Theta[(aThetaCode + (aSextant & 1)) << anOffset];
+    const SinCos& aPsiPar   = LOOKUP_TABLE.Psi  [ aPsiCode                      << anOffset];
 
     Jt_F32 x = static_cast <Jt_F32> (aPsiPar.Cos * aThetaPar.Cos);
     Jt_F32 y = static_cast <Jt_F32> (aPsiPar.Sin);
@@ -141,7 +167,7 @@ void JtDecode_VertexData_Deering::decode (Decoded::Ref theResults)
     }
 
     // Change some more based on the octant
-    Jt_U32 anOctant = anOctantCodes[i];
+    Jt_U32 anOctant = anOctantCode;
 
     // if first bit is 0, negate x component
     if ((anOctant & 4) == 0)

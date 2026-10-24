@@ -35,7 +35,7 @@ bool JtElement_ShapeLOD_Base::Read (JtData_Reader& theReader)
     return true;
 
   Jt_I16 aVersion;
-  return theReader.ReadI16 (aVersion);
+  return theReader.ReadVersion (aVersion);
 }
 
 //=======================================================================

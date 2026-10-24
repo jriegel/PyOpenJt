@@ -57,7 +57,7 @@ bool JtElement_ProxyMetaData::Read (JtData_Reader& theReader)
   keyValueStream.clear();
 
   Jt_U16 aVersion;
-  theReader.ReadU16(aVersion);
+  theReader.ReadVersion(aVersion);
 
   theReader.ReadMbString(Key);
 

@@ -33,7 +33,7 @@ bool JtNode_Instance::Read (JtData_Reader& theReader)
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (aVersion))
+  && !theReader.ReadVersion (aVersion))
     return false;
 
   return JtData_DeferredObject::Read (theReader, myObject);

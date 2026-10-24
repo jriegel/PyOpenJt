@@ -34,6 +34,14 @@ bool JtNode_Shape_Vertex::Read (JtData_Reader &theReader)
 
   Jt_I16 aVersion = 1;
 
+  if (theReader.Model()->MajorVersion() >= 10)
+  {
+    // JT 10.x: version and vertex binding only, no quantization parameters
+    JtElement_ShapeLOD_Vertex::VertexBinding2 aVertexBinding;
+    return theReader.ReadVersion (aVersion)
+        && aVertexBinding.Read (theReader);
+  }
+
   if (theReader.Model()->MajorVersion() < 9)
   {
     Jt_I32 aNormalBinding;

@@ -18,11 +18,76 @@
 
 void JtDecode_Int32CDP_Bitlength2::decode (int32_t* theResultPtr, int32_t* theResultEnd)
 {
+  if (myIsV10)
+  {
+    decodeV10 (theResultPtr, theResultEnd);
+    return;
+  }
+
   // Analyze the variable-width tag
   if (ReadBit())
     decodeVariableWidth (theResultPtr, theResultEnd);
   else
     decodeFixedWidth    (theResultPtr, theResultEnd);
+}
+
+int32_t JtDecode_Int32CDP_Bitlength2::nibblerGet()
+{
+  int32_t aResult = 0;
+  int aNibbles = 0;
+  unsigned aMore;
+  do
+  {
+    uint32_t aTmp = ReadU32 (4);
+    aResult |= (int32_t)(aTmp << (aNibbles * 4));
+    aMore = ReadU32 (1);
+    aNibbles++;
+  }
+  while (aMore != 0 && aNibbles < 8);
+
+  int aWidth = aNibbles * 4;
+  if (aWidth < 32)
+  {
+    aResult = (int32_t)((uint32_t)aResult << (32 - aWidth)) >> (32 - aWidth);
+  }
+  return aResult;
+}
+
+void JtDecode_Int32CDP_Bitlength2::decodeV10 (int32_t* theResultPtr, int32_t* theResultEnd)
+{
+  if (ReadBit() == 0)
+  {
+    int32_t aMin = nibblerGet();
+    int32_t aMax = nibblerGet();
+    int32_t aSpan = aMax - aMin;
+    unsigned aWidth = 0;
+    for (; aSpan != 0; aSpan = (int32_t)((uint32_t)aSpan >> 1))
+      aWidth++;
+
+    while (theResultPtr < theResultEnd)
+      *theResultPtr++ = (aWidth ? (int32_t)ReadU32 (aWidth) : 0) + aMin;
+    return;
+  }
+
+  int32_t aMean = nibblerGet();
+  unsigned aFieldWidth = 0;
+  while (theResultPtr < theResultEnd)
+  {
+    int aChange;
+    do
+    {
+      aChange = ReadI32 (4);
+      aFieldWidth += aChange;
+    }
+    while (aChange == -8 || aChange == 7);
+
+    uint32_t aRunLen = ReadU32 (4);
+    int32_t* aRunEnd = theResultPtr + aRunLen;
+    if (aRunEnd > theResultEnd)
+      aRunEnd = theResultEnd;
+    while (theResultPtr < aRunEnd)
+      *theResultPtr++ = (aFieldWidth > 0 ? ReadI32 (aFieldWidth) : 0) + aMean;
+  }
 }
 
 void JtDecode_Int32CDP_Bitlength2::decodeFixedWidth (int32_t* theResultPtr, int32_t* theResultEnd)

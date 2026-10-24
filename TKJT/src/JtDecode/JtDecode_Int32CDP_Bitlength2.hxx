@@ -25,9 +25,18 @@ class JtDecode_Int32CDP_Bitlength2 : public JtDecode_Int32CDP_Bits
 public:
 
   //! Initialize the bitlength 2 dedoder by reader.
-  JtDecode_Int32CDP_Bitlength2 (JtData_Reader& theReader) : JtDecode_Int32CDP_Bits (theReader) {}
+  JtDecode_Int32CDP_Bitlength2 (JtData_Reader& theReader, bool theIsV10 = false)
+    : JtDecode_Int32CDP_Bits (theReader), myIsV10 (theIsV10) {}
 
 protected:
+
+  //! Nibble-encoded signed integer (JT 10.x).
+  int32_t nibblerGet();
+
+  TKJT_EXPORT void decodeV10 (int32_t* theResultPtr, int32_t* theResultEnd);
+
+  bool myIsV10;
+
 
   //! Decode the data.
   TKJT_EXPORT void decode (int32_t* theResultPtr, int32_t* theResultEnd) override;

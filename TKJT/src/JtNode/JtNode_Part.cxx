@@ -30,7 +30,7 @@ bool JtNode_Part::Read (JtData_Reader& theReader)
   Jt_I16 aVersion;
   Jt_I32 aReserved;
   return JtNode_MetaData::Read (theReader)
-      && theReader.ReadI16 (aVersion)
+      && theReader.ReadVersion (aVersion)
       && theReader.ReadI32 (aReserved);
 }
 

@@ -18,6 +18,7 @@ REFERENCES = ROOT / "Data" / "Reference"
 DEFAULT_FILES = [
     "example_block_jt8.1.jt",
     "example_block_jt9.5.jt",
+    "example_block_jt10.3.jt",
     "opening_protection_plate1_jt8.0.jt",
     "opening_protection_plate1_jt9.5.jt",
 ]

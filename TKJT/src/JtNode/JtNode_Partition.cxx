@@ -30,7 +30,9 @@ bool JtNode_Partition::Read (JtData_Reader& theReader)
   myModel = theReader.Model();
 
   Jt_I32 aFlags;
+  Jt_I16 aPartitionVersion;
   if (!JtNode_Group::Read     (theReader)
+   || (theReader.Model()->MajorVersion() >= 10 && !theReader.ReadVersion (aPartitionVersion))
    || !theReader.ReadI32      (aFlags)
    || !theReader.ReadMbString (myFileName))
   {
@@ -55,7 +57,9 @@ bool JtNode_Partition::Read (JtData_Reader& theReader)
     return false;
   }
 
+  // JT 10.x files set the flag but do not store the additional box
   if (hasUntransformedBndBox
+   && theReader.Model()->MajorVersion() < 10
    && !theReader.ReadUniformStruct<Jt_F32> (aBBox))
   {
     return false;

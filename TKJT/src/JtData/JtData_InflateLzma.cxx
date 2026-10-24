@@ -1,5 +1,5 @@
 // JT format reading and visualization tools
-// Copyright (C) 2024 Jürgen Riegel
+// Copyright (C) 2024 Jï¿½rgen Riegel
 // 
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -195,7 +195,7 @@ size_t JtData_InflateLzma::read (uint8_t* theBuffer, size_t theLength)
 		// getting more output it must have successfully
 		// decoded everything.
 		if (ret == LZMA_STREAM_END)
-			return true;
+			return theLength - myZStream.avail_out;
 
 		// It's not LZMA_OK nor LZMA_STREAM_END,
 		// so it must be an error code. See lzma/base.h

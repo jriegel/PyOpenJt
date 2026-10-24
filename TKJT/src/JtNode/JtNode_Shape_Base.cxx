@@ -32,8 +32,20 @@ bool JtNode_Shape_Base::Read (JtData_Reader& theReader)
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (aVersion))
+  && !theReader.ReadVersion (aVersion))
     return false;
+
+  if (theReader.Model()->MajorVersion() >= 10)
+  {
+    // JT 10.x stores a single bounding box
+    return theReader.ReadUniformStruct<Jt_F32> (myReservedBnd)
+        && theReader.ReadF32   (myArea)
+        && theReader.ReadArray (myVertexRange)
+        && theReader.ReadArray (myNodeRange)
+        && theReader.ReadArray (myPolyRange)
+        && theReader.ReadI32   (mySize)
+        && theReader.ReadF32   (myCompression);
+  }
 
   return theReader.ReadUniformStruct<Jt_F32> (myReservedBnd)
       && theReader.ReadUniformStruct<Jt_F32> (myUntransBnd)

@@ -32,7 +32,7 @@ bool JtProperty_LateLoaded::Read (JtData_Reader& theReader)
 
   Jt_I16 aVersion;
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (aVersion))
+  && !theReader.ReadVersion (aVersion))
     return false;
 
   Jt_GUID aGUID;
@@ -48,11 +48,12 @@ bool JtProperty_LateLoaded::Read (JtData_Reader& theReader)
   if (theReader.Model()->MajorVersion() > 8)
   {
     Jt_I32 aPayloadObjectID, aReserved;
-    if (!theReader.ReadI32 (aPayloadObjectID)
-     || !theReader.ReadI32 (aReserved))
-    {
+    if (!theReader.ReadI32 (aPayloadObjectID))
       return false;
-    }
+    // the reserved field is not stored in JT 10.x
+    if (theReader.Model()->MajorVersion() < 10
+     && !theReader.ReadI32 (aReserved))
+      return false;
   }
 
   mySegModel = theReader.Model()->FindSegment (aGUID, mySegOffset);

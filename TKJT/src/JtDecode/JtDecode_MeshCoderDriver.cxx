@@ -1198,6 +1198,11 @@ JtDecode_MeshCoderDriver::LoadInputData (JtData_Reader& theReader)
   JtData_VectorRef<JtDecode_Int32CDP> aVectorRef (*aData);
   for (size_t i = 0; i < aVectorRef.Count(); i++)
   {
+    // JT 10.x stores a single Face Attribute Mask 8 array instead of the 30-bit and 4-bit pair
+    if (&aVectorRef[i] == &aData->_faceAttributeMask8_4
+     && theReader.Model()->MajorVersion() >= 10)
+      continue;
+
     if (!aVectorRef[i].Load2 (theReader))
       return nullptr;
   }
@@ -1393,8 +1398,12 @@ int64_t JtDecode_MeshCoderDriver::_nextAttrMaskSymbol (int32_t iCCntx)
 
   if (iCCntx == 7)
   {
-    eSym |= (((int64_t) _faceAttributeMask8_4 [readpos]) << 30) +
-            (((int64_t) _faceAttributeMask8_30[readpos]) << 30);
+    int64_t aHigh = 0;
+    if (readpos < _faceAttributeMask8_4.Count())
+      aHigh += ((int64_t) _faceAttributeMask8_4[readpos]) << 30;
+    if (readpos < _faceAttributeMask8_30.Count())
+      aHigh += ((int64_t) _faceAttributeMask8_30[readpos]) << 30;
+    eSym |= aHigh;
   }
   
   _iAttrMaskReadPos[iCCntx]++;

@@ -36,4 +36,18 @@ protected:
   TKJT_EXPORT void decode (Decoded::Ref theResults) override;
 };
 
+//! Decoder for JT 10.x raw float data: one package per component holding the float bit patterns.
+class JtDecode_VertexData_RawFloat : public JtDecode_VertexData
+{
+public:
+  //! Constructor.
+  TKJT_EXPORT JtDecode_VertexData_RawFloat (
+    const size_t theNbComponents,
+    JtDecode_Unpack& theUnpacker = JtDecode_Unpack_Null);
+
+protected:
+  TKJT_EXPORT int getOutCompCount (size_t thePackageCount) override;
+  TKJT_EXPORT void decode (Decoded::Ref theResults) override;
+};
+
 #endif

@@ -57,6 +57,8 @@ JtDecode_VertexData::Ptr JtDecode_VertexData::LoadCompressedCoords (JtData_Reade
   Ptr aData;
   if (aQuantizerData.X.bits)
     aData = std::make_unique<JtDecode_VertexData_Quantized>(aQuantizerData, aNbComponents, JtDecode_Unpack_Lag1);
+  else if (theReader.Model()->MajorVersion() >= 10)
+    aData = std::make_unique<JtDecode_VertexData_RawFloat>(aNbComponents, JtDecode_Unpack_Lag1);
   else
     aData = std::make_unique<JtDecode_VertexData_ExpMant>(aNbComponents, JtDecode_Unpack_Lag1);
 
@@ -107,7 +109,10 @@ JtDecode_VertexData::Ptr JtDecode_VertexData::LoadCompressedNormals (JtData_Read
   // Create decoder object
   Ptr aData;
   if (aNbBits)
-    aData = std::make_unique<JtDecode_VertexData_Deering>(aNbBits);
+    aData = std::make_unique<JtDecode_VertexData_Deering>(aNbBits, JtDecode_Unpack_Null,
+      theReader.Model()->MajorVersion() >= 10 ? (size_t)1 : (size_t)4);
+  else if (theReader.Model()->MajorVersion() >= 10)
+    aData = std::make_unique<JtDecode_VertexData_RawFloat>(aNbComponents);
   else
     aData = std::make_unique<JtDecode_VertexData_ExpMant>(aNbComponents);
 

@@ -26,7 +26,8 @@ public:
   //! Constructor.
   TKJT_EXPORT JtDecode_VertexData_Deering (
     const Jt_U8 theNbBits,
-    JtDecode_Unpack& theUnpacker = JtDecode_Unpack_Null);
+    JtDecode_Unpack& theUnpacker = JtDecode_Unpack_Null,
+    const size_t theNbPackages = 4);
 
 protected:
   //! Get expected count of output components.
@@ -36,6 +37,7 @@ protected:
   TKJT_EXPORT void decode (Decoded::Ref theResults) override;
 
   Jt_U8 myNbBits;
+  size_t myNbPkg;
 };
 
 #endif

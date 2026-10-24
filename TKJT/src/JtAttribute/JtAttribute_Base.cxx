@@ -37,11 +37,19 @@ bool JtAttribute_Base::Read (JtData_Reader& theReader)
     return false;
 
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (myVersion))
+  && !theReader.ReadVersion (myVersion))
     return false;
 
-  return theReader.ReadU8  (myStateFlags)
-      && theReader.ReadU32 (myFieldInhibitFlags);
+  if (!theReader.ReadU8  (myStateFlags)
+   || !theReader.ReadU32 (myFieldInhibitFlags))
+    return false;
+
+  if (theReader.Model()->MajorVersion() >= 10)
+  {
+    Jt_U32 aFieldFinalFlags;
+    return theReader.ReadU32 (aFieldFinalFlags);
+  }
+  return true;
 }
 
 //=======================================================================

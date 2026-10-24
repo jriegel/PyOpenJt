@@ -32,7 +32,7 @@ bool JtNode_RangeLOD::Read (JtData_Reader& theReader)
 
   myVersion = 0;
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (myVersion))
+  && !theReader.ReadVersion (myVersion))
     return false;
 
   return theReader.ReadVec          <Jt_F32> (myVecR)

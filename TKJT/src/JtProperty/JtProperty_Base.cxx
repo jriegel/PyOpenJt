@@ -39,7 +39,7 @@ bool JtProperty_Base::Read (JtData_Reader& theReader)
     return false;
 
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (myVersion))
+  && !theReader.ReadVersion (myVersion))
     return false;
 
   return theReader.ReadU32 (myStateFlags);

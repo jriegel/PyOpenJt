@@ -48,6 +48,9 @@ public:
   //! Read the probability table for Mark II codec.
   bool ReadMk2   (JtDecode_BitReader::Raw& theReader);
 
+  //! Read the probability table for Mark II codec in JT 10.x layout.
+  bool ReadMk3   (JtDecode_BitReader::Raw& theReader);
+
   //! Fetch the entry.
   const Entry& operator[] (size_t theIndex) const { return myEntries[theIndex]; }
 
@@ -56,6 +59,15 @@ public:
 
   //! Return total number of symbols.
   unsigned TotalCount() const { return myTotalCount; }
+
+  //! Return true if the context contains the escape symbol (out-of-band values follow).
+  bool HasEscape() const
+  {
+    for (size_t i = 0; i < myEntries.Count(); i++)
+      if (myEntries[i].symbol == -2)
+        return true;
+    return false;
+  }
 
 protected:
 

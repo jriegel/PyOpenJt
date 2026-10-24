@@ -248,6 +248,25 @@ public:
   bool ReadU16(int &theValue) { return ReadValue(Jt_U16(), theValue); }
   bool ReadU16(size_t &theValue) { return ReadValue(Jt_U16(), theValue); }
   bool ReadI16(int &theValue) { return ReadValue(Jt_I16(), theValue); }
+
+  //! Element version numbers are I16 up to JT 9.x and U8 starting with JT 10.x
+  template <class Type>
+  bool ReadVersion(Type &theValue)
+  {
+    if (Model()->MajorVersion() >= 10)
+    {
+      Jt_U8 aValue;
+      if (!ReadU8(aValue))
+        return false;
+      theValue = static_cast<Type>(aValue);
+      return true;
+    }
+    Jt_I16 aValue;
+    if (!ReadI16(aValue))
+      return false;
+    theValue = static_cast<Type>(aValue);
+    return true;
+  }
   bool ReadF32(double &theValue) { return ReadValue(Jt_F32(), theValue); }
 
   // Abstract reading of basic JT data types

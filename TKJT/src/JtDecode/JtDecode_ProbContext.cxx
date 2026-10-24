@@ -47,6 +47,39 @@ bool JtDecode_ProbContextI32::ReadMk2 (JtDecode_BitReader::Raw& theReader)
   return read (theReader, 16, 6, 6, 6, 0, 32);
 }
 
+bool JtDecode_ProbContextI32::ReadMk3 (JtDecode_BitReader::Raw& theReader)
+{
+  // JT 10.x layout: no symbol field, entries start with an escape flag bit
+  if (!theReader.Load (16 + 6 + 7 + 32))
+    return false;
+
+  unsigned anEntryCount = theReader.ReadU32 (16);
+  unsigned aOccBits     = theReader.ReadU32 (6);
+  unsigned aValBits     = theReader.ReadU32 (7);
+  int32_t  aMinValue    = theReader.ReadI32 (32);
+
+  if (aOccBits > 32 || aValBits > 32
+   || !theReader.Load (anEntryCount * (1 + aOccBits + aValBits)))
+    return false;
+
+  myEntries.Allocate (anEntryCount);
+  myTotalCount = 0;
+
+  for (size_t i = 0; i < anEntryCount; i++)
+  {
+    Entry& anEntry = myEntries[i];
+
+    anEntry.symbol          = theReader.ReadU32 (1) ? -2 : 0;
+    anEntry.occCount        = theReader.ReadU32Or0 (aOccBits);
+    anEntry.associatedValue = theReader.ReadU32Or0 (aValBits) + aMinValue;
+    anEntry.nextContext     = 0;
+
+    myTotalCount += anEntry.occCount;
+  }
+
+  return true;
+}
+
 bool JtDecode_ProbContextI32::read (JtDecode_BitReader::Raw& theReader,
                                                 const unsigned theEntryCountWidth,
                                                 const unsigned theSymBitsNumWidth,

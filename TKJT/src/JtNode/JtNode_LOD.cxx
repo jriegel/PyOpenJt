@@ -32,8 +32,12 @@ bool JtNode_LOD::Read (JtData_Reader& theReader)
 
   myVersion = 0;
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (myVersion))
+  && !theReader.ReadVersion (myVersion))
     return false;
+
+  // JT 10.x LOD nodes no longer store the reserved fields
+  if (theReader.Model()->MajorVersion() >= 10)
+    return true;
 
   Jt_VecF32 aReservedVec;
   Jt_F32    aReservedVal;

@@ -61,7 +61,7 @@ bool JtAttribute_Material::Read (JtData_Reader& theReader)
     return false;
 
   if (theReader.Model()->MajorVersion() > 8
-  && !theReader.ReadI16 (myVersion))
+  && !theReader.ReadVersion (myVersion))
     return false;
 
   if (!theReader.ReadU16 (myDataFlags)
@@ -71,6 +71,20 @@ bool JtAttribute_Material::Read (JtData_Reader& theReader)
    || !readColor (theReader, myEmissionColor, (myDataFlags & 9) == 9)
    || !theReader.ReadF32 (myShininess))
     return false;
+
+  if (theReader.Model()->MajorVersion() >= 10)
+  {
+    Jt_F32 aBumpiness;
+    if (!theReader.ReadF32 (myReflectivity)
+     || !theReader.ReadF32 (aBumpiness))
+      return false;
+    if (myVersion >= 2)
+    {
+      Jt_U32 aPaletteIndex;
+      return theReader.ReadU32 (aPaletteIndex);
+    }
+    return true;
+  }
 
   if (myVersion == 2
   && !theReader.ReadF32 (myReflectivity))

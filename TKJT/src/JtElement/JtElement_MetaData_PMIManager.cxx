@@ -330,6 +330,11 @@ public:
 
   bool ReadObject (JtElement_MetaData_PMIManager& theData)
   {
+    // The JT 10.x PMI Manager layout differs and is not implemented yet:
+    // the rest of the element data is skipped by the element reader.
+    if (Model()->MajorVersion() >= 10)
+      return true;
+
     // Read additional version if JT version is 9.x or higher
     if (Model()->MajorVersion() > 8)
     {

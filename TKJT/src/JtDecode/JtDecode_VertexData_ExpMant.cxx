@@ -45,3 +45,24 @@ void JtDecode_VertexData_ExpMant::decode (Decoded::Ref theResults)
     }
   }
 }
+
+JtDecode_VertexData_RawFloat::JtDecode_VertexData_RawFloat (const size_t theNbComponents,
+                                                            JtDecode_Unpack& theUnpacker)
+  : JtDecode_VertexData (theNbComponents, theUnpacker) {}
+
+int JtDecode_VertexData_RawFloat::getOutCompCount (size_t thePackageCount)
+{
+  return static_cast<int>(thePackageCount);
+}
+
+void JtDecode_VertexData_RawFloat::decode (Decoded::Ref theResults)
+{
+  for (Decoded::CompCountType j = 0; j < theResults.CompCount(); j++)
+  {
+    Jt_VecU32 aBits;
+    getDecodingFunctor (j, aBits)();
+
+    for (Decoded::SizeType i = 0; i < theResults.Count(); i++)
+      reinterpret_cast <uint32_t&> (theResults[i][j]) = aBits[i];
+  }
+}

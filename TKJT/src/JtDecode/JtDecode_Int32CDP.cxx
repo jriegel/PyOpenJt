@@ -190,7 +190,7 @@ JtDecode_Int32CDP::EncodedDataPtr JtDecode_Int32CDP::loadCDP2 (JtData_Reader& th
   switch (aCodec)
   {
   case 1: // Bitlength codec
-    aData = std::make_unique<JtDecode_Int32CDP_Bitlength2>(theReader);
+    aData = std::make_unique<JtDecode_Int32CDP_Bitlength2>(theReader, theReader.Model()->MajorVersion() >= 10);
     break;
 
   case 3: // Arithmetic codec
@@ -213,20 +213,26 @@ JtDecode_Int32CDP::EncodedDataPtr JtDecode_Int32CDP::loadCDP2 (JtData_Reader& th
   if (aCodec == 3)
   {
     // read probability context
+    const bool aIsV10 = theReader.Model()->MajorVersion() >= 10;
     JtData_Vector<JtDecode_ProbContextI32> aProbContexts (1);
     {
       JtDecode_BitReader::Raw aContextReader (theReader);
-      if (!aProbContexts[0].ReadMk2 (aContextReader))
+      if (aIsV10 ? !aProbContexts[0].ReadMk3 (aContextReader)
+                 : !aProbContexts[0].ReadMk2 (aContextReader))
         return EncodedDataPtr();
     }
+    const bool aHasEscape = !aIsV10 || aProbContexts[0].HasEscape();
     aData->SetProbContexts (aProbContexts.Move());
 
-    // load out-of-band data
-    JtDecode_Int32CDP anOOBData;
-    if (!anOOBData.Load2 (theReader))
-      return EncodedDataPtr();
+    // load out-of-band data (in 10.x only present if the context has an escape symbol)
+    if (aHasEscape)
+    {
+      JtDecode_Int32CDP anOOBData;
+      if (!anOOBData.Load2 (theReader))
+        return EncodedDataPtr();
 
-    aData->SetOOBData (std::move (anOOBData));
+      aData->SetOOBData (std::move (anOOBData));
+    }
   }
 
   return aData;
