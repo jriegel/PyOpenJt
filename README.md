@@ -37,6 +37,10 @@ Used fixes and improvements from following forks
 * https://github.com/wwmayer/TKJT
 * https://github.com/pgibertini/oce-jt
 
+Used the Voyager Project of Tobias Musin to fix JT 10.x import:
+* https://github.com/TobiasMusin/Voyager
+
+
 Huge thanks to [OpenCascade Company](https://dev.opencascade.org/) for publishing TKJT and JTAssistand. And also thanks to [cbsghost](https://github.com/cbsghost), [mmaenz](https://github.com/mmaenz), [wwmayer](https://github.com/wwmayer) and [pgibertini](https://github.com/pgibertini) for
 caring the code through time. 
   
@@ -50,7 +54,7 @@ caring the code through time.
 - [x] Jt Mesh to USD Mesh-Definition converter
 - [ ] Building Python Test-Cases with corner case Jts
 - [ ] Python PLMXML parser
-- [ ] Upgrade TKJT to Jt 10.5 specification 
+- [x] Upgrade TKJT to Jt 10.5 specification 
 - [ ] PyPI Package
 - [x] Remove OpenCascade dependency 
 
