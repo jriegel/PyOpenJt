@@ -37,8 +37,8 @@ bool JtNode_Shape_Base::Read (JtData_Reader& theReader)
 
   if (theReader.Model()->MajorVersion() >= 10)
   {
-    // JT 10.x stores a single bounding box
-    return theReader.ReadUniformStruct<Jt_F32> (myReservedBnd)
+    // JT 10.x stores a single (untransformed) bounding box
+    return theReader.ReadUniformStruct<Jt_F32> (myUntransBnd)
         && theReader.ReadF32   (myArea)
         && theReader.ReadArray (myVertexRange)
         && theReader.ReadArray (myNodeRange)
