@@ -20,6 +20,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <codecvt>
+#include <locale>
 #include <string>
 
 

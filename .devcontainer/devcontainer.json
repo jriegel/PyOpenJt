@@ -1,0 +1,20 @@
+{
+  "name": "PyOpenJt (Linux, manylinux_2_28)",
+  "build": {
+    "dockerfile": "../Docker/Dockerfile",
+    "context": "..",
+    "target": "dev"
+  },
+  "remoteEnv": {
+    "LD_LIBRARY_PATH": "${containerWorkspaceFolder}/build/wheel/vcpkg_installed/x64-linux-dynamic/lib"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cmake-tools",
+        "ms-vscode.cpptools",
+        "ms-python.python"
+      ]
+    }
+  }
+}

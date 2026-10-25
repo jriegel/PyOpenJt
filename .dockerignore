@@ -1,0 +1,9 @@
+.git
+WinBuild
+build
+dist
+Documents
+*.log
+**/__pycache__
+Data/ExampleFiles/fmsr_*
+Data/ExampleFiles/*.gltf
